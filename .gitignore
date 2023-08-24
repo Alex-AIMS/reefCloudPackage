@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+*pptx
+*docx
+*.Rproj
+GBR/
+Palau/
+Data/
