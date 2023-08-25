@@ -2,19 +2,16 @@
 % Please edit documentation in R/loadRData.R
 \name{loadRData}
 \alias{loadRData}
-\title{Function}
+\title{loadRData}
 \usage{
 loadRData(fileName)
 }
 \arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
+\item{fileName}{.RData file name}
 }
 \description{
-Description
+Reads RData, and assigns a name
 }
 \examples{
-examples 
+loadRData(".RData")
 }

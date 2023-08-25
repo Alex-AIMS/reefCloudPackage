@@ -1,9 +1,8 @@
-
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 ReefCloud__add_status <- function(stage, item, label, status, update_display = TRUE) {
     STATUS[[stage]]$items <- c(STATUS[[stage]]$items, item)

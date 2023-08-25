@@ -7,14 +7,17 @@
 ReefCloud_startMatter(args = commandArgs())
 }
 \arguments{
-\item{parameters}{description}
+\item{args}{command line arguments (defaults commandArgs())}
 }
 \value{
 returned arguments description
 }
 \description{
-Description
+The following function is a wrapper around a number of routines
+that occur once at the start of an analysis run. In order, these routines are:
+- initialise a status list.  This list is the basis of information presented in the command line interface.
+- initialise the log file
 }
 \examples{
-examples 
+ReefCloud_startMatter(args = c("--bucket=/home/data/AUS", "--domain=tier", "--by_tier=4", "--debug=true", "--runStage=1", "--refresh_data=false"))
 }

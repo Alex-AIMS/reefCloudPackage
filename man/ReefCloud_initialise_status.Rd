@@ -2,19 +2,23 @@
 % Please edit documentation in R/ReefCloud_initialise_status.R
 \name{ReefCloud_initialise_status}
 \alias{ReefCloud_initialise_status}
-\title{Function}
+\title{ReefCloud_initialise_status}
 \usage{
 ReefCloud_initialise_status()
-}
-\arguments{
-\item{parameters}{description}
 }
 \value{
 returned arguments description
 }
 \description{
-Description
+The following function provides a list used to report run status  and progress. The list itself comprises
+ - top level items represent the major status items that form
+   status categories
+ - within each list there are four items:
+    - title:  a title to use in the status
+    - items:  a vector of object names
+    - labels: a vector of human readable labels to associate with objects
+    - status: the status of the item (determines symbol)
 }
 \examples{
-examples 
+examples
 }

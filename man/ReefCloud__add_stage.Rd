@@ -2,19 +2,21 @@
 % Please edit documentation in R/ReefCloud__add_stage.R
 \name{ReefCloud__add_stage}
 \alias{ReefCloud__add_stage}
-\title{Function}
+\title{ReefCloud__add_stage}
 \usage{
 ReefCloud__add_stage(stage, title)
 }
 \arguments{
-\item{parameters}{description}
+\item{stage}{stage id (integer)}
+
+\item{title}{name of stage (character)}
 }
 \value{
-returned arguments description
+The global variable STATUS is modified
 }
 \description{
-Description
+Adds stage to STATUS global variable
 }
 \examples{
-examples 
+examples
 }
