@@ -22,7 +22,7 @@ ReefCloud_meshINLA_tier_sub <- function(FOCAL_TIER, TIER, tier5.sf) {
   tier5_sub.sf <- tier5.sf %>%
     filter(Tier5 %in% Tier5_levels)
   tier5_sub.sf <- tier5_sub.sf %>%
-    st_buffer(ReefCloud_fraction_of_bbox(st_bbox(.), frac = 0.25)) %>%
+    st_buffer(reefCloudPackage::ReefCloud_fraction_of_bbox(st_bbox(.), frac = 0.25)) %>%
     st_union()
   tier5_buffer.sf <- tier5.sf %>% st_intersection(tier5_sub.sf)
 

@@ -11,13 +11,13 @@ ReefCloud__remove_predicates <- function(update_display = TRUE) {
             if (!is.na(STATUS[[i]]$predicate[j]) &
                 exists(STATUS[[i]]$predicate[j])) { 
                 if (is.null(get(STATUS[[i]]$predicate[j]))) next
-                if (ReefCloud__compare_predicates(
+                if (reefCloudPackage::ReefCloud__compare_predicates(
                     get(STATUS[[i]]$predicate[j]),
                     STATUS[[i]]$predicate_value[j]))
-                    ReefCloud__remove_status(i, STATUS[[i]]$items[j])
+                    reefCloudPackage::ReefCloud__remove_status(i, STATUS[[i]]$items[j])
             }
             
         }
     }
-    if (DEBUG_MODE & update_display) ReefCloud_openingBanner()
+    if (DEBUG_MODE & update_display) reefCloudPackage::ReefCloud_openingBanner()
 }

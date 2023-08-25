@@ -6,7 +6,7 @@
 #' @examples examples 
 #' @export
 ReefCloud_make_tiers_figures <- function(tier.sf) {
-    tier2.sf <- loadRData(file = paste0(DATA_PATH, "primary/tier2.sf.RData"))
+    tier2.sf <- reefCloudPackage::loadRData(file = paste0(DATA_PATH, "primary/tier2.sf.RData"))
     coast <- rnaturalearth::ne_coastline(returnclass = "sf", scale='medium') %>% st_make_valid()
     land <- rnaturalearth::ne_countries(returnclass = "sf", scale='medium') %>% st_make_valid()
 

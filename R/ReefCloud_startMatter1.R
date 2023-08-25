@@ -79,13 +79,13 @@ ReefCloud_startMatter1 <- function(){
             ## perform any configurations (mainly creating directories if they dont exist)
             source('ReefCloud_config.R')
 
-            ReefCloud_openingBanner()
+            reefCloudPackage::ReefCloud_openingBanner()
             
-            ReefCloud_log('INFO',  logFile = LOG_FILE, '--Modelling routines--',
+            reefCloudPackage::ReefCloud_log('INFO',  logFile = LOG_FILE, '--Modelling routines--',
                           msg = paste0('Running script WITH command line args'))
             ## load all packages and quit if any are missing
-            missing <- ReefCloud_checkPackages()
-            ReefCloud_log(ifelse(missing=="", 'FAILURE', 'SUCCESS'), logFile = LOG_FILE,
+            missing <- reefCloudPackage::ReefCloud_checkPackages()
+            reefCloudPackage::ReefCloud_log(ifelse(missing=="", 'FAILURE', 'SUCCESS'), logFile = LOG_FILE,
                           Category = '--Starting matter--',
                           msg = 'Checking that all necessary packages are available')
             if(missing=="") {

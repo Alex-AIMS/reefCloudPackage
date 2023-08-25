@@ -31,22 +31,22 @@ ReefCloud_openingBanner <- function() {
         box.margins*2    # add the left and right margin
     
     ## Outer box (top)
-    top <- ReefCloud__outerBox.top(box.width, settings.box.width)
+    top <- reefCloudPackage::ReefCloud__outerBox.top(box.width, settings.box.width)
 
     ## Settings box
-    settings.box.text <- ReefCloud__settingsBox(settings = STATUS$SETTINGS,
+    settings.box.text <- reefCloudPackage::ReefCloud__settingsBox(settings = STATUS$SETTINGS,
                                      box.width = settings.box.width,
                                      box.nchar = settings.box.nchar,
                                      box.margins = box.margins,
                                      currentTime,
                                      max.settings.width)
     ## Main box
-    main.box.text <- ReefCloud__mainBox(settings.box.text,
+    main.box.text <- reefCloudPackage::ReefCloud__mainBox(settings.box.text,
                                   box.width,
                                   settings.box.width,
                                   box.margins)
     ## Outer box (bottom)
-    bottom <- ReefCloud__outerBox.bottom(box.width, settings.box.width)
+    bottom <- reefCloudPackage::ReefCloud__outerBox.bottom(box.width, settings.box.width)
 
     ## Combine boxes
     combined.boxes.text <- ReefCloud__combinedBoxes(
@@ -61,6 +61,6 @@ ReefCloud_openingBanner <- function() {
     cat(combined.boxes.text)
 
     ## log box
-    log.box <- ReefCloud__logBox(box.width, box.margins)
+    log.box <- reefCloudPackage::ReefCloud__logBox(box.width, box.margins)
     cat(log.box) 
 }

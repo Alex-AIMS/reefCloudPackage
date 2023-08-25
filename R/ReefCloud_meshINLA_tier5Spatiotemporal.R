@@ -15,7 +15,7 @@ ReefCloud_meshINLA_tier5Spatiotemporal <- function(tier5.sf, cellmeans.full) {
               CI = coda::HPDinterval(coda::as.mcmc(value))) %>%
     mutate(lower = CI[,1], upper = CI[,2]) %>%
     dplyr::select(-CI) %>%
-    ## ReefCloud_mean_median_hdci(value) %>%
+    ## reefCloudPackage::ReefCloud_mean_median_hdci(value) %>%
     left_join(tier5.sf) %>%
     st_as_sf() %>%
     ungroup() %>%

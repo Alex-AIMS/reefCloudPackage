@@ -22,7 +22,7 @@ ReefCloud_meshINLA_tier2TemporalFocal <- function(cellmeans.full.tier2) {
     mutate(Tier2 = forcats::fct_reorder(Tier2, Latitude, min)) %>%
     group_by(fYEAR, Tier2) %>%
     mutate(value = plogis(value)) %>%
-    ReefCloud_mean_median_hdci(value) %>%
+    reefCloudPackage::ReefCloud_mean_median_hdci(value) %>%
     suppressMessages() %>%
     suppressWarnings()
   saveRDS(list(cellmeans.tier2.sum=cellmeans.tier2.sum, data = data.sub),

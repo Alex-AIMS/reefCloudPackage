@@ -26,7 +26,7 @@ ReefCloud_simpleINLA_tier5 <- function(data.sub, GROUP, TIER, .data, .data.fit.c
 
   cellmeans.tier5 <- cellmeans %>%
     group_by(fYEAR, Tier4, Tier5) %>%
-    ReefCloud_mean_median_hdci(value) %>%
+    reefCloudPackage::ReefCloud_mean_median_hdci(value) %>%
     ungroup
 
   cellmeans.tier5.sf <-

@@ -13,20 +13,20 @@ ReefCloud_cellmeans <- function(data.sub, GROUP, TIER, FOCAL_TIER) {
     ## ---- RawMeans
     {
       cli::cli_progress_bar("Raw cellmeans", type = "iterator", total = 4, clear = TRUE)
-      ReefCloud_log('INFO', logFile = LOG_FILE,
+      reefCloudPackage::ReefCloud_log('INFO', logFile = LOG_FILE,
                     Category = '--Modelling (Raw means)--',
                     msg = paste0(DOMAIN_NAME, ": ", GROUP, ", Tier: ", TIER, " Raw cellmeans calculated"))
 
-      ReefCloud_cellmeans_temporal(data.sub, GROUP, TIER)
+      reefCloudPackage::ReefCloud_cellmeans_temporal(data.sub, GROUP, TIER)
       cli::cli_progress_update(inc = 1, set = 1, force = TRUE)
 
-      ReefCloud_cellmeans_spatiotemporal(data.sub, GROUP, TIER)
+      reefCloudPackage::ReefCloud_cellmeans_spatiotemporal(data.sub, GROUP, TIER)
       cli::cli_progress_update(inc = 1, set = 2, force = TRUE)
 
-      ReefCloud_cellmeans_spatiotemporal_tier4(data.sub, GROUP, TIER)
+      reefCloudPackage::ReefCloud_cellmeans_spatiotemporal_tier4(data.sub, GROUP, TIER)
       cli::cli_progress_update(inc = 1, set = 3, force = TRUE)
 
-      ReefCloud_cellmeans_spatiotemporal_tier3(data.sub, GROUP, TIER)
+      reefCloudPackage::ReefCloud_cellmeans_spatiotemporal_tier3(data.sub, GROUP, TIER)
       cli::cli_progress_update(inc = 1, set = 4, force = TRUE)
     }
     ## ----end

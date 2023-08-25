@@ -8,6 +8,6 @@
 ReefCloud__change_status <- function(stage, item, status, update_display = TRUE) {
     STATUS[[stage]]$status[which(STATUS[[stage]]$item == item)] <- status
     assign("STATUS", STATUS, env = globalenv())
-    if (exists("DATA_PATH")) ReefCloud__save_status()
-    if (update_display) ReefCloud_openingBanner()
+    if (exists("DATA_PATH")) reefCloudPackage::ReefCloud__save_status()
+    if (update_display) reefCloudPackage::ReefCloud_openingBanner()
 }

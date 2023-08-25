@@ -11,38 +11,38 @@ ReefCloud_meshINLA <- function(data.sub, tier5.sf, tier5_buffer.list, FOCAL_TIER
   ReefCloud_tryCatch({
       cli::cli_progress_bar("SPDE INLA cellmeans", type = "iterator", total = 10, clear = TRUE)
       ##full.grid, full.coords
-      full.grid.list <- ReefCloud_meshINLA_full_grid(data.sub, tier5_buffer.sf)
+      full.grid.list <- reefCloudPackage::ReefCloud_meshINLA_full_grid(data.sub, tier5_buffer.sf)
       cli::cli_progress_update(force=TRUE)
 
       ##data.grid, coords - NOTE - DATA ASSIGNED LAT/LONG OF TIER5 GRID
-      obs.grid.list <- ReefCloud_meshINLA_obs_grid(data.sub, tier5.sf, tier5_buffer.sf)
+      obs.grid.list <- reefCloudPackage::ReefCloud_meshINLA_obs_grid(data.sub, tier5.sf, tier5_buffer.sf)
       cli::cli_progress_update(force=TRUE)
 
       ## Newdata is just the observed locations so that this can be compared to simpler models
-      newdata.grid.list <- ReefCloud_meshINLA_newdata_grid(data.sub, FOCAL_TIER)
+      newdata.grid.list <- reefCloudPackage::ReefCloud_meshINLA_newdata_grid(data.sub, FOCAL_TIER)
       cli::cli_progress_update(force=TRUE)
 
-      mesh <- ReefCloud_meshINLA_mesh(full.grid.list, tier5_buffer.sf)
+      mesh <- reefCloudPackage::ReefCloud_meshINLA_mesh(full.grid.list, tier5_buffer.sf)
       cli::cli_progress_update(force=TRUE)
 
       ##i.spatial, stack.est
-      spatial_and_stack.list <- ReefCloud_meshINLA_SPDEandStacks(mesh, full.grid.list, obs.grid.list, year = 'rw1')
+      spatial_and_stack.list <- reefCloudPackage::ReefCloud_meshINLA_SPDEandStacks(mesh, full.grid.list, obs.grid.list, year = 'rw1')
       cli::cli_progress_update(force=TRUE)
 
-      form <- ReefCloud_meshINLA_formula(obs.grid.list, spatial_and_stack.list, year='rw1')
+      form <- reefCloudPackage::ReefCloud_meshINLA_formula(obs.grid.list, spatial_and_stack.list, year='rw1')
       cli::cli_progress_update(force=TRUE)
 
-      ReefCloud_meshINLA_fit(form, spatial_and_stack.list)
+      reefCloudPackage::ReefCloud_meshINLA_fit(form, spatial_and_stack.list)
       cli::cli_progress_update(force=TRUE)
 
-      cellmeans.full <- ReefCloud_meshINLA_cellmeans(mesh, newdata.grid.list,
+      cellmeans.full <- reefCloudPackage::ReefCloud_meshINLA_cellmeans(mesh, newdata.grid.list,
                                                         spatial_and_stack.list)
       cli::cli_progress_update(force=TRUE)
 
-      ReefCloud_meshINLA_tier5TemporalFocal(data.sub, cellmeans.full, FOCAL_TIER)
+      reefCloudPackage::ReefCloud_meshINLA_tier5TemporalFocal(data.sub, cellmeans.full, FOCAL_TIER)
       cli::cli_progress_update(force=TRUE)
 
-      cellmeans.tier5.sf <- ReefCloud_meshINLA_tier5Spatiotemporal(tier5.sf, cellmeans.full)
+      cellmeans.tier5.sf <- reefCloudPackage::ReefCloud_meshINLA_tier5Spatiotemporal(tier5.sf, cellmeans.full)
       cli::cli_progress_update(force=TRUE)
 
   }, logFile=LOG_FILE, Category='--Modelling fitting routines--',

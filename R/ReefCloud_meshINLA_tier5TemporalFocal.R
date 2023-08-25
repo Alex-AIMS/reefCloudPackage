@@ -23,7 +23,7 @@ ReefCloud_meshINLA_tier5TemporalFocal <- function(data.sub, cellmeans.full, FOCA
            Tier5 = forcats::fct_reorder(Tier5, Latitude, min)) %>%
     group_by(fYEAR, Tier4, Tier5) %>%
     mutate(value = plogis(value)) %>%
-    ReefCloud_mean_median_hdci(value) %>%
+    reefCloudPackage::ReefCloud_mean_median_hdci(value) %>%
     suppressMessages()
   saveRDS(list(cellmeans.tier5=cellmeans.tier5, data = data.sub),
           file = paste0(DATA_PATH, "modelled/", "cellmeans_meshTemporalTier5focal_", DOMAIN_NAME, "_",

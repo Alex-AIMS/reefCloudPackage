@@ -8,5 +8,5 @@
 ReefCloud__add_stage <- function(stage, title) {
     STATUS[[stage]]$title <- title
     assign("STATUS", STATUS, env = globalenv())
-    if (exists("DATA_PATH")) ReefCloud__save_status()
+    if (exists("DATA_PATH")) reefCloudPackage::ReefCloud__save_status()
 }

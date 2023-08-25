@@ -28,10 +28,10 @@ ReefCloud_log <- function(status, logFile, Category, msg=NULL) {
     if (!DEBUG_MODE) cat(paste0(msg,'\n'))
     if (!is.null(msg)) {
         write(msg,  file=paste0(logFile), append=TRUE)
-        if (DATA_FROM=="S3") ReefCloud_write_aws(file=basename(logFile),level='log/')
+        if (DATA_FROM=="S3") reefCloudPackage::ReefCloud_write_aws(file=basename(logFile),level='log/')
         if (DATA_FROM=="LOCAL") {
             file.copy(from = logFile, to = paste0(AWS_OUTPUT_PATH, "reef_data_",DOMAIN_CATEGORY,".log"), overwrite = TRUE)
         }
     }
-    if (DEBUG_MODE) ReefCloud_openingBanner()
+    if (DEBUG_MODE) reefCloudPackage::ReefCloud_openingBanner()
 }

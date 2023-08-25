@@ -11,6 +11,6 @@ ReefCloud__add_status <- function(stage, item, label, status, update_display = T
     STATUS[[stage]]$predicate <- c(STATUS[[stage]]$predicate, NA)
     STATUS[[stage]]$predicate_value <- c(STATUS[[stage]]$predicate_value, NA)
     assign("STATUS", STATUS, env = globalenv())
-    if (exists("DATA_PATH")) ReefCloud__save_status()
-    if (update_display) ReefCloud_openingBanner()
+    if (exists("DATA_PATH")) reefCloudPackage::ReefCloud__save_status()
+    if (update_display) reefCloudPackage::ReefCloud_openingBanner()
 }

@@ -12,7 +12,7 @@ ReefCloud_meshINLA_tier3Spatiotemporal <- function(cellmeans.full.tier3) {
   cellmeans.tier3.sf <- cellmeans.full.tier3 %>%
     group_by(fYEAR, Tier3) %>%
     mutate(value = plogis(value)) %>%
-    ReefCloud_mean_median_hdci(value) %>%
+    reefCloudPackage::ReefCloud_mean_median_hdci(value) %>%
     left_join(tier3.sf) %>%
     st_as_sf() %>%
     ungroup() %>%

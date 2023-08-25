@@ -48,11 +48,11 @@ ReefCloud_fakeArg1 <- function() {
         DATA_METHOD <<- gsub('[^/]*//[^/]*/[^/]*/([^/]*)/.*','\\1', AWS_PATH)
         LOG_FILE <<- paste0(DATA_PATH, 'log/', FILENAME, '.log')
         source('ReefCloud_config.R')
-        ReefCloud_openingBanner()
-        ReefCloud_log('INFO',  logFile = LOG_FILE, '--Modelling routines--',
+        reefCloudPackage::ReefCloud_openingBanner()
+        reefCloudPackage::ReefCloud_log('INFO',  logFile = LOG_FILE, '--Modelling routines--',
                       msg = paste0('Running script WITHOUT command line args'))
-        missing = ReefCloud_checkPackages()
-        ReefCloud_log(ifelse(missing=="", 'FAILURE', 'SUCCESS'), logFile = LOG_FILE,
+        missing = reefCloudPackage::ReefCloud_checkPackages()
+        reefCloudPackage::ReefCloud_log(ifelse(missing=="", 'FAILURE', 'SUCCESS'), logFile = LOG_FILE,
                       Category = '--Starting matter--',
                       msg = 'Checking that all necessary packages are available')
         if(missing!="") {

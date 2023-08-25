@@ -30,18 +30,18 @@ ReefCloud_checkPackages <- function(log = TRUE) {
                                p,"))"))) 
     }
     if(missing!="") { 
-        ReefCloud_log(status = "FAILURE",
+        reefCloudPackage::ReefCloud_log(status = "FAILURE",
                 logFile = LOG_FILE,
                 Category = "Loading the necessary R packages",
                 msg=NULL) 
-        ## ReefCloud__change_status(stage = "STAGE1", item = "Load packages", status = "failure")
-        ReefCloud__change_status(stage = "STAGE1", item = "Load packages", status = "failure")
-        ReefCloud_openingBanner()
+        ## reefCloudPackage::ReefCloud__change_status(stage = "STAGE1", item = "Load packages", status = "failure")
+        reefCloudPackage::ReefCloud__change_status(stage = "STAGE1", item = "Load packages", status = "failure")
+        reefCloudPackage::ReefCloud_openingBanner()
         stop(paste('The following required package(s) are missing: ',paste(missing, collapse=', ')))
     } else {
-        ## ReefCloud__change_status(stage = "STAGE1", item = "Load packages", status = "success")
-        ReefCloud__change_status(stage = "STAGE1", item = "Load packages", status = "success")
-        ReefCloud_log(status = "SUCCESS",
+        ## reefCloudPackage::ReefCloud__change_status(stage = "STAGE1", item = "Load packages", status = "success")
+        reefCloudPackage::ReefCloud__change_status(stage = "STAGE1", item = "Load packages", status = "success")
+        reefCloudPackage::ReefCloud_log(status = "SUCCESS",
                 logFile = LOG_FILE,
                 Category = "Loading the necessary R packages",
                 msg=NULL) 

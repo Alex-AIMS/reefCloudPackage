@@ -58,17 +58,17 @@ ReefCloud_parseCLA <- function(args) {
     ##          call. = FALSE)
 
     REFRESH_DATA <<- ifelse(any(grepl('--refresh_data ?= ?(true|t|TRUE|T)', args, perl = TRUE)), TRUE, FALSE)
-    ReefCloud__change_status(stage = "SETTINGS", item = "REFRESH_DATA",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "REFRESH_DATA",
                              status = "success", update_display = FALSE)
 
     DEBUG_MODE <<- ifelse(any(grepl('--debug ?= ?(true|t|TRUE|T)', args, perl = TRUE)), TRUE, FALSE)
-    ReefCloud__change_status(stage = "SETTINGS", item = "DEBUG_MODE",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "DEBUG_MODE",
                              status = "success", update_display = FALSE)
 
     runstage <<- grep('--runStage ?=.*', args, perl = TRUE)
     runStage <<- gsub('--runStage ?= ?', '\\1', args[runstage])
-    if (length(runStage) == 0) runStage <<- ReefCloud_get_stages()
-    if (length(runStage) == 1) if (runStage == -1) runStage <<- ReefCloud_get_stages()
+    if (length(runStage) == 0) runStage <<- reefCloudPackage::ReefCloud_get_stages()
+    if (length(runStage) == 1) if (runStage == -1) runStage <<- reefCloudPackage::ReefCloud_get_stages()
 
     ## Ensure that a bucket is supplied
     if (length(domain)==0)
@@ -77,7 +77,7 @@ ReefCloud_parseCLA <- function(args) {
                     ))
     file <- args[bucket]
     AWS_PATH <<- gsub('--bucket=(.*)','\\1/', file)
-    ReefCloud__change_status(stage = "SETTINGS", item = "AWS_PATH",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "AWS_PATH",
                              status = "success", update_display = FALSE)
 
     ## Determine whether data are to be sourced locally or from s3 bucket
@@ -85,7 +85,7 @@ ReefCloud_parseCLA <- function(args) {
         grepl('data/synthetic', AWS_PATH, perl = TRUE), 'SYNTHETIC',
                   ifelse(grepl('(^/mnt.*|^/home/data.*)', AWS_PATH, perl=TRUE), 'LOCAL',
                   ifelse(grepl('^[sS]3.*', AWS_PATH, perl=TRUE), 'S3', 'User defined')))
-    ReefCloud__change_status(stage = "SETTINGS", item = "DATA_FROM",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "DATA_FROM",
                              status = "success", update_display = FALSE)
 
 
@@ -99,27 +99,27 @@ ReefCloud_parseCLA <- function(args) {
 
     ## Set domain category global variable
     DOMAIN_CATEGORY <<- gsub('--domain=', '', args[domain])
-    ReefCloud__change_status(stage = "SETTINGS", item = "DOMAIN_CATEGORY",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "DOMAIN_CATEGORY",
                              status = "success", update_display = FALSE)
 
     ## Set the AWS_OUTPUT_PATH
     AWS_OUTPUT_PATH <<- paste0(AWS_PATH, "outputs/", DOMAIN_CATEGORY,"/")
-    ReefCloud__change_status(stage = "SETTINGS", item = "AWS_OUTPUT_PATH",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "AWS_OUTPUT_PATH",
                              status = "success", update_display = FALSE)
 
     ## Get the domain name
     DOMAIN_NAME <<- basename(AWS_PATH)
-    ReefCloud__change_status(stage = "SETTINGS", item = "DOMAIN_NAME",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "DOMAIN_NAME",
                              status = "success", update_display = FALSE)
 
     ## Determine whether a report should be generated
     GENERATE_REPORT <<- FALSE
-    ReefCloud__change_status(stage = "SETTINGS", item = "GENERATE_REPORT",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "GENERATE_REPORT",
                              status = "success", update_display = FALSE)
 
     ## Model type
     MODEL_TYPE <<- 2   #simple hierachical
-    ReefCloud__change_status(stage = "SETTINGS", item = "MODEL_TYPE",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "MODEL_TYPE",
                              status = "success", update_display = FALSE)
 
     ## Tier level on which to break up analyses
@@ -128,11 +128,11 @@ ReefCloud_parseCLA <- function(args) {
     } else {
         BY_TIER <<- gsub('--by_tier=(.*)', '\\1', args[by_tier])
     }
-    ReefCloud__change_status(stage = "SETTINGS", item = "BY_TIER",
+    reefCloudPackage::ReefCloud__change_status(stage = "SETTINGS", item = "BY_TIER",
                              status = "success", update_display = FALSE)
 
     if(!exists("LEGACY_DATA")) LEGACY_DATA <<- NULL
 
-    ReefCloud__remove_predicates(update_display = FALSE)
-    ## if (DEBUG_MODE) ReefCloud_openingBanner()
+    reefCloudPackage::ReefCloud__remove_predicates(update_display = FALSE)
+    ## if (DEBUG_MODE) reefCloudPackage::ReefCloud_openingBanner()
 }
