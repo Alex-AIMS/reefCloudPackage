@@ -1,17 +1,11 @@
-
-########################################################################
-## The following function is a wrapper around a number of routines    ##
-## that occur once at the start of an analysis run.                   ##
-## In order, these routines are:                                      ##
-## - initialise a status list.  This list is the basis of information ##
-##   presented in the command line interface.                         ##
-## - initialise the log file                                          ##
-########################################################################
-#' @title Function 
-#' @description Description 
-#' @param parameters description
+#' @title Function
+#' @description The following function is a wrapper around a number of routines
+#' that occur once at the start of an analysis run. In order, these routines are:
+#' - initialise a status list.  This list is the basis of information presented in the command line interface.
+#' - initialise the log file
+#' @param args command line arguments (defaults commandArgs())
 #' @return returned arguments description
-#' @examples examples 
+#' @examples ReefCloud_startMatter(args = c("--bucket=/home/data/AUS", "--domain=tier", "--by_tier=4", "--debug=true", "--runStage=1", "--refresh_data=false"))
 #' @export
 ReefCloud_startMatter <- function(args = commandArgs()) {
     ReefCloud_initialise_status()    ## create the status list
@@ -19,7 +13,7 @@ ReefCloud_startMatter <- function(args = commandArgs()) {
     ## Start by clearing all local data folders
     if (REFRESH_DATA) source('ReefCloud_05_clear_data.R')
     CURRENT_STAGE <<- 1
-    ## ReefCloud__add_stage(stage = paste0("STAGE",CURRENT_STAGE), title = 'Stage 1 - prepare environment') 
+    ## ReefCloud__add_stage(stage = paste0("STAGE",CURRENT_STAGE), title = 'Stage 1 - prepare environment')
     ReefCloud_generateSettings()     ## generate the rest of the path and naming settings
     ReefCloud_initialise_log()       ## create the log file
     source('ReefCloud_config.R')     ## create directory structure if it does not yet exist
