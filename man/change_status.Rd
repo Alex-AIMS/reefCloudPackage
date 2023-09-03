@@ -2,19 +2,26 @@
 % Please edit documentation in R/change_status.R
 \name{change_status}
 \alias{change_status}
-\title{Function}
+\title{Modify the STATUS global variable}
 \usage{
 change_status(stage, item, status, update_display = TRUE)
 }
 \arguments{
-\item{parameters}{description}
+\item{stage}{current running stage}
+
+\item{item}{name of item to be changed}
+
+\item{status}{new value assigned to STATUS[[stage]]$item}
+
+\item{update_display}{Bool: if TRUE prompts update in console. Default TRUE}
 }
 \value{
-returned arguments description
+void. Modifies STATUS only
 }
 \description{
-Description
+This function modifies the STATUS global variable
 }
 \examples{
-examples 
+change_status(stage = "SETTINGS", item = "DEBUG_MODE",
+status = "success", update_display = FALSE)
 }

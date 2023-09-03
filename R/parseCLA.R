@@ -1,27 +1,35 @@
 #' @title parseCLA
-#' @description The following function parses the command line arguments
-#' 1. Ensure that a bucket has been supplied as --bucket=<bucket>
-#' 2. If the bucket is local (/data/.* or /mnt/reefcloud/.*)
-#'    - set DATA_FROM <<- "LOCAL"
-#'    If the bucket is S3 (s3://dev-aims-gov-au-reefcloud-stats/reefcloud/.*)
-#'    - set DATA_FROM <<- "S3"
-#' 3. Ensure that a valid domain has been supplied and if so
-##    - set DOMAIN_CATEGORY <<- <domain>
-#' @param args command line arguments. The call must be of the form:
-#' 30_model.R --bucket="<PATH>"
-#' --domain=<DOMAIN>
-#'   [--by_tier=<NUMBER> --debug=<true|false> --runStage=<NUM> --refresh_data=<true|false>]
-#'
-#'
-#' <PATH>:  	a valid path to a folder containing the input data
-#' <DOMAIN>:	either tier (spatio-temporal model for the data provide)
-#' or site (hierarchical model for a single site.
-#'          <NUMBER>:	for tier analyses, an optional tier number to indicate which
-#'          tier level to use in splitting up analyses [n>true|false>:	 whether to operate in debug mode.
-#'           If true, progress is provided via a CLI
-#' <NUM>:	 which stages of the analysis to run (-1 or missing is all stages
-#' @return returned arguments description
-#' @examples examples
+#' @description The following function parses the command line arguments \cr
+#' 1. Ensure that a bucket has been supplied as --bucket=<bucket>\cr
+#' 2. If the bucket is local (/data/.* or /mnt/reefcloud/.*)\cr
+#'    - set DATA_FROM <<- "LOCAL"\cr
+#'    If the bucket is S3 (s3://dev-aims-gov-au-reefcloud-stats/reefcloud/.*)\cr
+#'    - set DATA_FROM <<- "S3"\cr
+#' 3. Ensure that a valid domain has been supplied and if so\cr
+##    - set DOMAIN_CATEGORY <<- <domain>\cr
+#' @param args command line arguments. The call must be of the form:\cr
+#' "--bucket="<PATH> --domain=<DOMAIN> --by_tier=<NUMBER> --debug=<true|false> --runStage=<NUM> --refresh_data=<true|false>"\cr
+#' <PATH>:  	a valid path to a folder containing the input data\cr
+#' <DOMAIN>:	either tier (spatio-temporal model for the data provide) or site (hierarchical model for a single site.\cr
+#' <NUMBER>:	for tier analyses, an optional tier number to indicate which tier level to use in splitting up analyses \cr
+#' <true|false>:	 whether to operate in debug mode. If true, progress is provided via a CLI\cr
+#' <NUM>:	 which stages of the analysis to run (-1 or missing is all stages)
+#' @return Creates the following global variables \cr
+#' REFRESH_DATA\cr
+#' DEBUG_MODE\cr
+#' runstage\cr
+#' runStage\cr
+#' AWS_PATH\cr
+#' DATA_FROM\cr
+#' DOMAIN_CATEGORY \cr
+#' AWS_OUTPUT_PATH \cr
+#' DOMAIN_NAME \cr
+#' GENERATE_REPORT \cr
+#' MODEL_TYPE \cr
+#' BY_TIER
+#' @examples
+#' args = c("--bucket=/home/data/AUS", "--domain=tier", "--by_tier=4", "--debug=true", "--runStage=1", "--refresh_data=false")
+#' parseCLA(args)
 #' @export
 parseCLA <- function(args) {
     valid_cla <- paste0("The call must be of the form:\n",
