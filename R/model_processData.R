@@ -12,8 +12,8 @@ model_processData <- function(){
   CURRENT_STAGE <<- 3
 
   ## load in the benthic data
-  tryCatch({
-    if (!DEBUG_MODE) cli_h1("Processing benthic data")
+  reefCloudPackage::ReefCloud_tryCatch({
+    if (!DEBUG_MODE) cli::cli_h1("Processing benthic data")
     load(file = paste0(DATA_PATH, "primary/", RDATA_FILE))
     data <- data %>%
       dplyr::rename(any_of(c("REEF" = "REEF_NAME", "REEF" = "SITE_NAME"))) %>%
@@ -30,8 +30,8 @@ model_processData <- function(){
 
   ## process the legacy benthic data (if it exists)
   if (LEGACY_DATA) {
-    tryCatch({
-      if (!DEBUG_MODE) cli_h1("Processing legacy benthic data")
+    reefCloudPackage::ReefCloud_tryCatch({
+      if (!DEBUG_MODE) cli::cli_h1("Processing legacy benthic data")
       load(file = paste0(DATA_PATH, "primary/", gsub('reef', 'legacy', RDATA_FILE)))
       legacy_data <- legacy_data %>%
         dplyr::rename(any_of(c("REEF" = "REEF_NAME", "REEF" = "SITE_NAME")),

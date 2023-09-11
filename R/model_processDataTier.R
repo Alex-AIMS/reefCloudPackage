@@ -5,8 +5,8 @@
 ## spatiotemporal FRK model).
 #' @examples model_processData()
 #' @export
-model_processDataSiteTier <- function(){
-  if (isParent()) startMatter()
+model_processDataTier <- function(){
+  if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
 
   #############################################################
@@ -38,10 +38,10 @@ model_processDataSiteTier <- function(){
     sf_use_s2(FALSE)
     data.site <-
       data.site %>%
-      assignSpatialDomain_tier(tier = 2) %>%
-      assignSpatialDomain_tier(tier = 3) %>%
-      assignSpatialDomain_tier(tier = 4) %>%
-      assignSpatialDomain_tier(tier = 5) %>%
+      reefCloudPackage::assignSpatialDomain_tier(tier = 2) %>%
+      reefCloudPackage::assignSpatialDomain_tier(tier = 3) %>%
+      reefCloudPackage::assignSpatialDomain_tier(tier = 4) %>%
+      reefCloudPackage::assignSpatialDomain_tier(tier = 5) %>%
       dplyr::select(-LONGITUDE, -LATITUDE) %>%
       distinct() %>%
       suppressMessages() %>%
@@ -68,7 +68,7 @@ model_processDataSiteTier <- function(){
   ## create a tiers lookup
   ## the following creates a lookup of tiers (primary/tiers_lookup.RData)
   reefCloudPackage::ReefCloud_tryCatch({
-    make_tiers_lookup()
+    reefCloudPackage::make_tiers_lookup()
   },
   logFile=LOG_FILE,
   Category='--Processing routines--',
@@ -233,7 +233,7 @@ model_processDataSiteTier <- function(){
         misTier <- tiers.lookup %>% anti_join(covariate) %>% nrow() %>%
           suppressMessages()
         if (misTier > 0) {
-          log(status = 'WARNING',
+          reefCloudPackage::log(status = 'WARNING',
                         logFile=LOG_FILE,
                         Category='--Processing routines--',
                         msg=paste0('The ', COV, ' covariate has no data for ',misTier,' tier 5 hexagons')
@@ -273,7 +273,7 @@ model_processDataSiteTier <- function(){
         misTier <- covariate %>% anti_join(tiers.lookup) %>% nrow() %>%
           suppressMessages()
         if (misTier > 0) {
-          log(status = 'WARNING',
+          reefCloudPackage::log(status = 'WARNING',
                         logFile=LOG_FILE,
                         Category='--Processing routines--',
                         msg=paste0('The ', COV, ' covariate has ',misTier,' tier 5 hexagons that should not be in this region.')
@@ -295,7 +295,7 @@ model_processDataSiteTier <- function(){
           suppressMessages()
         COVARIATES <<- c(COVARIATES, COV)
         save(covariate, file=paste0(DATA_PATH, "processed/covariate_",COV,".RData"))
-        add_status(1, item = "COVARIATES", label = "Covariates", status = "SUCCESS",
+        reefCloudPackage::add_status(1, item = "COVARIATES", label = "Covariates", status = "SUCCESS",
                               update_display = FALSE)
       }
     }
