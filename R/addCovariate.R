@@ -1,10 +1,8 @@
-
-
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 addCovariate <- function(data = data, covariate, method = 'nearest') {
     name <- attr(covariate, "name")
@@ -25,7 +23,7 @@ addCovariate <- function(data = data, covariate, method = 'nearest') {
         nms <- nms[nms != 'geometry']
         ## Add extract the nearest points to the reference grid
         covar <- data.sf %>%
-            st_drop_geometry() %>% 
+            st_drop_geometry() %>%
             bind_cols(covar.sf[wch,] %>% st_drop_geometry()) %>%
             pivot_longer(cols=-ID, names_to = 'fYEAR', values_to = name) %>%
             mutate(fYEAR = factor(format(as.Date(fYEAR), "%Y")))
@@ -43,9 +41,9 @@ addCovariate <- function(data = data, covariate, method = 'nearest') {
             mutate(time = as.Date(paste0(fYEAR, '-01-01')))
         covar.sf %>% st_extract(data.sf, bilinear = FALSE, time_column = "time", interpolate_time = FALSE) %>%
             st_as_sf() %>%
-            st_drop_geometry() %>% 
+            st_drop_geometry() %>%
             select({{name}})
-        
-        
+
+
     }
 }

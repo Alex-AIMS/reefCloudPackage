@@ -10,8 +10,8 @@ config <- function(){
   ## Create the general data path if it does not exists
   if (!dir.exists(DATA_PATH)) dir.create(DATA_PATH)
 
-  ## Create the log file (if it does not exits)
-  if (!dir.exists(paste0(DATA_PATH, '/log'))) dir.create(paste0(DATA_PATH, '/log'))
+  ## Create the reefCloudPackage::log file (if it does not exits)
+  if (!dir.exists(paste0(DATA_PATH, 'log'))) dir.create(paste0(DATA_PATH, 'log'))
   if (file.exists(LOG_FILE)) file.remove(LOG_FILE)
   if (!file.exists(LOG_FILE)) file.create(LOG_FILE)
   if (!dir.exists(paste0(AWS_PATH, "outputs"))) dir.create(paste0(AWS_PATH, "outputs"))

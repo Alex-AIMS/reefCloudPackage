@@ -19,5 +19,5 @@ clear_data <- function(){
 
   unlink("../docs/Reports/*.html")
   unlink("../data/model_stage.RData")
-  unlink("../data/analysis_stage.RData")
+  unlink("../data/reefCloudPackage::analysis_stage.RData")
 }

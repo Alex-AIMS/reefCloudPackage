@@ -2,14 +2,14 @@
 
 ## Modelling functions (tiers) =====================================================
 ## Cellmeans -----------------------------------------------------------------------
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 cellmeans <- function(data.sub, GROUP, TIER, FOCAL_TIER) {
-  tryCatch({
+  reefCloudPackage::ReefCloud_tryCatch({
     ## ---- RawMeans
     {
       cli::cli_progress_bar("Raw cellmeans", type = "iterator", total = 4, clear = TRUE)

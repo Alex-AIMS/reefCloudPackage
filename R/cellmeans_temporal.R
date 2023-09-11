@@ -1,11 +1,11 @@
 
 
 
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 cellmeans_temporal <- function(data.sub, GROUP, TIER) {
   ## ---- RawMeansTemporal

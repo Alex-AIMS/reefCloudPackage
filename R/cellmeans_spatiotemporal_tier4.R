@@ -1,9 +1,9 @@
 
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 cellmeans_spatiotemporal_tier4 <- function(data.sub, GROUP, TIER) {
   ## ---- RawMeansSpatioTemporalTier4

@@ -12,30 +12,30 @@
 ## proceed with a hard coded AWS_PATH.  It will then perform       ##
 ## similar tasks as startMatter().                                 ##
 #####################################################################
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 fakeArg1 <- function() {
     args <- commandArgs()
     ## determine whether any of them include the name of the R script file
     file <- grep('--file=.*', args)
     domain <- grep('--domain=.*', args)
-    ## if they do (indicating that startMatter is being run from the parent script),
+    ## if they do (indicating that reefCloudPackage::startMatter is being run from the parent script),
     ## extract the filename of the R script
     if (length(file)==0) {
         DATA_FROM <<- 'FILE'
         FILENAME <<- "reef_data.csv"
         ## AWS_PATH <<- "s3://dev-aims-gov-au-reefcloud-data-downloads/stats/photo-transect/2021-01-14/process/LTMP/XXXX/XXXX/reef/Taoch 2/"
         ## AWS_PATH <<- "s3://rc-prod-aims-gov-au-reefcloud-data-downloads/stats/photo-transect/2021-01-14/process/LTMP/XXXX/XXXX/combined/Palau/"
-        ## AWS_PATH <<- "s3://rc-prod-aims-gov-au-reefcloud-data-downloads/stats/photo-transect/2021-01-14/process/Palau/XXXX/XXXX/reef/Kayangel/" 
-        AWS_PATH <<- "s3://arn:aws:s3:ap-southeast-2:255329909679:accesspoint/nectar/stats/photo-transect/2021-01-14/process/Palau/XXXX/XXXX/reef/Kayangel/" 
+        ## AWS_PATH <<- "s3://rc-prod-aims-gov-au-reefcloud-data-downloads/stats/photo-transect/2021-01-14/process/Palau/XXXX/XXXX/reef/Kayangel/"
+        AWS_PATH <<- "s3://arn:aws:s3:ap-southeast-2:255329909679:accesspoint/nectar/stats/photo-transect/2021-01-14/process/Palau/XXXX/XXXX/reef/Kayangel/"
         AWS_PATH <<- "s3://rc-prod-aims-gov-au-reefcloud-data-downloads/stats/reefcloud/Palau/Kayangel/"
 
         DATA_PATH <<- "../data/"
-        RDATA_FILE <<- "reef_data.RData" 
+        RDATA_FILE <<- "reef_data.RData"
         DOMAIN_NAME <<- "reef" #'GBR'
         DATA_TYPE <<- "COVER"
         DATA_PROGRAM <<- "LTMP"
@@ -47,7 +47,7 @@ fakeArg1 <- function() {
         DATA_PROGRAM <<- gsub('.*process/([^/]*).*','\\1', AWS_PATH)
         DATA_METHOD <<- gsub('[^/]*//[^/]*/[^/]*/([^/]*)/.*','\\1', AWS_PATH)
         LOG_FILE <<- paste0(DATA_PATH, 'log/', FILENAME, '.log')
-        source('config.R')
+        reefCloudPackage::config()
         reefCloudPackage::openingBanner()
         reefCloudPackage::log('INFO',  logFile = LOG_FILE, '--Modelling routines--',
                       msg = paste0('Running script WITHOUT command line args'))

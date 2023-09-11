@@ -11,6 +11,7 @@
 #' @param item ask
 #' @return updates Log file according to
 #' @export
+
 ReefCloud_tryCatch <- function(expr, logFile,Category, expectedClass=NULL, msg=NULL, return=NULL,
                      showWarnings=FALSE, stage = NULL, item = NULL) {
   if (DEBUG_MODE & !is.null(stage)) reefCloudPackage::change_status(stage = stage, item = item, status = "progress")

@@ -7,7 +7,7 @@
 initialise_log <- function() {
     ##Log file
     LOG_FILE <<- paste0(DATA_PATH, 'log/', FILENAME, '.log')
-    ## LOG_FILE <<- paste0("../.mmp.log")
+    ## LOG_FILE <<- paste0("../.mmp.reefCloudPackage::log")
     if (file.exists(LOG_FILE)) unlink(LOG_FILE)
     reefCloudPackage::add_status(stage = "SETTINGS", item = "LOG_FILE",
                           label = "Log file", status = "success",

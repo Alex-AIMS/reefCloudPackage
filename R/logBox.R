@@ -1,10 +1,10 @@
 
 
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 logBox <- function(box.width, box.margins) {
     if (exists("LOG_FILE")) {
@@ -18,7 +18,7 @@ logBox <- function(box.width, box.margins) {
     } else {
         log <- ''
     }
-    
+
     log.text <- paste0(
         cli::ansi_align(
                  paste0(
@@ -31,5 +31,5 @@ logBox <- function(box.width, box.margins) {
     log.text <- c("",log.text,
                   paste0("\u255A", strrep("\u2550", box.width + 1), "\u255D\n")
                   )
-   log.text 
+   log.text
 }

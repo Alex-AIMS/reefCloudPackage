@@ -16,7 +16,7 @@ model_loadData_windows <- function(){
 
   ## Benthic data =============================================================
   ## 1. Retrieve the benthic data from the S3 bucket
-  reefCloudPackage::ReefCloud_tryCatch({
+  reefCloudPackage::tryCatch({
     ## Retrieve a more local version of the data
     if (!DEBUG_MODE) cli_h1("Loading data")
     if (DATA_FROM == "S3") reefCloudPackage::load_aws(file = CSV_FILE, level = "primary/")
@@ -43,12 +43,12 @@ model_loadData_windows <- function(){
   item = "Retrieve data")
 
   ## 2. Unzip data
-  reefCloudPackage::ReefCloud_tryCatch({
+  reefCloudPackage::tryCatch({
     if (INPUT_FORMAT == "zip") {
       zip_file <- paste0(DATA_PATH, 'primary/', FILENAME, '.zip')
-      zip_file <- paste0(DATA_PATH, 'primary/')
+      extract_dir <- paste0(DATA_PATH, 'primary/')
       unzip(zipfile = zip_file, exdir = extract_dir)
-      if (!DEBUG_MODE) cli_alert_success("Benthic data successfully unzipped to: {.file {paste0(DATA_PATH, 'primary/')}}")
+      if (!DEBUG_MODE) cli::cli_alert_success("Benthic data successfully unzipped to: {.file {paste0(DATA_PATH, 'primary/')}}")
     }
   },
   logFile = LOG_FILE,
@@ -58,7 +58,7 @@ model_loadData_windows <- function(){
   item = "Unzip data")
 
   ## 3. Import data
-  reefCloudPackage::ReefCloud_tryCatch({
+  reefCloudPackage::tryCatch({
     ## Read data into a R
     data <- read_csv(paste0(DATA_PATH, "primary/", CSV_FILE),
                      ## col_types = "cdccccdddddcdTcdccc",
@@ -75,10 +75,10 @@ model_loadData_windows <- function(){
   )
 
   ## 3. Save data
-  reefCloudPackage::ReefCloud_tryCatch({
+  reefCloudPackage::tryCatch({
     ## Save as native R file
     save(data, file = paste0(DATA_PATH, "primary/", RDATA_FILE))
-    if (!DEBUG_MODE) cli_alert_success("Benthic data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
+    if (!DEBUG_MODE) cli::cli_alert_success("Benthic data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
     if (GENERATE_REPORT) {
       ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
                            list(list(type='component', value = '31a_load_benthos'))) %>%
@@ -102,16 +102,21 @@ model_loadData_windows <- function(){
   LEGACY_FILENAME <<- 'legacy_data'
   LEGACY_DATA <<- FALSE
   if(file.exists(paste0(AWS_PATH, 'raw/', LEGACY_FILENAME, '.zip'))) {
-    reefCloudPackage::ReefCloud_tryCatch({
+    reefCloudPackage::tryCatch({
       LEGACY_DATA <<- TRUE
-      if (DATA_FROM == "LOCAL")
-        system(paste0("cp ", AWS_PATH, "raw/", LEGACY_FILENAME, ".zip", " ",
-                      DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"))
+      if (DATA_FROM == "LOCAL"){
+        source_file <- paste0(AWS_PATH, "raw/", LEGACY_FILENAME, ".zip")
+        destination_file <- paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".zip")
+        file.copy(from = source_file, to = destination_file, overwrite = TRUE)
+      }
+
       ## if (INPUT_FORMAT == "zip")
       ##   unzip(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"),
       ##         overwrite = TRUE, junkpaths = TRUE, exdir = paste0(DATA_PATH, "primary/"))
-      if (INPUT_FORMAT == "zip")
-        system(paste0('unzip -o -j ', DATA_PATH, 'primary/', LEGACY_FILENAME, '.zip -d ', DATA_PATH, 'primary/'))
+      if (INPUT_FORMAT == "zip"){
+          unzip(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"),
+                overwrite = TRUE, junkpaths = TRUE, exdir = paste0(DATA_PATH, "primary/"))
+      }
       legacy_data <- read_csv(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".csv"),
                               ## col_types = "cdccccdddddcdTcdccc",
                               ## col_types = "cdcddccccdccdccd",
@@ -123,7 +128,7 @@ model_loadData_windows <- function(){
         mutate(SURVEY_DATE = as.POSIXct(SURVEY_DATE, format='%d/%m/%Y'),
                SITE_DEPTH = as.character(SITE_DEPTH))
       save(legacy_data, file = paste0(DATA_PATH, "primary/", gsub('reef', 'legacy', RDATA_FILE)))
-      if (!DEBUG_MODE) cli_alert_success("Benthic data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
+      if (!DEBUG_MODE) cli::cli_alert_success("Benthic data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
 
       if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
                                                       item = "Legacy data",
@@ -145,7 +150,7 @@ model_loadData_windows <- function(){
   ## If DOMAIN_CATOGORY == "tier" then we need to also retrieve the Tiers
   if (DOMAIN_CATEGORY == "tier") {
     ## Get tiers data =================================================
-    reefCloudPackage::ReefCloud_tryCatch({
+    reefCloudPackage::tryCatch({
       TIERS <<- NULL
       ## Extract spatial data from geoserver
       if (!DATA_FROM %in% c("SYNTHETIC","User defined")) {
@@ -206,11 +211,14 @@ model_loadData_windows <- function(){
     )
 
     if (1==2) {
-      reefCloudPackage::ReefCloud_tryCatch({
+      reefCloudPackage::tryCatch({
         ## if(1==2) {
         ## copy the shapefiles (zip) to local
         if (DATA_FROM %in% c("SYNTHETIC", "User defined")) {
-          system(paste0("cp ", AWS_PATH, "raw/tiers.zip", " ", DATA_PATH, "primary/tiers.zip"))
+          source_file <- paste0(AWS_PATH, "raw/tiers.zip")
+          destination_file <- paste0(DATA_PATH, "primary/tiers.zip")
+          file.copy(from = source_file, to = destination_file, overwrite = TRUE)
+
           unzip(paste0(DATA_PATH, "primary/tiers.zip"), list = FALSE,
                 exdir = paste0(DATA_PATH, "primary/"))
           ## gj_files <- list.files(path = paste0(AWS_PATH, "raw"), pattern = ".*geojson", full.names=TRUE)
@@ -282,7 +290,7 @@ model_loadData_windows <- function(){
             reefCloudPackage::openingBanner()
           }
         }
-        if (!DEBUG_MODE) cli_alert_success("GIS data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
+        if (!DEBUG_MODE) cli::cli_alert_success("GIS data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
         ## cat(paste0("Successfully read in GIS data into: ", DATA_PATH,
         ##            "primary/", "\n"))
         ## if(!reefCloudPackage::build_report(component = "load_tiers"))
@@ -305,7 +313,7 @@ model_loadData_windows <- function(){
 
 
       ## Try to load covariates from netCDF files
-      reefCloudPackage::ReefCloud_tryCatch({
+      reefCloudPackage::tryCatch({
         files <- list.files(path = paste0(AWS_PATH, "raw"), pattern = "*.nc", full.names = TRUE)
         files <- gsub("//", "/", files)
         if (length(files)>0) {
@@ -314,7 +322,7 @@ model_loadData_windows <- function(){
             covariate <- raster::brick(f) %>% st_as_stars() %>% suppressWarnings()
             save(covariate, file = paste0(DATA_PATH, "primary/covariate_", gsub(".nc", "", basename(f)), ".RData"))
           }
-          if (!DEBUG_MODE) cli_alert_success("Covariates data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
+          if (!DEBUG_MODE) cli::cli_alert_success("Covariates data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
           ## if(!reefCloudPackage::build_report(component = "load_covariates"))
           ##     cli_alert_danger("Info on loaded covariates data is {col_red(style_bold('NOT'))} incorporated into report!")
           ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
@@ -333,7 +341,7 @@ model_loadData_windows <- function(){
     }
 
     ## Try to load covariates from flat files  ========================
-    reefCloudPackage::ReefCloud_tryCatch({
+    reefCloudPackage::tryCatch({
       files <- list.files(path = paste0(AWS_PATH, "raw"), pattern = "*.csv$", full.names = TRUE)
       files <- gsub("//", "/", files)
       if (length(files)>0) {
@@ -344,7 +352,7 @@ model_loadData_windows <- function(){
                                         sub(".csv", "", basename(f)), ".RData"))
         }
         if (!DEBUG_MODE)
-          cli_alert_success("Covariates data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
+          cli::cli_alert_success("Covariates data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
         if (GENERATE_REPORT) {
           ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
                                list(list(type='component', value = '31c_load_covariates'))) %>%
@@ -364,11 +372,11 @@ model_loadData_windows <- function(){
 
   ## Unzip and load the Coral Reefs of the World code
   if (DOMAIN_CATEGORY == "tier") {
-    reefCloudPackage::ReefCloud_tryCatch({
+    reefCloudPackage::tryCatch({
       ## Retrieve a more local version of the data
       if (!DEBUG_MODE) cli_h1("Loading coral reefs of the world shapefile")
-      system(paste0('unzip -o -j ', '../parameters/TropicalCoralReefsOfTheWorld.zip -d ', DATA_PATH, 'primary/'), ignore.stdout = TRUE)
-
+      unzip("../parameters/TropicalCoralReefsOfTheWorld.zip", list = FALSE, overwrite = TRUE,
+            exdir = paste0(DATA_PATH, "primary/"))
       reef_layer.sf <- read_sf(paste0(DATA_PATH, "/primary/reef_500_poly.shp"))
       save(reef_layer.sf, file = paste0(DATA_PATH, "/primary/reef_layer.sf.RData"))
       sf_files <- list.files(path = paste0(DATA_PATH, "/primary/"),
