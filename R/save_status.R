@@ -1,9 +1,8 @@
-
-#' @title Function 
-#' @description Description 
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples 
+#' @title Save status
+#' @description save current status and current global variables
+#' @return save STATUS IN in DATA_PATH/STATUS.RData file\cr
+#' and current values of settings in DATA_PATH/global_settings.RData
+#' @examples save_status()
 #' @export
 save_status <- function() {
     saveRDS(STATUS, file = paste0(DATA_PATH, "STATUS.RData"))

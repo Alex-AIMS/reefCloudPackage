@@ -1,22 +1,10 @@
-
-
-####################################################################
-## The following function checks to ensure that all the required  ##
-## packages are available on the system.                          ##
-##                                                                ##
-## NOTE - we could run code to check whether a package is present ##
-## or not and tif it is not, then install the package.  However,  ##
-## this will install the package in the user .libPath rather than ##
-## system .libPath and this could lead to multiple                ##
-## packages/versions in multiple locations.                       ##
-####################################################################
-#' @title Function 
-#' @description Description 
-#' @param parameters description
+#' @title Check packages
+#' @description The following function checks to ensure that all the required packages are available on the system.
+#' @param log = TRUE description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
-checkPackages <- function(log = TRUE) {           
+checkPackages <- function(log = TRUE) {
     missing <- ''
     options(tidyverse.quiet = TRUE)
     pkgs <- c('tidyverse','sf','INLA','jsonlite','rlang','tidybayes', 'testthat',
@@ -27,13 +15,13 @@ checkPackages <- function(log = TRUE) {
         ## loaded
         eval(parse(text=paste0("suppressPackageStartupMessages(if(!require(",
                                p,",quietly = TRUE, warn.conflicts = FALSE)) missing <- c(missing, ",
-                               p,"))"))) 
+                               p,"))")))
     }
-    if(missing!="") { 
+    if(missing!="") {
         reefCloudPackage::log(status = "FAILURE",
                 logFile = LOG_FILE,
                 Category = "Loading the necessary R packages",
-                msg=NULL) 
+                msg=NULL)
         ## reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "failure")
         reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "failure")
         reefCloudPackage::openingBanner()
@@ -44,7 +32,7 @@ checkPackages <- function(log = TRUE) {
         reefCloudPackage::log(status = "SUCCESS",
                 logFile = LOG_FILE,
                 Category = "Loading the necessary R packages",
-                msg=NULL) 
+                msg=NULL)
     }
 
     ## return(0)

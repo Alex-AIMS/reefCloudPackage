@@ -1,9 +1,7 @@
-
-#' @title Function 
-#' @description Description 
-#' @param parameters description
+#' @title Analysis stage
+#' @description Read in the stage that the analysis is up to
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 analysis_stage <- function() {
     if (file.exists(paste0(DATA_PATH, "analysis_stage.RData"))) {

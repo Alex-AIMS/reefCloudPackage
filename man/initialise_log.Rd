@@ -2,19 +2,17 @@
 % Please edit documentation in R/initialise_log.R
 \name{initialise_log}
 \alias{initialise_log}
-\title{Function}
+\title{Initialise log}
 \usage{
 initialise_log()
 }
-\arguments{
-\item{parameters}{description}
-}
 \value{
-returned arguments description
+creates log file\cr
+and the globabal variable LOG_FILE, which contains file location
 }
 \description{
-Description
+The following function initialises a log file. This log file is placed in the root of the project as it needs to be in a location that is guarenteed to exist from a freshly cloned instance of this codebase.
 }
 \examples{
-examples 
+initialise_log
 }

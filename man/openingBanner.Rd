@@ -2,19 +2,13 @@
 % Please edit documentation in R/openingBanner.R
 \name{openingBanner}
 \alias{openingBanner}
-\title{Function}
+\title{Opennig banner}
 \usage{
 openingBanner()
 }
-\arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
-}
 \description{
-Description
+Display an opening banner
 }
 \examples{
-examples 
+openingBanner()
 }

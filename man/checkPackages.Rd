@@ -2,19 +2,19 @@
 % Please edit documentation in R/checkPackages.R
 \name{checkPackages}
 \alias{checkPackages}
-\title{Function}
+\title{Check packages}
 \usage{
 checkPackages(log = TRUE)
 }
 \arguments{
-\item{parameters}{description}
+\item{log}{= TRUE description}
 }
 \value{
 returned arguments description
 }
 \description{
-Description
+The following function checks to ensure that all the required packages are available on the system.
 }
 \examples{
-examples 
+examples
 }

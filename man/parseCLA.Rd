@@ -20,6 +20,7 @@ Creates the following global variables \cr
 REFRESH_DATA\cr
 DEBUG_MODE\cr
 runstage\cr
+runStage\cr
 AWS_PATH\cr
 DATA_FROM\cr
 DOMAIN_CATEGORY \cr

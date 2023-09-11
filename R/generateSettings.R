@@ -1,9 +1,14 @@
-
-#' @title Function 
-#' @description Description 
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples 
+#' @title Generate settings
+#' @description Generates path and naming settings
+#' @return Creates the following global variables\cr
+#' DATA_PATH\cr
+#' INPUT_DATA\cr
+#' RDATA_FILE \cr
+#' FILENAME \cr
+#' INPUT_FORMAT \cr
+#' CSV_FILE \cr
+#' TIER_DATA
+#' @examples generateSettings()
 #' @export
 generateSettings <- function() {
     ## Location of folder to store R data objects

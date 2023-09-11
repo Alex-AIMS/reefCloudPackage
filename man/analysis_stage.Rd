@@ -2,19 +2,16 @@
 % Please edit documentation in R/analysis_stage.R
 \name{analysis_stage}
 \alias{analysis_stage}
-\title{Function}
+\title{Analysis stage}
 \usage{
 analysis_stage()
-}
-\arguments{
-\item{parameters}{description}
 }
 \value{
 returned arguments description
 }
 \description{
-Description
+Read in the stage that the analysis is up to
 }
 \examples{
-examples 
+examples
 }

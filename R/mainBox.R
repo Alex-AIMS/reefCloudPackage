@@ -1,9 +1,8 @@
-
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 mainBox <- function(settings.box.text, box.width, settings.box.width, box.margins) {
     main.box.text <- c("ReefCloud Statistical Modelling", "")
@@ -13,7 +12,7 @@ mainBox <- function(settings.box.text, box.width, settings.box.width, box.margin
                                             width = box.width - settings.box.width - 1,
                                             align = 'center')
     if (all(runStage > 0)) {
-        ## add the stages as left justified 
+        ## add the stages as left justified
         for (j in 1:length(runStage)) {
             main.box.text <- c(main.box.text,
                                cli::ansi_align(STATUS[[paste0("STAGE",runStage[j])]]$title,
@@ -26,7 +25,7 @@ mainBox <- function(settings.box.text, box.width, settings.box.width, box.margin
                     STATUS[[paste0("STAGE",runStage[j])]]$status[i] == 'failure') {
                     main.box.text <- c(main.box.text,
                                        cli::ansi_align(
-                                                paste0(strrep(" ", box.margins),      
+                                                paste0(strrep(" ", box.margins),
                                                        switch(STATUS[[paste0("STAGE",runStage[j])]]$status[i],
                                                               'pending' = crayon::white(cli::symbol$line),
                                                               'progress' = crayon::magenta("\u23F1"),
@@ -40,8 +39,8 @@ mainBox <- function(settings.box.text, box.width, settings.box.width, box.margin
                                             )
                                        )
                 }
-                
-            } 
+
+            }
         }
     }
     main.box.nchar <- nchar(main.box.text)

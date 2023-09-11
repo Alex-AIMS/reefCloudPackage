@@ -1,15 +1,8 @@
-
-#########################################################################
-## The following function initialises a log file.  This log file is    ##
-## placed in the root of the project as it needs to be in a location   ##
-## that is guarenteed to exist from a freshly cloned instance of this  ##
-## codebase.                                                           ##
-#########################################################################
-#' @title Function 
-#' @description Description 
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples 
+#' @title Initialise log
+#' @description The following function initialises a log file. This log file is placed in the root of the project as it needs to be in a location that is guarenteed to exist from a freshly cloned instance of this codebase.
+#' @return creates log file\cr
+#' and the globabal variable LOG_FILE, which contains file location
+#' @examples initialise_log
 #' @export
 initialise_log <- function() {
     ##Log file

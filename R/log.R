@@ -1,4 +1,3 @@
-
 ####################################################################################
 ## The following function writes out log information to a file named by the       ##
 ## logFile argument in the log/ folder.                                           ##
@@ -12,11 +11,11 @@
 ##               (for warnings) or anything else for a failure                    ##
 ## - msg:        the message (as a string) to appear verbatim in the log          ##
 ####################################################################################
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 log <- function(status, logFile, Category, msg=NULL) {
     d=dirname(logFile)

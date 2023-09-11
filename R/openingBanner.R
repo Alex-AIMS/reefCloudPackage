@@ -1,9 +1,6 @@
-
-#' @title Function 
-#' @description Description 
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples 
+#' @title Opennig banner
+#' @description Display an opening banner
+#' @examples openingBanner()
 #' @export
 openingBanner <- function() {
     system('clear')
@@ -17,7 +14,7 @@ openingBanner <- function() {
     box.style <- cli:::box_styles()
     box.width <- 80
     box.margins <- 1
-    
+
     ## get the width of the path box
     max.settings.width <- 40
     settings.box.nchar <-nchar(
@@ -29,7 +26,7 @@ openingBanner <- function() {
     settings.box.width <- max(settings.box.nchar) +
         2 +              # add one for the status character
         box.margins*2    # add the left and right margin
-    
+
     ## Outer box (top)
     top <- reefCloudPackage::outerBox.top(box.width, settings.box.width)
 
@@ -49,7 +46,7 @@ openingBanner <- function() {
     bottom <- reefCloudPackage::outerBox.bottom(box.width, settings.box.width)
 
     ## Combine boxes
-    combined.boxes.text <- combinedBoxes(
+    combined.boxes.text <- reefCloudPackage::combinedBoxes(
         top,
         settings.box.text,
         main.box.text,
@@ -57,10 +54,10 @@ openingBanner <- function() {
         box.width,
         settings.box.width,
         box.margins)
-    
+
     cat(combined.boxes.text)
 
     ## log box
     log.box <- reefCloudPackage::logBox(box.width, box.margins)
-    cat(log.box) 
+    cat(log.box)
 }

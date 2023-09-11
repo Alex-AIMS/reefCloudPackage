@@ -2,19 +2,17 @@
 % Please edit documentation in R/save_status.R
 \name{save_status}
 \alias{save_status}
-\title{Function}
+\title{Save status}
 \usage{
 save_status()
 }
-\arguments{
-\item{parameters}{description}
-}
 \value{
-returned arguments description
+save STATUS IN in DATA_PATH/STATUS.RData file\cr
+and current values of settings in DATA_PATH/global_settings.RData
 }
 \description{
-Description
+save current status and current global variables
 }
 \examples{
-examples 
+save_status()
 }

@@ -2,19 +2,23 @@
 % Please edit documentation in R/generateSettings.R
 \name{generateSettings}
 \alias{generateSettings}
-\title{Function}
+\title{Generate settings}
 \usage{
 generateSettings()
 }
-\arguments{
-\item{parameters}{description}
-}
 \value{
-returned arguments description
+Creates the following global variables\cr
+DATA_PATH\cr
+INPUT_DATA\cr
+RDATA_FILE \cr
+FILENAME \cr
+INPUT_FORMAT \cr
+CSV_FILE \cr
+TIER_DATA
 }
 \description{
-Description
+Generates path and naming settings
 }
 \examples{
-examples 
+generateSettings()
 }
