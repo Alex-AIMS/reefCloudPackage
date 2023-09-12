@@ -1,0 +1,20 @@
+model_fitmodel <- function(){
+  if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
+
+  reefCloudPackage::read_status()
+  CURRENT_STAGE <<- 4
+
+  ## There are sufficient differences in the processing of benthic data
+  ## between 'site' and 'tier' level analyses to warrent forking off the
+  ## code into separate paths at this point.
+
+  if (!DEBUG_MODE) cli::cli_h1("Model fitting")
+
+  if (DOMAIN_CATEGORY == "site") {
+    reefCloudPackage::model_fitModelSite()
+  } else {
+    reefCloudPackage::model_fitModelTier()
+    if (GENERATE_REPORT) reefCloudPackage::model_summariseModelTier()
+  }
+
+}
