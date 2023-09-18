@@ -2,19 +2,21 @@
 % Please edit documentation in R/prep_group_data_for_modelling.R
 \name{prep_group_data_for_modelling}
 \alias{prep_group_data_for_modelling}
-\title{Function}
+\title{Group data for model}
 \usage{
 prep_group_data_for_modelling(data, GROUP)
 }
 \arguments{
-\item{parameters}{description}
+\item{data}{data set}
+
+\item{GROUP}{string, name of group}
 }
 \value{
-returned arguments description
+grouped data, arranged by Tier4, Tier5, Site, Transect, and descending fYEAR
 }
 \description{
-Description
+Prepare fGROUP for modelling
 }
 \examples{
-examples 
+prep_group_data_for_modelling(data, GROUP)
 }

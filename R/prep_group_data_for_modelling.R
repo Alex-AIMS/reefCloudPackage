@@ -1,13 +1,12 @@
-
-#### Modelling functions
-#' @title Function 
-#' @description Description 
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples 
+#' @title Group data for model
+#' @description Prepare fGROUP for modelling
+#' @param data data set
+#' @param GROUP string, name of group
+#' @return grouped data, arranged by Tier4, Tier5, Site, Transect, and descending fYEAR
+#' @examples prep_group_data_for_modelling(data, GROUP)
 #' @export
 prep_group_data_for_modelling <- function(data, GROUP) {
-    tryCatch({
+  reefCloudPackage::ReefCloud_tryCatch({
         ## ---- data_sub
         data.grp <- data %>%
             filter(fGROUP == GROUP) %>%

@@ -1,4 +1,8 @@
-model_fitmodel <- function(){
+#' @title Fit model
+#' @description Fits model to data
+#' @examples model_fitModel()
+#' @export
+model_fitModel <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
   reefCloudPackage::read_status()

@@ -1,14 +1,13 @@
-
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 meshINLA <- function(data.sub, tier5.sf, tier5_buffer.list, FOCAL_TIER) {
   list2env(tier5_buffer.list, envir = environment())
 
-  tryCatch({
+  reefCloudPackage::ReefCloud_tryCatch({
       cli::cli_progress_bar("SPDE INLA cellmeans", type = "iterator", total = 10, clear = TRUE)
       ##full.grid, full.coords
       full.grid.list <- reefCloudPackage::meshINLA_full_grid(data.sub, tier5_buffer.sf)

@@ -16,5 +16,5 @@ returned arguments description
 Description
 }
 \examples{
-examples 
+examples
 }

@@ -1,14 +1,14 @@
 
 ## simpleINLA -----------------------------------------------------------------------
 
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 simpleINLA <- function(data.sub, GROUP, TIER) {
-  tryCatch({
+  reefCloudPackage::ReefCloud_tryCatch({
     ## ---- simpleINLA
     {
       cli::cli_progress_bar("Simple INLA cellmeans", type = "iterator", total = 7, clear = TRUE)

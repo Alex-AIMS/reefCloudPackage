@@ -1,14 +1,14 @@
 
 
 
-#' @title Function 
-#' @description Description 
+#' @title Function
+#' @description Description
 #' @param parameters description
 #' @return returned arguments description
-#' @examples examples 
+#' @examples examples
 #' @export
 meshINLA_reconstruct <- function(GROUP, TIERS) {
-  tryCatch({
+  reefCloudPackage::ReefCloud_tryCatch({
     ## ---- reconstruct
     {
       load(paste0(DATA_PATH, "primary/tier5.sf.RData"))
