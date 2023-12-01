@@ -1,9 +1,5 @@
-
-#' @title Function
-#' @description Description
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples
+#' @title endMatter
+#' @description Closing banner
 #' @export
 endMatter <- function() {
     cat("\n***************************************************\n")

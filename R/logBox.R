@@ -1,5 +1,3 @@
-
-
 #' @title Function
 #' @description Description
 #' @param parameters description

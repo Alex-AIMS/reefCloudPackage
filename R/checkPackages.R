@@ -9,7 +9,7 @@ checkPackages <- function(log = TRUE) {
     options(tidyverse.quiet = TRUE)
     pkgs <- c('tidyverse','sf','INLA','jsonlite','rlang','tidybayes', 'testthat',
               'rnaturalearth', 'rnaturalearthdata', 'patchwork', 'ggnewscale',
-              'inlabru', 'cli', 'stars', 'geojsonR', 'geojsonsf','s2')
+              'inlabru', 'cli', 'stars', 'geojsonR', 'geojsonsf','s2', 'FRK','spacetime')
     for (p in pkgs) {
         ## unforunately we must do this the base r way until rlang is
         ## loaded

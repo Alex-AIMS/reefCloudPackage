@@ -4,7 +4,10 @@
 \alias{model_fitModel}
 \title{Fit model}
 \usage{
-model_fitModel()
+model_fitModel(raw_cell_means = TRUE)
+}
+\arguments{
+\item{raw_cell_means}{boolean. If TRUE, runs raw cell means. If FALSE, runs simple INLA cell means. Default is TRUE.}
 }
 \description{
 Fits model to data

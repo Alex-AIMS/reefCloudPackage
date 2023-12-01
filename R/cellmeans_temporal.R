@@ -1,11 +1,8 @@
-
-
-
-#' @title Function
-#' @description Description
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples
+#' @title cellmeans_temporal
+#' @description RawMeansTemporal
+#' @param data.sub data set
+#' @param GROUP Benthic group
+#' @param TIERS tiers considered
 #' @export
 cellmeans_temporal <- function(data.sub, GROUP, TIER) {
   ## ---- RawMeansTemporal

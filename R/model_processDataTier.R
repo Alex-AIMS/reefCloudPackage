@@ -104,7 +104,7 @@ model_processDataTier <- function(){
                REPORT_YEAR, DATE, fYEAR, fDEPTH, REEF_ZONE,
                fGROUP, GROUP_DESC) %>%
       summarise(COUNT = n(),
-                COVER = mean(COVER)/100) %>%
+                COVER = mean(COVER)/100) %>% #for legacy data
       ungroup(fGROUP, GROUP_DESC) %>%
       mutate(TOTAL=sum(COUNT),
              PERC_COVER=COUNT/TOTAL,
@@ -121,7 +121,8 @@ model_processDataTier <- function(){
     ## data %>% filter(is.na(fGROUP)) %>% head
     ## ====================================================
     save(data, file=paste0(DATA_PATH, "processed/", RDATA_FILE))
-    write_csv(data %>% dplyr::select(-fYEAR), file = paste0(AWS_OUTPUT_PATH, gsub('.csv','_tier.csv', CSV_FILE)))
+    write_csv(data %>% dplyr::select(-fYEAR),
+              file = paste0(AWS_OUTPUT_PATH, gsub('.csv','_tier.csv', CSV_FILE)))
     ## cat(paste0('Data successfully processed:\n'))
     if (!DEBUG_MODE) cli_alert_success("Benthic data successfully processed")
     ## if(!build_report(component = "prepare_tier")) cat("Tier maps will be excluded from the report!\n\n")
@@ -196,7 +197,9 @@ model_processDataTier <- function(){
         disturb.str <- str_replace(f, ".*covariate_(.*).RData", "\\1")
 
         covariate.hexpred <- covariate %>%
-          mutate(dist = disturb.str) %>%
+          mutate(dist = disturb.str) %>%#cest la ou on a peut etre tout casse
+          # mutate(storm_t5_weight_wave_hours = ifelse(is.na(storm_t5_weight_wave_hours),
+          #                                            0, storm_t5_weight_wave_hours))%>%
           group_by(Tier5, fYEAR) %>%
           mutate(n_lag = list(0:max_lag)) %>%
           tidyr::unnest(c(n_lag)) %>%
@@ -251,23 +254,6 @@ model_processDataTier <- function(){
           ggsave(filename = paste0(OUTPUT_PATH, "figures/Missing_Tiers_", COV, ".pdf"),
                  width = 5, plot = g1,) %>%
             suppressMessages()
-          ## benthos_tier5s <- data %>% pull(Tier5) %>% unique()
-          ## gotTier <- covariate %>% pull(Tier5) %>% unique()
-          ## world <- ne_countries(country = "Australia", scale = "small", returnclass = "sf")
-          ## g1 <- ggplot() +
-          ##   geom_sf(data = rnaturalearth::countries110 %>% st_as_sf()) +
-          ##   geom_sf(data = tier.sf, colour = 'gray') +
-          ##   geom_sf(data = tier.sf %>% filter(Tier5 %in% benthos_tier5s), colour = 'blue') +
-          ##   geom_sf(data = tier.sf %>% filter(Tier5 %in% gotTier), colour = 'green') +
-          ##   geom_sf(data = tier.sf %>%
-          ##             filter(Tier5 %in% misTiers) %>%
-          ##          suppressMessages() ,
-          ##           colour = 'red') +
-          ##   theme_bw() +
-          ##   coord_sf(xlim = c(147, 151), ylim = c(-23,-20))
-          ## ggsave(filename = paste0(OUTPUT_PATH, "figures/Missing_Tiers_", COV, "_1.pdf"),
-          ##        width = 5, plot = g1,) %>%
-          ##   suppressMessages()
         }
         ## If there are excessive tier 5 levels, flag how many
         misTier <- covariate %>% anti_join(tiers.lookup) %>% nrow() %>%
@@ -312,7 +298,8 @@ model_processDataTier <- function(){
     covs <- purrr::reduce(covs, dplyr::left_join)
     save(covs, file=paste0(DATA_PATH, "processed/covs.RData"))
 
-    files <- list.files(path = paste0(DATA_PATH, "processed"), pattern = "covariate.hexpred.*.RData$", full.names = TRUE)
+    files <- list.files(path = paste0(DATA_PATH, "processed"),
+                        pattern = "covariate.hexpred.*.RData$", full.names = TRUE)
     files <- gsub("//", "/", files)
     if (length(files)>0) {
       covs.hexpred <- vector('list', length(files))
@@ -324,7 +311,6 @@ model_processDataTier <- function(){
     }
     covs.hexpred <- purrr::reduce(covs.hexpred, dplyr::left_join)
     save(covs.hexpred, file=paste0(DATA_PATH, "processed/covs.hexpred.RData"))
-
   },
   logFile=LOG_FILE,
   Category='--Processing routines--',

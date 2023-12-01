@@ -2,19 +2,21 @@
 % Please edit documentation in R/log.R
 \name{log}
 \alias{log}
-\title{Function}
+\title{write in log file}
 \usage{
 log(status, logFile, Category, msg = NULL)
 }
 \arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
+\item{status}{a string indicating either 'FAILURE',  'SUCCESS',  'WARNING' or 'INFO'}
+
+\item{logFile}{a character string representation of the log file name (including path relative to the current working director)}
+
+\item{msg}{the message (as a string) to appear verbatim in the log}
+
+\item{Categorya}{character string with a category to appear verbatim in the log}
+
+\item{success}{boolean or string. One of TRUE (for success), 'WARNING' (for warnings) or anything else for a failure}
 }
 \description{
-Description
-}
-\examples{
-examples
+The following function writes out log information to a file named by the logFile argument in the log/ folder.
 }

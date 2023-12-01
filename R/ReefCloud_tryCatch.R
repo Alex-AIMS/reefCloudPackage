@@ -21,7 +21,8 @@ ReefCloud_tryCatch <- function(expr, logFile,Category, expectedClass=NULL, msg=N
   W <- NULL
   w.handler <- function(w){ # warning handler
     m<-w$message
-    if ((warnings < max.warnings) && (grepl ('reefCloudPackage::WARNING', m)>0)) {
+    print(m)
+    if ((warnings < max.warnings) && (grepl ('WARNING', m)>0)) {
       reefCloudPackage::log('WARNING', logFile, Category, paste(warnings, msg, m))
       warnings<<-warnings+1
     }

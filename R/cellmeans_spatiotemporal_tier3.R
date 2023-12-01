@@ -1,9 +1,8 @@
-
-#' @title Function
-#' @description Description
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples
+#' @title cellmeans_spatiotemporal_tier3
+#' @description RawMeansSpatioTemporal at Tier 3 level
+#' @param data.sub data set
+#' @param GROUP Benthic group
+#' @param TIERS tiers considered
 #' @export
 cellmeans_spatiotemporal_tier3 <- function(data.sub, GROUP, TIER) {
   ## ---- RawMeansSpatioTemporalTier3

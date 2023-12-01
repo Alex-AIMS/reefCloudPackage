@@ -1,9 +1,8 @@
-
-#' @title Function
+#' @title cellmeans_reconstruct
 #' @description Description
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples
+#' @param data.sub data set
+#' @param GROUP Benthic group
+#' @param TIERS tiers considered
 #' @export
 cellmeans_reconstruct <- function(data.sub, GROUP, TIERS) {
   reefCloudPackage::ReefCloud_tryCatch({

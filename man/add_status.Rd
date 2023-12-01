@@ -2,19 +2,19 @@
 % Please edit documentation in R/add_status.R
 \name{add_status}
 \alias{add_status}
-\title{Function}
+\title{add_status}
 \usage{
 add_status(stage, item, label, status, update_display = TRUE)
 }
 \arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
+\item{stage}{integer indicating current stage}
+
+\item{item}{item to be added}
+
+\item{label}{name of item to be added}
+
+\item{update_display}{boolean indicating if change to STATUS displayed on screen}
 }
 \description{
-Description
-}
-\examples{
-examples
+modify STATUS global variable
 }

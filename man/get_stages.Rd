@@ -2,19 +2,10 @@
 % Please edit documentation in R/get_stages.R
 \name{get_stages}
 \alias{get_stages}
-\title{Function}
+\title{get_stages}
 \usage{
 get_stages()
 }
-\arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
-}
 \description{
-Description
-}
-\examples{
-examples 
+The following function selects specific key files that mark the start of major analysis stages and thus determines the totalnumber of analysis stages.  The function returns a vector from 1 to the maximum number of stages.
 }

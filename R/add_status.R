@@ -1,8 +1,9 @@
-#' @title Function
-#' @description Description
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples
+#' @title add_status
+#' @description modify STATUS global variable
+#' @param stage integer indicating current stage
+#' @param item item to be added
+#' @param label name of item to be added
+#' @param update_display boolean indicating if change to STATUS displayed on screen
 #' @export
 add_status <- function(stage, item, label, status, update_display = TRUE) {
     STATUS[[stage]]$items <- c(STATUS[[stage]]$items, item)

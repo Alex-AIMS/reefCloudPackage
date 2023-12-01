@@ -1,9 +1,8 @@
-
-#' @title Function
-#' @description Description
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples
+#' @title cellmeans_spatiotemporal_tier4
+#' @description RawMeansSpatioTemporal at Tier 4 level
+#' @param data.sub data set
+#' @param GROUP Benthic group
+#' @param TIERS tiers considered
 #' @export
 cellmeans_spatiotemporal_tier4 <- function(data.sub, GROUP, TIER) {
   ## ---- RawMeansSpatioTemporalTier4
@@ -27,13 +26,7 @@ cellmeans_spatiotemporal_tier4 <- function(data.sub, GROUP, TIER) {
     left_join(tier4.sf) %>%
     st_as_sf() %>%
     suppressMessages()
-  ## Tests =========================================
-  ## ggplot(cellmeans.tier4) +
-  ##   geom_point(aes(y=Cover, x=as.numeric(as.character(fYEAR)), color=fDEPTH)) +
-  ##   geom_line(aes(y=Cover, x=as.numeric(as.character(fYEAR)), linetype=fDEPTH)) +
-  ##   facet_wrap(~Tier4)
-  ## dev.off()
-  ## ===============================================
+
   saveRDS(list(cellmeans=cellmeans.tier4,
                data = data.sub,
                tier5.sf = tier5.sf,

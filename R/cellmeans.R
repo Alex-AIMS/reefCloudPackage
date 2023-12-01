@@ -1,12 +1,9 @@
-
-
-## Modelling functions (tiers) =====================================================
-## Cellmeans -----------------------------------------------------------------------
-#' @title Function
-#' @description Description
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples
+#' @title Cellmeans
+#' @description Modelling functions (tiers) using cellmeans
+#' @param data.sub data set
+#' @param GROUP benthic group
+#' @param TIER tier
+#' @param FOCAL_TIER tier lever on which predictions are made
 #' @export
 cellmeans <- function(data.sub, GROUP, TIER, FOCAL_TIER) {
   reefCloudPackage::ReefCloud_tryCatch({

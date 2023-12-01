@@ -1,8 +1,9 @@
 #' @title Fit model
 #' @description Fits model to data
+#' @param raw_cell_means boolean. If TRUE, runs raw cell means. If FALSE, runs simple INLA cell means. Default is TRUE.
 #' @examples model_fitModel()
 #' @export
-model_fitModel <- function(){
+model_fitModel <- function(raw_cell_means=TRUE){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
   reefCloudPackage::read_status()
@@ -15,7 +16,7 @@ model_fitModel <- function(){
   if (!DEBUG_MODE) cli::cli_h1("Model fitting")
 
   if (DOMAIN_CATEGORY == "site") {
-    reefCloudPackage::model_fitModelSite()
+    reefCloudPackage::model_fitModelSite(raw_cell_means)
   } else {
     reefCloudPackage::model_fitModelTier()
     if (GENERATE_REPORT) reefCloudPackage::model_summariseModelTier()

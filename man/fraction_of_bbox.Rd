@@ -2,19 +2,10 @@
 % Please edit documentation in R/fraction_of_bbox.R
 \name{fraction_of_bbox}
 \alias{fraction_of_bbox}
-\title{Function}
+\title{fraction_of_bbox}
 \usage{
 fraction_of_bbox(bbox, frac = 0.25)
 }
-\arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
-}
 \description{
-Description
-}
-\examples{
-examples 
+The following function is used to return a fraction of the longest of the eight and width of a bouding box. This is useful if for when we want to havea buffer around a tier of (for example) 10% (frac = 0.1)
 }

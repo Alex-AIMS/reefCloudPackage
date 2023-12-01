@@ -4,10 +4,13 @@
 \alias{model_fitModelSite}
 \title{Fit model at site level}
 \usage{
-model_fitModelSite()
+model_fitModelSite(raw_cell_means = TRUE)
+}
+\arguments{
+\item{raw_cell_means}{boolean. If TRUE, runs raw cell means. If FALSE, runs simple INLA cell means}
 }
 \description{
-Fits model to data at site level
+Fits model to data at site level, temporal model
 }
 \examples{
 model_fitModelSite()

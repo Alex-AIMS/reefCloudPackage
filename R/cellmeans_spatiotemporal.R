@@ -1,9 +1,8 @@
-
-#' @title Function
-#' @description Description
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples
+#' @title cellmeans_spatiotemporal
+#' @description RawMeansSpatioTemporal
+#' @param data.sub data set
+#' @param GROUP Benthic group
+#' @param TIERS tiers considered
 #' @export
 cellmeans_spatiotemporal <- function(data.sub, GROUP, TIER) {
   ## ---- RawMeansSpatioTemporal
@@ -24,10 +23,7 @@ cellmeans_spatiotemporal <- function(data.sub, GROUP, TIER) {
     left_join(tier5.sf) %>%
     st_as_sf() %>%
     suppressMessages()
-  ## Tests =========================================
-  ## cellmeans %>% filter(Tier5 == '32783') %>% as.data.frame %>% head
-  ## cellmeans %>% filter(Tier5 == '33124') %>% as.data.frame %>% head
-  ## ===============================================
+
   saveRDS(list(cellmeans=cellmeans,
                data = data.sub,
                tier5.sf = tier5.sf,

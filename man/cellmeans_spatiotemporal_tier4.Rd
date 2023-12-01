@@ -2,19 +2,17 @@
 % Please edit documentation in R/cellmeans_spatiotemporal_tier4.R
 \name{cellmeans_spatiotemporal_tier4}
 \alias{cellmeans_spatiotemporal_tier4}
-\title{Function}
+\title{cellmeans_spatiotemporal_tier4}
 \usage{
 cellmeans_spatiotemporal_tier4(data.sub, GROUP, TIER)
 }
 \arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
+\item{data.sub}{data set}
+
+\item{GROUP}{Benthic group}
+
+\item{TIERS}{tiers considered}
 }
 \description{
-Description
-}
-\examples{
-examples
+RawMeansSpatioTemporal at Tier 4 level
 }

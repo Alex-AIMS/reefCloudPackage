@@ -35,7 +35,6 @@ startMatter <- function(args = commandArgs()) {
     ## Start by clearing all local data folders
     if (REFRESH_DATA) reefCloudPackage::clear_data()
     CURRENT_STAGE <<- 1
-    ## reefCloudPackage::add_stage(stage = paste0("STAGE",CURRENT_STAGE), title = 'Stage 1 - prepare environment')
     reefCloudPackage::generateSettings()     ## generate the rest of the path and naming settings
     reefCloudPackage::initialise_log()       ## create the log file
     reefCloudPackage::config()               ## create directory structure if it does not yet exist
@@ -43,10 +42,5 @@ startMatter <- function(args = commandArgs()) {
     reefCloudPackage::analysis_stage()       ## read in the stage that the analysis is up to
     reefCloudPackage::openingBanner()        ## display an opening banner
     reefCloudPackage::save_status()
-    ## reefCloudPackage::checkPackages()
-    ## sf_use_s2(FALSE)
-    ## reefCloudPackage::log('INFO',  logFile = LOG_FILE, '--Modelling routines--',
-    ##               msg = paste0('Running script WITH command line args'))
-    ## ## The following checks to see if there are any Tiers in a GIS folder
-    ## TIERS <<- grep('^tier[0-9]$', list.files('../data/primary/GIS'), perl=TRUE, value=TRUE)
+
 }

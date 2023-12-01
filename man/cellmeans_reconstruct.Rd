@@ -2,19 +2,17 @@
 % Please edit documentation in R/cellmeans_reconstruct.R
 \name{cellmeans_reconstruct}
 \alias{cellmeans_reconstruct}
-\title{Function}
+\title{cellmeans_reconstruct}
 \usage{
 cellmeans_reconstruct(data.sub, GROUP, TIERS)
 }
 \arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
+\item{data.sub}{data set}
+
+\item{GROUP}{Benthic group}
+
+\item{TIERS}{tiers considered}
 }
 \description{
 Description
-}
-\examples{
-examples
 }

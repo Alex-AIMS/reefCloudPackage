@@ -45,25 +45,11 @@ parseCLA <- function(args) {
                         "[n>true|false>:\t whether to operate in debug mode.  If true,",
                         "\n\t\tprogress is provided via a CLI",
                         "\n<NUM>:\t which stages of the analysis to run (-1 or missing is all stages")
-    ## args <- commandArgs()
-    ## Ensure that a bucket path is supplied
+
     bucket <- grep('--bucket=.*', args)
-    ## if (length(bucket) != 1)
-    ##     stop(paste0('A --bucket argument must be provided with a valid ',
-    ##                 'path to a folder containing the input data.\n', valid_cla),
-    ##          call. = FALSE)
-    ## Ensure that a domain is supplied
     domain <- grep('--domain=.*', args)
-    ## if (length(domain) != 1)
-    ##     stop(paste0('A --domain argument must be provided with a value of either site or tier.\n',
-    ##                 valid_cla),
-    ##          call. = FALSE)
-    ## ## Ensure that a if a by_tier is provided, it is a valid number
     by_tier <- grep('--by_tier=.*', args)
-    ## if (length(by_tier) == 1 & !is.numeric(by_tier) & by_tier %in% 2:5)
-    ##     stop(paste0('If a --by_tier argument is provided, it must be a number between 2 and 5.\n',
-    ##                 valid_cla),
-    ##          call. = FALSE)
+    model_type <- grep('--model_type=.*', args)
 
     REFRESH_DATA <<- ifelse(any(grepl('--refresh_data ?= ?(true|t|TRUE|T)', args, perl = TRUE)), TRUE, FALSE)
     reefCloudPackage::change_status(stage = "SETTINGS", item = "REFRESH_DATA",
@@ -126,7 +112,12 @@ parseCLA <- function(args) {
                              status = "success", update_display = FALSE)
 
     ## Model type
-    MODEL_TYPE <<- 2   #simple hierachical
+    ## Tier level on which to break up analyses
+    if (length(model_type) == 0) {
+      MODEL_TYPE <<- 2   #simple hierachical
+    } else {
+      MODEL_TYPE <<- as.numeric(gsub('--model_type=(.*)', '\\1', args[model_type]))
+    }
     reefCloudPackage::change_status(stage = "SETTINGS", item = "MODEL_TYPE",
                              status = "success", update_display = FALSE)
 

@@ -15,6 +15,4 @@ model_loadData <- function(){
   } else if (.Platform$OS.type == "windows"){
     reefCloudPackage::model_loadData_windows()
   }
-
-
 }

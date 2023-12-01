@@ -2,19 +2,15 @@
 % Please edit documentation in R/load_aws.R
 \name{load_aws}
 \alias{load_aws}
-\title{Function}
+\title{load_aws}
 \usage{
 load_aws(file, level, col_types)
 }
 \arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
+\item{file}{a string representation of the name of the file to retrieve from the bucket}
+
+\item{level}{a string representation of the name of the processing level (primary, processed, modelled)}
 }
 \description{
-Description
-}
-\examples{
-examples 
+The following function is a wrapper for loading data from the aws bucket_exists
 }

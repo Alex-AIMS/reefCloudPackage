@@ -7,7 +7,7 @@
 model_fitModelTier()
 }
 \description{
-Fits model to data at tier level
+Fits model to data at tier level, spatio temporal model
 }
 \examples{
 model_fitModelTier()

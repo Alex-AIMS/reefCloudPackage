@@ -63,7 +63,7 @@ model_processDataSite <- function(){
       ungroup %>%
       droplevels %>%
       filter(!is.na(REPORT_YEAR)) %>% droplevels() %>%   # exclude any records that do not have a REPORT_YEAR
-      mutate(ZONE_DEPTH = interaction(REEF_ZONE, fDEPTH, sep=":"),
+      mutate(ZONE_DEPTH = interaction(REEF_ZONE, fDEPTH, sep=";"),
              SITE = REEF)%>%
       mutate(COUNT = ifelse(!is.na(COVER), NA, COUNT),                    ## for legacy data that only provides
              TOTAL = ifelse(!is.na(COVER), NA, TOTAL),                    ## COVER, reset COUNT, TOTAL and
@@ -163,8 +163,9 @@ model_processDataSite <- function(){
 
   reefCloudPackage::ReefCloud_tryCatch({
     save(data,  file=paste0(DATA_PATH,'processed/',RDATA_FILE))
-    write_csv(data %>% dplyr::select(-fYEAR),  path=paste0(DATA_PATH, 'processed/', CSV_FILE))
-    write_csv(data %>% dplyr::select(-fYEAR), path = paste0(AWS_OUTPUT_PATH, gsub('.csv','_site.csv', CSV_FILE)))
+    write_csv(data %>% dplyr::select(-fYEAR),  file=paste0(DATA_PATH, 'processed/', CSV_FILE))
+    write_csv(data %>% dplyr::select(-fYEAR), file = paste0(AWS_OUTPUT_PATH, gsub('.csv','_site.csv', CSV_FILE)))
+    # ask Murray? on repart jamais dans le AWS bucket,
     ## reefCloudPackage::write_aws(file=CSV_FILE,  level='processed/')
     cat(paste0('Data successfully processed:\n'))
   },

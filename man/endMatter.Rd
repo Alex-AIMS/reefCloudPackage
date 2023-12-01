@@ -2,19 +2,10 @@
 % Please edit documentation in R/endMatter.R
 \name{endMatter}
 \alias{endMatter}
-\title{Function}
+\title{endMatter}
 \usage{
 endMatter()
 }
-\arguments{
-\item{parameters}{description}
-}
-\value{
-returned arguments description
-}
 \description{
-Description
-}
-\examples{
-examples
+Closing banner
 }
