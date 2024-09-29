@@ -77,7 +77,7 @@ parseCLA <- function(args) {
     ## Determine whether data are to be sourced locally or from s3 bucket
     DATA_FROM <<- ifelse(
         grepl('data/synthetic', AWS_PATH, perl = TRUE), 'SYNTHETIC',
-                  ifelse(grepl('(^/mnt.*|^/home/data.*)', AWS_PATH, perl=TRUE), 'LOCAL',
+                  ifelse(grepl('(^/mnt.*|^/home/data.*|^/data/.*)', AWS_PATH, perl=TRUE), 'LOCAL',
                   ifelse(grepl('^[sS]3.*', AWS_PATH, perl=TRUE), 'S3', 'User defined')))
     reefCloudPackage::change_status(stage = "SETTINGS", item = "DATA_FROM",
                              status = "success", update_display = FALSE)

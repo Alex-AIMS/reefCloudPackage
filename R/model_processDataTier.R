@@ -38,10 +38,10 @@ model_processDataTier <- function(){
     sf_use_s2(FALSE)
     data.site <-
       data.site %>%
-      reefCloudPackage::assignSpatialDomain_tier(tier = 2) %>%
-      reefCloudPackage::assignSpatialDomain_tier(tier = 3) %>%
-      reefCloudPackage::assignSpatialDomain_tier(tier = 4) %>%
-      reefCloudPackage::assignSpatialDomain_tier(tier = 5) %>%
+      assignSpatialDomain_tier(tier = 2) %>%
+      assignSpatialDomain_tier(tier = 3) %>%
+      assignSpatialDomain_tier(tier = 4) %>%
+      assignSpatialDomain_tier(tier = 5) %>%
       dplyr::select(-LONGITUDE, -LATITUDE) %>%
       distinct() %>%
       suppressMessages() %>%
@@ -294,9 +294,9 @@ model_processDataTier <- function(){
         load(file = f)
         covs[[f]] <- covariate
       }
+      covs <- purrr::reduce(covs, dplyr::left_join)
+      save(covs, file=paste0(DATA_PATH, "processed/covs.RData"))
     }
-    covs <- purrr::reduce(covs, dplyr::left_join)
-    save(covs, file=paste0(DATA_PATH, "processed/covs.RData"))
 
     files <- list.files(path = paste0(DATA_PATH, "processed"),
                         pattern = "covariate.hexpred.*.RData$", full.names = TRUE)
@@ -308,9 +308,9 @@ model_processDataTier <- function(){
         load(file = f)
         covs.hexpred[[f]] <- covariate.hexpred
       }
+      covs.hexpred <- purrr::reduce(covs.hexpred, dplyr::left_join)
+      save(covs.hexpred, file=paste0(DATA_PATH, "processed/covs.hexpred.RData"))
     }
-    covs.hexpred <- purrr::reduce(covs.hexpred, dplyr::left_join)
-    save(covs.hexpred, file=paste0(DATA_PATH, "processed/covs.hexpred.RData"))
   },
   logFile=LOG_FILE,
   Category='--Processing routines--',

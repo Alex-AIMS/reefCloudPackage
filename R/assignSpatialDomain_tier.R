@@ -28,7 +28,15 @@ assignSpatialDomain_tier <- function(dat, tier, andNearest=TRUE) {
           distinct() %>%
           suppressMessages() %>%
           suppressWarnings()
-      dat <- rows_update(dat, a, by=c("P_CODE", "REEF", "SITE_NO"))
+      ## update the original dat according to the new a
+      ## dat <- rows_update(dat, a, by=c("P_CODE", "REEF", "SITE_NO"))
+      ## note, rows_update does not work nicely with sf objects (any more)
+      ## So there is a need to strip the geometry of both and then put it back
+      dat_no_geom <- rows_update(st_drop_geometry(dat),
+                         st_drop_geometry(a),
+                         by=c("P_CODE", "REEF", "SITE_NO"))
+      dat <- dat_no_geom %>%
+        st_as_sf(coords = c("LONGITUDE", "LATITUDE"), remove = FALSE, crs = st_crs(dat))
   }
   dat %>%
     st_drop_geometry() %>%
