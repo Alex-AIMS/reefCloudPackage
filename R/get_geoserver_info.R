@@ -1,3 +1,10 @@
+##' Retrieves metadata from the geoserver 
+##'
+##' Get data from geoserver
+##' @title get geoserver info 
+##' @return NULL 
+##' @author Murray Logan
+##' @export
 get_geoserver_info <- function() {
   status::status_try_catch(
   {
