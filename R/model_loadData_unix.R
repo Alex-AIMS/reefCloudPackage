@@ -348,6 +348,45 @@ model_loadData_unix <- function(){
     item = "Save covariate data")
   }
 
+  ## Try to load covariates from geoserver  ========================
+  reefCloudPackage::ReefCloud_tryCatch({
+    COVARIATES <<- NULL
+
+    ## get the geoserver info
+    get_geoserver_info()
+    ## get tiers
+    load(file=paste0(DATA_PATH,'primary/tier', 5, '.sf.RData'))
+    cov_dhw <- get_geoserver_data(Tier = 4, cov_name = "degrees_heating_weeks_tier")   
+    cov_dhw <- tier.sf %>% st_intersection(cov_dhw) 
+    cov_dhw <- cov_dhw %>%
+      st_drop_geometry() %>% 
+      group_by(Tier5, year) %>%
+      summarise(severity_dhw = max(severity),
+                max_dhw =  max(dhwmax),
+                end_date_dhw = max(latest)) %>%
+      ungroup()
+    save(cov_dhw, file = paste0(DATA_PATH, "primary/covariate_dhw.RData"))
+
+    cov_cyc <- get_geoserver_data(Tier = 4, cov_name = "storm4m_exposure_year_tier")   
+    cov_cyc <- tier.sf %>% st_intersection(cov_cyc) 
+    cov_cyc <- cov_cyc %>%
+      st_drop_geometry() %>% 
+      group_by(Tier5, end_year) %>%
+      summarise(severity_cyc = max(severity),
+                max_cyc =  max(max_hrs),
+                end_date_cyc = max(end_date)) %>%
+      dplyr::rename(year =  end_year) %>% 
+      ungroup()
+    save(cov_cyc, file = paste0(DATA_PATH, "primary/covariate_cyc.RData"))
+
+  },
+  logFile = LOG_FILE,
+  Category = "--Data processing routines--",
+  msg = "Retrieving covariate data from geoserver",
+  stage = paste0("STAGE", CURRENT_STAGE),
+  item = "Save covariate data")
+}
+
   ## Unzip and load the Coral Reefs of the World code
   if (DOMAIN_CATEGORY == "tier") {
     reefCloudPackage::ReefCloud_tryCatch({

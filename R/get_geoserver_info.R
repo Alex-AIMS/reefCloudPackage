@@ -8,7 +8,7 @@
 get_geoserver_info <- function() {
   status::status_try_catch(
   {
-  ## reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
     rc_geo<-"https://geoserver.apps.aims.gov.au/reefcloud/ows"
     rc_client <- WFSClient$new(rc_geo, 
                                serviceVersion = "2.0.0")
@@ -18,14 +18,14 @@ get_geoserver_info <- function() {
     url <- parse_url(rc_geo)
     geo_info <- list(rc_lyrs = rc_lyrs, url = url)
     assign("geo_info", geo_info, env =  .GlobalEnv)
-  ## },
-  ## logFile=LOG_FILE,
-  ## Category='--Processing routines--',
-  ## msg='Process covariates',
-  ## return=NULL,
-  ## stage = paste0("STAGE", CURRENT_STAGE),
-  ## item = "Get geoserver info")
-      },
+    ## },
+    ## logFile=LOG_FILE,
+    ## Category='--Processing routines--',
+    ## msg='Process covariates',
+    ## return=NULL,
+    ## stage = paste0("STAGE", CURRENT_STAGE),
+    ## item = "Get geoserver info")
+  },
   stage_ = 1,
   name_ = "Get_geoserver_info",
   item_ = "get_geoserver_info"

@@ -54,10 +54,12 @@ parseCLA <- function(args) {
     REFRESH_DATA <<- ifelse(any(grepl('--refresh_data ?= ?(true|t|TRUE|T)', args, perl = TRUE)), TRUE, FALSE)
     reefCloudPackage::change_status(stage = "SETTINGS", item = "REFRESH_DATA",
                              status = "success", update_display = FALSE)
+    status::add_setting(element = "refresh_data", item = REFRESH_DATA, name = "Refresh data")
 
     DEBUG_MODE <<- ifelse(any(grepl('--debug ?= ?(true|t|TRUE|T)', args, perl = TRUE)), TRUE, FALSE)
     reefCloudPackage::change_status(stage = "SETTINGS", item = "DEBUG_MODE",
                              status = "success", update_display = FALSE)
+    status::add_setting(element = "debug_mode", item = DEBUG_MODE, name = "Debug mode")
 
     runstage <<- grep('--runStage ?=.*', args, perl = TRUE)
     runStage <<- gsub('--runStage ?= ?', '\\1', args[runstage])
@@ -73,6 +75,7 @@ parseCLA <- function(args) {
     AWS_PATH <<- gsub('--bucket=(.*)','\\1/', file)
     reefCloudPackage::change_status(stage = "SETTINGS", item = "AWS_PATH",
                              status = "success", update_display = FALSE)
+    status::add_setting(element = "aws_path", item = AWS_PATH, name = "AWS path")
 
     ## Determine whether data are to be sourced locally or from s3 bucket
     DATA_FROM <<- ifelse(

@@ -142,12 +142,51 @@ model_processDataTier <- function(){
   stage = paste0("STAGE", CURRENT_STAGE),
   item = "Processing data")
 
-  reefCloudPackage::ReefCloud_tryCatch({
-    COVARIATES <<- NULL
-    files <- list.files(path = paste0(DATA_PATH, "primary"),
-                        pattern = "covariate.*.RData$",
-                        full.names = TRUE)
-    files <- gsub("//", "/", files)
+  ## Process covariates from geoserver =====================================
+  load(file=paste0(DATA_PATH, "processed/", RDATA_FILE))
+  load(paste0(DATA_PATH, 'primary/tier', 5, '.sf.RData'))
+  files <- list.files(path = paste0(DATA_PATH, "primary"),
+                      pattern = "covariate.*.RData$",
+                      full.names = TRUE)
+  files <- gsub("//", "/", files)
+  if (length(files)>0) {
+    cov_list <- vector("list", length(files)) 
+    names(cov_list) <- gsub('.*covariate_(.*).RData', '\\1', files)
+    for (f in files) {
+      cov_name <- gsub('.*covariate_(.*).RData', '\\1', f)
+      cov <- get(load(file = f))
+
+      ## join to benthic data
+      data <- data %>% add_cov_to_data(cov, cov_name)
+
+      ## fill in the missing years for each Tier5 in the covariates
+      year_range <- data %>% pull(REPORT_YEAR) %>% range()
+      full_cov_lookup <- data.frame(year = seq(year_range[1], year_range[2], by =  1)) %>%
+        crossing(Tier5 = unique(tier.sf$Tier5)) %>%
+        arrange(Tier5)
+      cov_list[[cov_name]] <-
+        cov %>% lag_covariates(year_range, full_cov_lookup, cov_name)
+    }
+    full_cov <- cov_list[[1]] %>%
+      dplyr::select(Tier5, year) %>%
+      bind_cols(lapply(cov_list,
+                       function(x) x %>%
+                                   ## ungroup() %>%
+                                   dplyr::select(-Tier5, -year)))
+    save(full_cov, file=paste0(DATA_PATH, "processed/", "covariates_full_tier5.RData"))
+    assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))
+    save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE))
+
+    covs.hexpred_tier_sf_v2_prep <- extract_reef_id_tier(full_cov)
+    
+    
+  }
+
+
+  
+  if (1 == 2) {
+    
+    ## old
     if (length(files)>0) {
       load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
       load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
@@ -311,6 +350,7 @@ model_processDataTier <- function(){
       covs.hexpred <- purrr::reduce(covs.hexpred, dplyr::left_join)
       save(covs.hexpred, file=paste0(DATA_PATH, "processed/covs.hexpred.RData"))
     }
+    }
   },
   logFile=LOG_FILE,
   Category='--Processing routines--',
@@ -318,4 +358,5 @@ model_processDataTier <- function(){
   return=NULL,
   stage = paste0("STAGE", CURRENT_STAGE),
   item = "Processing covariates")
+
 }
