@@ -351,12 +351,12 @@ model_processDataTier <- function(){
       save(covs.hexpred, file=paste0(DATA_PATH, "processed/covs.hexpred.RData"))
     }
     }
-  },
-  logFile=LOG_FILE,
-  Category='--Processing routines--',
-  msg='Prepare covariates data',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Processing covariates")
+  ## },
+  ## logFile=LOG_FILE,
+  ## Category='--Processing routines--',
+  ## msg='Prepare covariates data',
+  ## return=NULL,
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "Processing covariates")
 
 }

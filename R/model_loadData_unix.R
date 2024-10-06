@@ -385,7 +385,7 @@ model_loadData_unix <- function(){
   msg = "Retrieving covariate data from geoserver",
   stage = paste0("STAGE", CURRENT_STAGE),
   item = "Save covariate data")
-}
+
 
   ## Unzip and load the Coral Reefs of the World code
   if (DOMAIN_CATEGORY == "tier") {
