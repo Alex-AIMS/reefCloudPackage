@@ -45,7 +45,7 @@ checkPackages <- function(log = TRUE) {
     ## }
   },
   stage_ = 1,
-  order_ = 1
+  order_ = 1,
   name_ = "Load package dependencies",
   item_ = "load_packages"
   )
