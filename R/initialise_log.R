@@ -12,4 +12,10 @@ initialise_log <- function() {
     reefCloudPackage::add_status(stage = "SETTINGS", item = "LOG_FILE",
                           label = "Log file", status = "success",
                           update_display = FALSE)
+  if (is.null(status::get_setting("log_file"))) {
+    status::add_setting("log_file", LOG_FILE, "LOG file")
+  } else {
+   status::update_setting("log_file", LOG_FILE) 
+  }
 }
+
