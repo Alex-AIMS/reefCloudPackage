@@ -23,59 +23,11 @@ model_loadData_unix <- function(){
   unzip_benthic_data()
   
   ## 3. Import data
-  status::status_try_catch(
-  {
-  ## reefCloudPackage::ReefCloud_tryCatch({
-    ## Read data into a R
-    data <- read_csv(paste0(DATA_PATH, "primary/", CSV_FILE),
-                     ## col_types = "cdccccdddddcdTcdccc",
-                     ## col_types = "cdcddccccdTcdcc",
-                     col_types = "cdcddccdcdTcdcc",
-                     trim_ws = TRUE) %>%
-      mutate(SITE_DEPTH = as.character(SITE_DEPTH))
-  ## },
-  ## logFile = LOG_FILE,
-  ## Category = "--Data processing routines--",
-  ## msg = "Importing benthic data from local store",
-  ## stage = paste0("STAGE", CURRENT_STAGE),
-  ## item = "Import data"
-  ## )
-  },
-  stage_ = 2,
-  order_ = 3,
-  name_ = "Import benthic data",
-  item_ = "import_benthic_data"
-  )
-
+  import_benthic_data()
+  
   ## 4. Save data
-  status::status_try_catch(
-  {
-  ## reefCloudPackage::ReefCloud_tryCatch({
-    ## Save as native R file
-    save(data, file = paste0(DATA_PATH, "primary/", RDATA_FILE))
-    if (!DEBUG_MODE) cli_alert_success("Benthic data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
-    if (GENERATE_REPORT) {
-      ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
-                           list(list(type='component', value = '31a_load_benthos'))) %>%
-        unique()
-      save(ANALYSIS_STAGE, file=paste0(DATA_PATH, "analysis_stage.RData"))
-      ## if(!reefCloudPackage::build_report(component = "load_benthos"))
-      ##     cli_alert_danger("Info on loaded benthic data is {col_red(style_bold('NOT'))} incorporated into report!")
-    }
-  ## },
-  ## logFile = LOG_FILE,
-  ## Category = "--Data processing routines--",
-  ## msg = "Saving benthic data",
-  ## stage = paste0("STAGE", CURRENT_STAGE),
-  ## item = "Save data"
-  ## )
-  },
-  stage_ = 2,
-  order_ = 4,
-  name_ = "Save benthic data",
-  item_ = "save_data"
-  )
-
+  save_benthic_data()
+  
   ## Retrieve legacy benthic data (if it exists) ===================================================
   ## The legacy data may have an additional field ('cover') that records
   ## the percentage cover of the benthos.  If this field is non-NA,
