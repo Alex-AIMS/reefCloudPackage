@@ -46,10 +46,9 @@ model_loadData_unix <- function(){
   },
   stage_ = 2,
   order_ = 1,
-  name_ = "Read input info",
-  item_ = "read_input_info"
+  name_ = "Retrieve data",
+  item_ = "retrieve_data"
   )
-
   ## },
   ## logFile = LOG_FILE,
   ## Category = "--Data processing routines--",
@@ -58,17 +57,25 @@ model_loadData_unix <- function(){
   ## item = "Retrieve data")
 
   ## 2. Unzip data
-  reefCloudPackage::ReefCloud_tryCatch({
+  status::status_try_catch(
+  {
+  ## reefCloudPackage::ReefCloud_tryCatch({
     if (INPUT_FORMAT == "zip") {
       system(paste0('unzip -o -j ', DATA_PATH, 'primary/', FILENAME, '.zip -d ', DATA_PATH, 'primary/'))
       if (!DEBUG_MODE) cli_alert_success("Benthic data successfully unzipped to: {.file {paste0(DATA_PATH, 'primary/')}}")
     }
+  ## },
+  ## logFile = LOG_FILE,
+  ## Category = "--Data processing routines--",
+  ## msg = "Unzip benthic data",
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "Unzip data")
   },
-  logFile = LOG_FILE,
-  Category = "--Data processing routines--",
-  msg = "Unzip benthic data",
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Unzip data")
+  stage_ = 2,
+  order_ = 2,
+  name_ = "Unzip benthic data",
+  item_ = "unzip_benthic_data"
+  )
 
   ## 3. Import data
   reefCloudPackage::ReefCloud_tryCatch({
