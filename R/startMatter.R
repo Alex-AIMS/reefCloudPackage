@@ -46,6 +46,7 @@ startMatter <- function(args = commandArgs()) {
     reefCloudPackage::checkPackages()        ## load required packages
     reefCloudPackage::analysis_stage()       ## read in the stage that the analysis is up to
     reefCloudPackage::openingBanner()        ## display an opening banner
+    status::display_status_terminal()        ## display an opening banner
     reefCloudPackage::save_status()
 
 }
