@@ -50,6 +50,8 @@ model_loadData_unix <- function(){
   }
 
   ## Try to load covariates from geoserver  ========================
+  get_covariates()
+  
   reefCloudPackage::ReefCloud_tryCatch({
     COVARIATES <<- NULL
 

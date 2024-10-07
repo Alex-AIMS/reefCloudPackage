@@ -26,7 +26,8 @@ get_geoserver_info <- function() {
     ## stage = paste0("STAGE", CURRENT_STAGE),
     ## item = "Get geoserver info")
   },
-  stage_ = 1,
+  stage_ = 2,
+  order_ = 6,
   name_ = "Get_geoserver_info",
   item_ = "get_geoserver_info"
   )
