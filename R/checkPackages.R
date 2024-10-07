@@ -5,6 +5,8 @@
 #' @examples examples
 #' @export
 checkPackages <- function(log = TRUE) {
+  status::status_try_catch(
+  {
     missing <- ''
     options(tidyverse.quiet = TRUE)
     pkgs <- c('tidyverse','sf','INLA','jsonlite','rlang','tidybayes', 'testthat',
@@ -17,23 +19,34 @@ checkPackages <- function(log = TRUE) {
                                p,",quietly = TRUE, warn.conflicts = FALSE)) missing <- c(missing, ",
                                p,"))")))
     }
-    if(missing!="") {
-        reefCloudPackage::log(status = "FAILURE",
-                logFile = LOG_FILE,
-                Category = "Loading the necessary R packages",
-                msg=NULL)
-        ## reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "failure")
-        reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "failure")
-        reefCloudPackage::openingBanner()
-        stop(paste('The following required package(s) are missing: ',paste(missing, collapse=', ')))
-    } else {
-        ## reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "success")
-        reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "success")
-        reefCloudPackage::log(status = "SUCCESS",
-                logFile = LOG_FILE,
-                Category = "Loading the necessary R packages",
-                msg=NULL)
+    if (missing != "") {
+      stop(paste(
+        "The following required package(s) are missing: ",
+        paste(missing, collapse = ", ")
+      ))
     }
 
-    ## return(0)
+    ## if(missing!="") {
+    ##     reefCloudPackage::log(status = "FAILURE",
+    ##             logFile = LOG_FILE,
+    ##             Category = "Loading the necessary R packages",
+    ##             msg=NULL)
+    ##     ## reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "failure")
+    ##     reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "failure")
+    ##     reefCloudPackage::openingBanner()
+    ##     stop(paste('The following required package(s) are missing: ',paste(missing, collapse=', ')))
+    ## } else {
+    ##     ## reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "success")
+    ##     reefCloudPackage::change_status(stage = "STAGE1", item = "Load packages", status = "success")
+    ##     reefCloudPackage::log(status = "SUCCESS",
+    ##             logFile = LOG_FILE,
+    ##             Category = "Loading the necessary R packages",
+    ##             msg=NULL)
+    ## }
+  },
+  stage_ = 1,
+  order_ = 1
+  name_ = "Load package dependencies",
+  item_ = "load_packages"
+  )
 }
