@@ -17,38 +17,39 @@ model_loadData_unix <- function(){
 
   ## Benthic data =============================================================
   ## 1. Retrieve the benthic data from the S3 bucket
-  status::status_try_catch(
-  {
-    ## reefCloudPackage::ReefCloud_tryCatch({
-    ## Retrieve a more local version of the data
-    if (!DEBUG_MODE) cli_h1("Loading data")
-    if (DATA_FROM == "S3") {
-      reefCloudPackage::load_aws(file = CSV_FILE, level = "primary/")
-    }
-    if (DATA_FROM == "LOCAL") {
-      system(paste0(
-        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-        DATA_PATH, "primary/", FILENAME, ".zip"
-      ))
-    }
-    if (DATA_FROM == "SYNTHETIC") {
-      system(paste0(
-        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-        DATA_PATH, "primary/", FILENAME, ".zip"
-      ))
-    }
-    if (DATA_FROM == "User defined") {
-      system(paste0(
-        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-        DATA_PATH, "primary/", FILENAME, ".zip"
-      ))
-    }
-  },
-  stage_ = 2,
-  order_ = 1,
-  name_ = "Retrieve data",
-  item_ = "retrieve_data"
-  )
+  retrieve_benthic_data()
+  ## status::status_try_catch(
+  ## {
+  ##   ## reefCloudPackage::ReefCloud_tryCatch({
+  ##   ## Retrieve a more local version of the data
+  ##   if (!DEBUG_MODE) cli_h1("Loading data")
+  ##   if (DATA_FROM == "S3") {
+  ##     reefCloudPackage::load_aws(file = CSV_FILE, level = "primary/")
+  ##   }
+  ##   if (DATA_FROM == "LOCAL") {
+  ##     system(paste0(
+  ##       "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
+  ##       DATA_PATH, "primary/", FILENAME, ".zip"
+  ##     ))
+  ##   }
+  ##   if (DATA_FROM == "SYNTHETIC") {
+  ##     system(paste0(
+  ##       "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
+  ##       DATA_PATH, "primary/", FILENAME, ".zip"
+  ##     ))
+  ##   }
+  ##   if (DATA_FROM == "User defined") {
+  ##     system(paste0(
+  ##       "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
+  ##       DATA_PATH, "primary/", FILENAME, ".zip"
+  ##     ))
+  ##   }
+  ## },
+  ## stage_ = 2,
+  ## order_ = 1,
+  ## name_ = "Retrieve data",
+  ## item_ = "retrieve_data"
+  ## )
   ## },
   ## logFile = LOG_FILE,
   ## Category = "--Data processing routines--",
@@ -78,7 +79,9 @@ model_loadData_unix <- function(){
   )
 
   ## 3. Import data
-  reefCloudPackage::ReefCloud_tryCatch({
+  status::status_try_catch(
+  {
+  ## reefCloudPackage::ReefCloud_tryCatch({
     ## Read data into a R
     data <- read_csv(paste0(DATA_PATH, "primary/", CSV_FILE),
                      ## col_types = "cdccccdddddcdTcdccc",
@@ -86,16 +89,24 @@ model_loadData_unix <- function(){
                      col_types = "cdcddccdcdTcdcc",
                      trim_ws = TRUE) %>%
       mutate(SITE_DEPTH = as.character(SITE_DEPTH))
+  ## },
+  ## logFile = LOG_FILE,
+  ## Category = "--Data processing routines--",
+  ## msg = "Importing benthic data from local store",
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "Import data"
+  ## )
   },
-  logFile = LOG_FILE,
-  Category = "--Data processing routines--",
-  msg = "Importing benthic data from local store",
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Import data"
+  stage_ = 2,
+  order_ = 3,
+  name_ = "Import benthic data",
+  item_ = "import_benthic_data"
   )
 
-  ## 3. Save data
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## 4. Save data
+  status::status_try_catch(
+  {
+  ## reefCloudPackage::ReefCloud_tryCatch({
     ## Save as native R file
     save(data, file = paste0(DATA_PATH, "primary/", RDATA_FILE))
     if (!DEBUG_MODE) cli_alert_success("Benthic data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
@@ -107,12 +118,18 @@ model_loadData_unix <- function(){
       ## if(!reefCloudPackage::build_report(component = "load_benthos"))
       ##     cli_alert_danger("Info on loaded benthic data is {col_red(style_bold('NOT'))} incorporated into report!")
     }
+  ## },
+  ## logFile = LOG_FILE,
+  ## Category = "--Data processing routines--",
+  ## msg = "Saving benthic data",
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "Save data"
+  ## )
   },
-  logFile = LOG_FILE,
-  Category = "--Data processing routines--",
-  msg = "Saving benthic data",
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Save data"
+  stage_ = 2,
+  order_ = 4,
+  name_ = "Save benthic data",
+  item_ = "save_data"
   )
 
   ## Retrieve legacy benthic data (if it exists) ===================================================
@@ -122,39 +139,47 @@ model_loadData_unix <- function(){
   LEGACY_FILENAME <<- 'legacy_data'
   LEGACY_DATA <<- FALSE
   if(file.exists(paste0(AWS_PATH, 'raw/', LEGACY_FILENAME, '.zip'))) {
-    reefCloudPackage::ReefCloud_tryCatch({
+    status::status_try_catch(
+    {
+      ## reefCloudPackage::ReefCloud_tryCatch({
       LEGACY_DATA <<- TRUE
       if (DATA_FROM == "LOCAL")
         system(paste0("cp ", AWS_PATH, "raw/", LEGACY_FILENAME, ".zip", " ",
-                      DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"))
+          DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"))
       ## if (INPUT_FORMAT == "zip")
       ##   unzip(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"),
       ##         overwrite = TRUE, junkpaths = TRUE, exdir = paste0(DATA_PATH, "primary/"))
       if (INPUT_FORMAT == "zip")
         system(paste0('unzip -o -j ', DATA_PATH, 'primary/', LEGACY_FILENAME, '.zip -d ', DATA_PATH, 'primary/'))
       legacy_data <- read_csv(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".csv"),
-                              ## col_types = "cdccccdddddcdTcdccc",
-                              ## col_types = "cdcddccccdccdccd",
-                              col_types = "cdcddccdcdccdccd",
-                              trim_ws = TRUE)
+        ## col_types = "cdccccdddddcdTcdccc",
+        ## col_types = "cdcddccccdccdccd",
+        col_types = "cdcddccdcdccdccd",
+        trim_ws = TRUE)
       ## Convert fieldnames to uppercase (to be consistent with main data)
       legacy_data <- legacy_data %>%
         dplyr::rename_with(toupper) %>%
         mutate(SURVEY_DATE = as.POSIXct(SURVEY_DATE, format='%d/%m/%Y'),
-               SITE_DEPTH = as.character(SITE_DEPTH))
+          SITE_DEPTH = as.character(SITE_DEPTH))
       save(legacy_data, file = paste0(DATA_PATH, "primary/", gsub('reef', 'legacy', RDATA_FILE)))
       if (!DEBUG_MODE) cli_alert_success("Benthic data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
 
       if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
-                                                      item = "Legacy data",
-                                                      ## label = "Legacy data",
-                                                      status = "success")
+        item = "Legacy data",
+        ## label = "Legacy data",
+        status = "success")
+      ## },
+      ## logFile = LOG_FILE,
+      ## Category = "--Data processing routines--",
+      ## msg = "Loading legacy benthic data from supplied bucket",
+      ## stage = paste0("STAGE", CURRENT_STAGE),
+      ## item = "Legacy data"
+      ## )
     },
-    logFile = LOG_FILE,
-    Category = "--Data processing routines--",
-    msg = "Loading legacy benthic data from supplied bucket",
-    stage = paste0("STAGE", CURRENT_STAGE),
-    item = "Legacy data"
+    stage_ = 2,
+    order_ = 5,
+    name_ = "Legacy benthic data",
+    item_ = "legacy_data"
     )
   } else {
     LEGACY_DATA <<- FALSE
@@ -165,7 +190,9 @@ model_loadData_unix <- function(){
   ## If DOMAIN_CATOGORY == "tier" then we need to also retrieve the Tiers
   if (DOMAIN_CATEGORY == "tier") {
     ## Get tiers data =================================================
-    reefCloudPackage::ReefCloud_tryCatch({
+  status::status_try_catch(
+  {
+    ## reefCloudPackage::ReefCloud_tryCatch({
       TIERS <<- NULL
       ## Extract spatial data from geoserver
       if (!DATA_FROM %in% c("SYNTHETIC","User defined")) {
@@ -217,12 +244,18 @@ model_loadData_unix <- function(){
                                    status="SUCCESS", update_display = FALSE)
       reefCloudPackage::add_status(CURRENT_STAGE, item="TIERS", label="TIERS",
                                    status="SUCCESS", update_display = FALSE)
+    ## },
+    ## logFile = LOG_FILE,
+    ## Category = "--Data processing routines--",
+    ## msg = "Loading tier data from supplied bucket",
+    ## stage = paste0("STAGE", CURRENT_STAGE),
+    ## item = "Retrieve tier data"
+    ## )
     },
-    logFile = LOG_FILE,
-    Category = "--Data processing routines--",
-    msg = "Loading tier data from supplied bucket",
-    stage = paste0("STAGE", CURRENT_STAGE),
-    item = "Retrieve tier data"
+    stage_ = 2,
+    order_ = 6,
+    name_ = "Retrieve tier data",
+    item_ = "retrieve_tier_data"
     )
 
     if (1==2) {
