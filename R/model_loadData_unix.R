@@ -35,50 +35,10 @@ model_loadData_unix <- function(){
   LEGACY_FILENAME <<- 'legacy_data'
   LEGACY_DATA <<- FALSE
   if(file.exists(paste0(AWS_PATH, 'raw/', LEGACY_FILENAME, '.zip'))) {
-    status::status_try_catch(
-    {
-      ## reefCloudPackage::ReefCloud_tryCatch({
-      LEGACY_DATA <<- TRUE
-      if (DATA_FROM == "LOCAL")
-        system(paste0("cp ", AWS_PATH, "raw/", LEGACY_FILENAME, ".zip", " ",
-          DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"))
-      ## if (INPUT_FORMAT == "zip")
-      ##   unzip(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"),
-      ##         overwrite = TRUE, junkpaths = TRUE, exdir = paste0(DATA_PATH, "primary/"))
-      if (INPUT_FORMAT == "zip")
-        system(paste0('unzip -o -j ', DATA_PATH, 'primary/', LEGACY_FILENAME, '.zip -d ', DATA_PATH, 'primary/'))
-      legacy_data <- read_csv(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".csv"),
-        ## col_types = "cdccccdddddcdTcdccc",
-        ## col_types = "cdcddccccdccdccd",
-        col_types = "cdcddccdcdccdccd",
-        trim_ws = TRUE)
-      ## Convert fieldnames to uppercase (to be consistent with main data)
-      legacy_data <- legacy_data %>%
-        dplyr::rename_with(toupper) %>%
-        mutate(SURVEY_DATE = as.POSIXct(SURVEY_DATE, format='%d/%m/%Y'),
-          SITE_DEPTH = as.character(SITE_DEPTH))
-      save(legacy_data, file = paste0(DATA_PATH, "primary/", gsub('reef', 'legacy', RDATA_FILE)))
-      if (!DEBUG_MODE) cli_alert_success("Benthic data successfully read into: {.file {paste0(DATA_PATH, 'primary/')}}")
-
-      if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
-        item = "Legacy data",
-        ## label = "Legacy data",
-        status = "success")
-      ## },
-      ## logFile = LOG_FILE,
-      ## Category = "--Data processing routines--",
-      ## msg = "Loading legacy benthic data from supplied bucket",
-      ## stage = paste0("STAGE", CURRENT_STAGE),
-      ## item = "Legacy data"
-      ## )
-    },
-    stage_ = 2,
-    order_ = 5,
-    name_ = "Legacy benthic data",
-    item_ = "legacy_data"
-    )
+    get_legacy_data()
   } else {
     LEGACY_DATA <<- FALSE
+    status::remove_status_item(stage = 1, item = "legacy_data")
     reefCloudPackage::remove_predicates()
   }
   reefCloudPackage::save_status()
