@@ -33,7 +33,8 @@ startMatter <- function(args = commandArgs()) {
     reefCloudPackage::initialise_status()    ## create the status list
     status::status_initialize(
       pkg = "reefCloudPackage",
-      project_name = "ReefCloud statistical modelling"
+      project_name = "ReefCloud statistical modelling",
+      box_width = 100
     ) ## create the status list
     reefCloudPackage::parseCLA(args)         ## parse command line arguments
     ## Start by clearing all local data folders
