@@ -22,7 +22,7 @@ generateSettings <- function() {
   INPUT_DATA <<- "reef_data.zip"
   reefCloudPackage::change_status(stage = "SETTINGS", item = "INPUT_DATA",
     status = "success", update_display = FALSE)
-  status::add_setting(element = "input_path", item = INPUT_PATH, name = "Input path")
+  status::add_setting(element = "input_data", item = INPUT_DATA, name = "Input data")
 
   ## Working name for RData version of input data
   RDATA_FILE <<- gsub('\\.csv|\\.zip','\\.RData', INPUT_DATA)
