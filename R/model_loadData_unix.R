@@ -10,25 +10,52 @@
 #' @export
 model_loadData_unix <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
+  status::status_set_stage(stage = 2, title = "Obtain data")
 
   reefCloudPackage::read_status()
   CURRENT_STAGE <<- 2
 
   ## Benthic data =============================================================
   ## 1. Retrieve the benthic data from the S3 bucket
-  reefCloudPackage::ReefCloud_tryCatch({
+  status::status_try_catch(
+  {
+    ## reefCloudPackage::ReefCloud_tryCatch({
     ## Retrieve a more local version of the data
     if (!DEBUG_MODE) cli_h1("Loading data")
-    if (DATA_FROM == "S3") reefCloudPackage::load_aws(file = CSV_FILE, level = "primary/")
-    if (DATA_FROM == "LOCAL") system(paste0("cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ", DATA_PATH, "primary/", FILENAME, ".zip"))
-    if (DATA_FROM == "SYNTHETIC") system(paste0("cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ", DATA_PATH, "primary/", FILENAME, ".zip"))
-    if (DATA_FROM == "User defined") system(paste0("cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ", DATA_PATH, "primary/", FILENAME, ".zip"))
+    if (DATA_FROM == "S3") {
+      reefCloudPackage::load_aws(file = CSV_FILE, level = "primary/")
+    }
+    if (DATA_FROM == "LOCAL") {
+      system(paste0(
+        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
+        DATA_PATH, "primary/", FILENAME, ".zip"
+      ))
+    }
+    if (DATA_FROM == "SYNTHETIC") {
+      system(paste0(
+        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
+        DATA_PATH, "primary/", FILENAME, ".zip"
+      ))
+    }
+    if (DATA_FROM == "User defined") {
+      system(paste0(
+        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
+        DATA_PATH, "primary/", FILENAME, ".zip"
+      ))
+    }
   },
-  logFile = LOG_FILE,
-  Category = "--Data processing routines--",
-  msg = "Retrieve benthic data from supplied bucket",
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Retrieve data")
+  stage_ = 2,
+  order_ = 1,
+  name_ = "Read input info",
+  item_ = "read_input_info"
+  )
+
+  ## },
+  ## logFile = LOG_FILE,
+  ## Category = "--Data processing routines--",
+  ## msg = "Retrieve benthic data from supplied bucket",
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "Retrieve data")
 
   ## 2. Unzip data
   reefCloudPackage::ReefCloud_tryCatch({
