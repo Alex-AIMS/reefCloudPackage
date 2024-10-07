@@ -18,66 +18,10 @@ model_loadData_unix <- function(){
   ## Benthic data =============================================================
   ## 1. Retrieve the benthic data from the S3 bucket
   retrieve_benthic_data()
-  ## status::status_try_catch(
-  ## {
-  ##   ## reefCloudPackage::ReefCloud_tryCatch({
-  ##   ## Retrieve a more local version of the data
-  ##   if (!DEBUG_MODE) cli_h1("Loading data")
-  ##   if (DATA_FROM == "S3") {
-  ##     reefCloudPackage::load_aws(file = CSV_FILE, level = "primary/")
-  ##   }
-  ##   if (DATA_FROM == "LOCAL") {
-  ##     system(paste0(
-  ##       "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-  ##       DATA_PATH, "primary/", FILENAME, ".zip"
-  ##     ))
-  ##   }
-  ##   if (DATA_FROM == "SYNTHETIC") {
-  ##     system(paste0(
-  ##       "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-  ##       DATA_PATH, "primary/", FILENAME, ".zip"
-  ##     ))
-  ##   }
-  ##   if (DATA_FROM == "User defined") {
-  ##     system(paste0(
-  ##       "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-  ##       DATA_PATH, "primary/", FILENAME, ".zip"
-  ##     ))
-  ##   }
-  ## },
-  ## stage_ = 2,
-  ## order_ = 1,
-  ## name_ = "Retrieve data",
-  ## item_ = "retrieve_data"
-  ## )
-  ## },
-  ## logFile = LOG_FILE,
-  ## Category = "--Data processing routines--",
-  ## msg = "Retrieve benthic data from supplied bucket",
-  ## stage = paste0("STAGE", CURRENT_STAGE),
-  ## item = "Retrieve data")
 
   ## 2. Unzip data
-  status::status_try_catch(
-  {
-  ## reefCloudPackage::ReefCloud_tryCatch({
-    if (INPUT_FORMAT == "zip") {
-      system(paste0('unzip -o -j ', DATA_PATH, 'primary/', FILENAME, '.zip -d ', DATA_PATH, 'primary/'))
-      if (!DEBUG_MODE) cli_alert_success("Benthic data successfully unzipped to: {.file {paste0(DATA_PATH, 'primary/')}}")
-    }
-  ## },
-  ## logFile = LOG_FILE,
-  ## Category = "--Data processing routines--",
-  ## msg = "Unzip benthic data",
-  ## stage = paste0("STAGE", CURRENT_STAGE),
-  ## item = "Unzip data")
-  },
-  stage_ = 2,
-  order_ = 2,
-  name_ = "Unzip benthic data",
-  item_ = "unzip_benthic_data"
-  )
-
+  unzip_benthic_data()
+  
   ## 3. Import data
   status::status_try_catch(
   {

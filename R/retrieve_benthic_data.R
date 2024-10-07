@@ -34,8 +34,8 @@ retrieve_benthic_data <- function() {
   },
   stage_ = 2,
   order_ = 1,
-  name_ = "Retrieve data",
-  item_ = "retrieve_data"
+  name_ = "Retrieve benthic data",
+  item_ = "retrieve_benthic_data"
   )
   return(NULL)
 }
