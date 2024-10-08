@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 *~
+*#
+data/STATUS.RData
+data/analysis_stage.RData
+data/global_settings.RData
+data/log/
+old.R
