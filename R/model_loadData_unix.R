@@ -52,30 +52,13 @@ model_loadData_unix <- function(){
   ## Try to load covariates from geoserver  ========================
   get_covariates()
   
-
   ## Unzip and load the Coral Reefs of the World code
   if (DOMAIN_CATEGORY == "tier") {
-    reefCloudPackage::ReefCloud_tryCatch({
-      ## Retrieve a more local version of the data
-      if (!DEBUG_MODE) cli_h1("Loading coral reefs of the world shapefile")
-      system(paste0('unzip -o -j ', '../parameters/TropicalCoralReefsOfTheWorld.zip -d ', DATA_PATH, 'primary/'), ignore.stdout = TRUE)
-
-      reef_layer.sf <- read_sf(paste0(DATA_PATH, "/primary/reef_500_poly.shp"))
-      save(reef_layer.sf, file = paste0(DATA_PATH, "/primary/reef_layer.sf.RData"))
-      sf_files <- list.files(path = paste0(DATA_PATH, "/primary/"),
-                             pattern = "reef_500_poly.*",
-                             full.names = TRUE)
-      invisible(file.remove(sf_files))
-    },
-    logFile = LOG_FILE,
-    Category = "--Data processing routines--",
-    msg = "Retrieve reef layer from /parameters",
-    stage = paste0("STAGE", CURRENT_STAGE),
-    item = "Retrieve reef layers")
+    get_coral_reef_shape_files()
   }
 
 
-  reefCloudPackage::save_status()
+  ## reefCloudPackage::save_status()
 
 
   ## dirs <- list.files("/mnt/reefcloud/Palau")
