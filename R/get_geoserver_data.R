@@ -41,7 +41,7 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
   },
   stage_ = 2,
   order_ = 8,
-  name_ = "Get_geoserver_data",
+  name_ = "Get geoserver data",
   item_ = "get_geoserver_data"
   )
 }

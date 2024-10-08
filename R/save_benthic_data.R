@@ -16,7 +16,7 @@ save_benthic_data <- function(data) {
         unique()
       save(ANALYSIS_STAGE, file=paste0(DATA_PATH, "analysis_stage.RData"))
       ## if(!reefCloudPackage::build_report(component = "load_benthos"))
-      ##     cli_alert_danger("Info on loaded benthic data is {col_red(style_bold('NOT'))} incorporated into report!")
+      ##     cli_alert_danger("Info on loaded benthic data is {col_red(style_bold('NOT'))} incorporated into report!") 
     }
   },
   stage_ = 2,
