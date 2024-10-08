@@ -20,7 +20,7 @@ get_covariates <- function() {
     summarise(
       severity_dhw = max(severity),
       max_dhw = max(dhwmax),
-      end_date_dhw = max(latest)
+      end_date = max(latest)
     ) %>%
     ungroup() |>
     suppressMessages() |>
@@ -35,7 +35,7 @@ get_covariates <- function() {
     group_by(Tier5, end_year) %>%
     summarise(severity_cyc = max(severity),
       max_cyc =  max(max_hrs),
-      end_date_cyc = max(end_date)) %>%
+      end_date = max(end_date)) %>%
     dplyr::rename(year =  end_year) %>% 
     ungroup() |>
     suppressMessages() |>
