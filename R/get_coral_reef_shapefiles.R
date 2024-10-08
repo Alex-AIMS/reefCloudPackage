@@ -27,7 +27,8 @@ get_coral_reef_shape_files <- function() {
       sf_files <- list.files(path = paste0(DATA_PATH, "/primary/"),
                              pattern = "reef_500_poly.*",
                              full.names = TRUE)
-      invisible(file.remove(sf_files))
+    succ <- file.remove(sf_files)
+    if (any(!succ)) stop("Cannot remove old shapefiles")
   },
   stage_ = 2,
   order_ = 9,
