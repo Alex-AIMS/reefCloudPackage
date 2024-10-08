@@ -30,7 +30,7 @@ get_coral_reef_shape_files <- function() {
       invisible(file.remove(sf_files))
   },
   stage_ = 2,
-  order_ = 8,
+  order_ = 9,
   name_ = "Get coral reef shapefiles",
   item_ = "get_coral_reef_shapefiles"
   )

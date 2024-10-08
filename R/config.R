@@ -34,8 +34,8 @@ config <- function(){
     DOCS_PATH <<- "../docs/"
     ## Dockerfile will handle adding the necessary files
 
-    reefCloudPackage::change_status(stage = "STAGE1", item = "Prepare file system", status = "success",
-                             update_display = FALSE)
+    ## reefCloudPackage::change_status(stage = "STAGE1", item = "Prepare file system", status = "success",
+    ##                          update_display = FALSE)
     status::add_status_item(stage = 1, item = "prepare_file_system", name = "Prepare file system", status = "success")
 
   }, LOG_FILE, '--Config--', msg='configure necessary folders', return=NULL,
