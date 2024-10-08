@@ -5,7 +5,7 @@
 ##' @param data - the benthic data
 ##' @return NULL 
 ##' @author Murray
-prepare_covariates <- function() {
+prepare_covariates <- function(data) {
   status::status_try_catch(
   {
     load(file=paste0(DATA_PATH, "processed/", RDATA_FILE))
