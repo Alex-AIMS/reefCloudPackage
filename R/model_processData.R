@@ -70,11 +70,11 @@ model_processData <- function(){
   ## between 'site' and 'tier' level analyses to warrent forking off the
   ## code into separate paths at this point.
 
-  ## if (DOMAIN_CATEGORY == "site") {
-  ##   reefCloudPackage::model_processDataSite()
-  ## } else { # tier
-  ##   reefCloudPackage::model_processDataTier()
-  ## }
+  if (DOMAIN_CATEGORY == "site") {
+    reefCloudPackage::model_processDataSite()
+  } else { # tier
+    reefCloudPackage::model_processDataTier()
+  }
 }
 
 
