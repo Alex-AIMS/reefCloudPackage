@@ -8,6 +8,7 @@
 model_processDataTier <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
+  data <- get_data_and_legacy_for_processing()
 
   #############################################################
   ## Assign each observation to all available spatial Tiers  ##

@@ -14,19 +14,6 @@ assign_spatial_data <- function(data) {
   status::status_try_catch(
   {
     ## reefCloudPackage::ReefCloud_tryCatch({
-    load(file=paste0(DATA_PATH, "processed/Part1_", RDATA_FILE))
-    data <- data %>%
-      mutate(DATA_TYPE = "Data",
-        COVER = NA)
-    if(LEGACY_DATA) {
-      load(file=paste0(DATA_PATH, "processed/Part1_",
-        gsub("reef", "legacy", RDATA_FILE)))
-      data <- data %>%
-        mutate(DATA_TYPE = "Data") %>%
-        bind_rows(legacy_data %>% mutate(DATA_TYPE = "Legacy"))
-    }
-    data <- data %>% mutate(DATA_TYPE = factor(DATA_TYPE))
-
     ## load(file=paste0(DATA_PATH,'primary/',RDATA_FILE))
     ## This only needs to be done at the site level
     data.site <- data %>%
@@ -62,7 +49,7 @@ assign_spatial_data <- function(data) {
     ## item = "Processing tiers")
   },
   stage_ = 3,
-  order_ = 3,
+  order_ = 4,
   name_ = "Assign spatial data",
   item_ = "assign_spatial_data"
   )

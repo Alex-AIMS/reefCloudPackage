@@ -8,6 +8,13 @@
 model_processDataSite <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
+  data <- get_data_and_legacy_for_processing()
+  
+  if (length(unique(data$TRANSECT_NO))<2) {
+    data <- data %>%
+      mutate(TRANSECT_NO = as.factor(basename(FRAME)))
+  }
+
   ## - remove REGION and FRAME                                                     ##
   ## - ensure that REEF, SITE_NO, TRANSECT_NO and YEAR are all declared as factors ##
   ## - ensure that each Site and Transect are uniquely identified                  ##
@@ -16,6 +23,11 @@ model_processDataSite <- function(){
   ## - generate a total number of points per REEF/SITE_NO/TRANSECT_NO              ##
   ## - calculate a percent cover for each GROUP_CODE (not for analyses)            ##
   ###################################################################################
+
+
+  data <- prepare_data(data)
+
+
   reefCloudPackage::ReefCloud_tryCatch({
     load(file=paste0(DATA_PATH, "processed/Part1_", RDATA_FILE))
     data <- data %>%
@@ -31,11 +43,6 @@ model_processDataSite <- function(){
     data <- data %>% mutate(DATA_TYPE = factor(DATA_TYPE))
     #mutate(SITE_DEPTH = as.character(as.numeric(as.character(SITE_DEPTH))))
 
-    if (length(unique(data$TRANSECT_NO))<2) {
-      data <- data %>%
-        mutate(TRANSECT_NO = as.factor(basename(FRAME)))
-      ## data$TRANSECT_NO <- as.factor(basename(data$FRAME))
-    }
     data <-
       data %>%
       dplyr::select(-matches("^AIMS_REEF_NAME$|^REGION$|^NRM_REGION$|^A_SECTOR$|^FRAME$|^CRUISE_CODE$|$MMP_REGION$")) %>%
