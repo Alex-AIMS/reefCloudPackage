@@ -32,6 +32,8 @@
 #' parseCLA(args)
 #' @export
 parseCLA <- function(args) {
+  status::status_try_catch(
+  {
   valid_cla <- paste0("The call must be of the form:\n",
     "30_model.R --bucket=\"<PATH>\"",
     "\n\t--domain=<DOMAIN>",
@@ -151,4 +153,11 @@ parseCLA <- function(args) {
 
   ## reefCloudPackage::remove_predicates(update_display = FALSE)
   ## if (DEBUG_MODE) reefCloudPackage::openingBanner()
+  },
+  stage_ = 1,
+  order_ = 1,
+  name_ = "Parse CLA",
+  item_ = "parse_cla"
+  )
+
 }
