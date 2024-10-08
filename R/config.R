@@ -19,7 +19,8 @@ config <- function(){
   unlink(paste0(AWS_OUTPUT_PATH, "*.*"), recursive = TRUE)
 
   ## Create the directory structure
-  reefCloudPackage::ReefCloud_tryCatch({
+  status::status_try_catch(
+  {
     if (!dir.exists(paste0(DATA_PATH, '/primary'))) dir.create(paste0(DATA_PATH, '/primary'))
     if (!dir.exists(paste0(DATA_PATH, '/processed'))) dir.create(paste0(DATA_PATH, '/processed'))
     if (!dir.exists(paste0(DATA_PATH, '/processed'))) dir.create(paste0(DATA_PATH, '/processed'))
@@ -37,8 +38,12 @@ config <- function(){
     ## reefCloudPackage::change_status(stage = "STAGE1", item = "Prepare file system", status = "success",
     ##                          update_display = FALSE)
     status::add_status_item(stage = 1, item = "prepare_file_system", name = "Prepare file system", status = "success")
+  },
+  stage_ = 1,
+  order_ = 4,
+  name_ = "Configure paths",
+  item_ = "configure_paths"
+  )
 
-  }, LOG_FILE, '--Config--', msg='configure necessary folders', return=NULL,
-  stage = NULL, item = NULL)
 }
 
