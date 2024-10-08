@@ -8,9 +8,11 @@ get_coral_reef_shape_files <- function() {
   status::status_try_catch(
   {
       ## Retrieve a more local version of the data
+      zip_path <- system.file("extdata", package = "reefCloudPackage") |>
+        list.files(full.names = TRUE)
       if (!DEBUG_MODE) cli_h1("Loading coral reefs of the world shapefile")
       system(paste0(
-        "unzip -o -j ", "../parameters/TropicalCoralReefsOfTheWorld.zip -d ",
+        "unzip -o -j ", zip_path, " -d ",
         DATA_PATH, "primary/"
       ), ignore.stdout = TRUE)
 
