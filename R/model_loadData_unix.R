@@ -12,7 +12,7 @@ model_loadData_unix <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
   status::status_set_stage(stage = 2, title = "Obtain data")
 
-  reefCloudPackage::read_status()
+  ## reefCloudPackage::read_status()
   CURRENT_STAGE <<- 2
 
   ## Benthic data =============================================================
@@ -39,9 +39,9 @@ model_loadData_unix <- function(){
   } else {
     LEGACY_DATA <<- FALSE
     status::remove_status_item(stage = 1, item = "legacy_data")
-    reefCloudPackage::remove_predicates()
+    ## reefCloudPackage::remove_predicates()
   }
-  reefCloudPackage::save_status()
+  ## reefCloudPackage::save_status()
 
   ## If DOMAIN_CATOGORY == "tier" then we need to also retrieve the Tiers
   if (DOMAIN_CATEGORY == "tier") {
