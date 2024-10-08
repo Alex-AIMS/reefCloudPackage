@@ -30,12 +30,13 @@
 #' @examples startMatter(args = c("--bucket=/home/data/AUS", "--domain=tier", "--by_tier=4", "--debug=true", "--runStage=1", "--refresh_data=false"))
 #' @export
 startMatter <- function(args = commandArgs()) {
-    reefCloudPackage::initialise_status()    ## create the status list
+    ## reefCloudPackage::initialise_status()    ## create the status list
     status::status_initialize(
       pkg = "reefCloudPackage",
       project_name = "ReefCloud statistical modelling",
       box_width = 100
     ) ## create the status list
+    status::display_status_terminal()        ## display an opening banner
     reefCloudPackage::parseCLA(args)         ## parse command line arguments
     ## Start by clearing all local data folders
     if (REFRESH_DATA) reefCloudPackage::clear_data()
