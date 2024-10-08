@@ -11,6 +11,8 @@
 #' @examples generateSettings()
 #' @export
 generateSettings <- function() {
+  status::status_try_catch(
+  {
   ## Location of folder to store R data objects
   DATA_PATH <<- "../data/"
   if (!dir.exists(DATA_PATH)) dir.create(DATA_PATH)
@@ -59,4 +61,11 @@ generateSettings <- function() {
   ## LEGACY_DATA <<- FALSE
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "LEGACY_DATA",
   ##                          status = "success", update_display = FALSE)
+  },
+  stage_ = 1,
+  order_ = 3,
+  name_ = "Generate settings",
+  item_ = "generate_settings"
+  )
+
 }

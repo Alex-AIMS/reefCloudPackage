@@ -40,7 +40,7 @@ config <- function(){
     status::add_status_item(stage = 1, item = "prepare_file_system", name = "Prepare file system", status = "success")
   },
   stage_ = 1,
-  order_ = 4,
+  order_ = 5,
   name_ = "Configure paths",
   item_ = "configure_paths"
   )
