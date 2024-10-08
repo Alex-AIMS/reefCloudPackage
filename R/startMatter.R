@@ -38,21 +38,14 @@ startMatter <- function(args = commandArgs()) {
     ) ## create the status list
     status::display_status_terminal()        ## display an opening banner
     reefCloudPackage::parseCLA(args)         ## parse command line arguments
-  print("here")
     ## Start by clearing all local data folders
     if (REFRESH_DATA) reefCloudPackage::clear_data()
     CURRENT_STAGE <<- 1
-  print("there")
     reefCloudPackage::generateSettings()     ## generate the rest of the path and naming settings
-  print("thereA")
     reefCloudPackage::initialise_log()       ## create the log file
-  print("thereB")
     reefCloudPackage::config()               ## create directory structure if it does not yet exist
-  print("thereC")
     reefCloudPackage::checkPackages()        ## load required packages
-  print("thereD")
     reefCloudPackage::analysis_stage()       ## read in the stage that the analysis is up to
-  print("thereE")
     ## reefCloudPackage::openingBanner()        ## display an opening banner
     status::display_status_terminal()        ## display an opening banner
     ## reefCloudPackage::save_status()
