@@ -21,15 +21,15 @@ model_processDataTier <- function(){
 
   ## create a tiers lookup
   ## the following creates a lookup of tiers (primary/tiers_lookup.RData)
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     reefCloudPackage::make_tiers_lookup()
-  },
-  logFile=LOG_FILE,
-  Category='--Processing routines--',
-  msg='Generate tiers lookup',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Tiers lookup")
+  ## },
+  ## logFile=LOG_FILE,
+  ## Category='--Processing routines--',
+  ## msg='Generate tiers lookup',
+  ## return=NULL,
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "Tiers lookup")
 
   ##########################################################################
   ## Prepare the data for modelling:                                      ##
