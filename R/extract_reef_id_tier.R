@@ -1,4 +1,4 @@
-extract_reef_id_tier <- function(full_cov) {
+extract_reef_id_tier <- function(full_cov, tier.sf) {
   load(file = paste0(DATA_PATH, "/primary/reef_layer.sf.RData"))
   full_cov.sf <-
     full_cov %>% 

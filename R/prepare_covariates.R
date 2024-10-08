@@ -42,7 +42,7 @@ prepare_covariates <- function(data) {
       assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))
       save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE))
 
-      covs.hexpred_tier_sf_v2_prep <- extract_reef_id_tier(full_cov)
+      covs.hexpred_tier_sf_v2_prep <- extract_reef_id_tier(full_cov, tier.sf)
       
       
     }
