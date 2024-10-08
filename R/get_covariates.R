@@ -10,4 +10,7 @@ get_covariates <- function() {
   ## get the geoserver info
   get_geoserver_info()
 
+  ## get the degree heating weeks
+  cov_dhw <- get_geoserver_data(Tier = 4, cov_name = "degrees_heating_weeks_tier")   
+
 }

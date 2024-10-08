@@ -4,7 +4,7 @@
 ##' @title Save benthic data 
 ##' @return NULL 
 ##' @author Murray
-save_benthic_data <- function() {
+save_benthic_data <- function(data) {
   status::status_try_catch(
   {
     ## Save as native R file

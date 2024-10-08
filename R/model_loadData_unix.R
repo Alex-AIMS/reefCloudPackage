@@ -23,10 +23,10 @@ model_loadData_unix <- function(){
   unzip_benthic_data()
   
   ## 3. Import data
-  import_benthic_data()
+  data <- import_benthic_data()
   
   ## 4. Save data
-  save_benthic_data()
+  save_benthic_data(data)
   
   ## Retrieve legacy benthic data (if it exists) ===================================================
   ## The legacy data may have an additional field ('cover') that records

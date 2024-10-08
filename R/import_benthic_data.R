@@ -2,7 +2,7 @@
 ##'
 ##' Import benthic data from a CSV file
 ##' @title Import benthic data 
-##' @return NULL 
+##' @return A data frame with the benthic data 
 ##' @author Murray
 import_benthic_data <- function() {
   status::status_try_catch(
@@ -20,4 +20,5 @@ import_benthic_data <- function() {
   name_ = "Import benthic data",
   item_ = "import_benthic_data"
   )
+  return(data)
 }
