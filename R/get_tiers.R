@@ -55,10 +55,10 @@ get_tiers <- function() {
       save(ANALYSIS_STAGE, file=paste0(DATA_PATH, "analysis_stage.RData"))
     }
     ## Need to make sure that TIERS are added to the settings
-    reefCloudPackage::add_status(1, item="TIERS", label="TIERS",
-      status="SUCCESS", update_display = FALSE)
-    reefCloudPackage::add_status(CURRENT_STAGE, item="TIERS", label="TIERS",
-      status="SUCCESS", update_display = FALSE)
+    ## reefCloudPackage::add_status(1, item="TIERS", label="TIERS",
+    ##   status="SUCCESS", update_display = FALSE)
+    ## reefCloudPackage::add_status(CURRENT_STAGE, item="TIERS", label="TIERS",
+    ##   status="SUCCESS", update_display = FALSE)
   },
   stage_ = 2,
   order_ = 6,
