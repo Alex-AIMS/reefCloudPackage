@@ -48,9 +48,9 @@ model_processData <- function(){
           any_of(c("ID" = "ELEMENT_ID"))) %>%
         mutate(VARIABLE ="ALL")
       save(legacy_data, file=paste0(DATA_PATH, "processed/Part1_", gsub('reef', 'legacy', RDATA_FILE)))
-      if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
-        item = "Initial legacy parse",
-        status = "success")
+      ## if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
+      ##   item = "Initial legacy parse",
+      ##   status = "success")
       ## },
       ## logFile = LOG_FILE,
       ## Category = "--Processing routines--",

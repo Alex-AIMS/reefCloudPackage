@@ -22,7 +22,7 @@ model_processDataTier <- function(){
 
   ## create a tiers lookup
   ## the following creates a lookup of tiers (primary/tiers_lookup.RData)
-  reefCloudPackage::make_tiers_lookup()
+  make_tiers_lookup()
 
   ##########################################################################
   ## Prepare the data for modelling:                                      ##
