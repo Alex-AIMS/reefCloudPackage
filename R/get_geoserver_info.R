@@ -27,7 +27,7 @@ get_geoserver_info <- function() {
     ## item = "Get geoserver info")
   },
   stage_ = 2,
-  order_ = 7,
+  order_ = 9,
   name_ = "Get geoserver info",
   item_ = "get_geoserver_info"
   )

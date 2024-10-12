@@ -31,7 +31,7 @@ get_coral_reef_shape_files <- function() {
     if (any(!succ)) stop("Cannot remove old shapefiles")
   },
   stage_ = 2,
-  order_ = 9,
+  order_ = 12,
   name_ = "Get coral reef shapefiles",
   item_ = "get_coral_reef_shapefiles"
   )

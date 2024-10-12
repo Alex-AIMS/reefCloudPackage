@@ -24,6 +24,9 @@ model_loadData_unix <- function(){
   
   ## 3. Import data
   data <- import_benthic_data()
+
+  ## 4. Validate data
+  result <- validate_benthic_data()
   
   ## 4. Save data
   save_benthic_data(data)

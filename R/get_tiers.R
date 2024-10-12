@@ -61,7 +61,7 @@ get_tiers <- function() {
     ##   status="SUCCESS", update_display = FALSE)
   },
   stage_ = 2,
-  order_ = 6,
+  order_ = 8,
   name_ = "Retrieve tier data",
   item_ = "retrieve_tier_data"
   )

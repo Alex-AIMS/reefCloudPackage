@@ -35,7 +35,7 @@ get_legacy_data <- function() {
       status = "success")
   },
   stage_ = 2,
-  order_ = 5,
+  order_ = 6,
   name_ = "Legacy benthic data",
   item_ = "legacy_data"
   )
