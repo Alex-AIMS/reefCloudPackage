@@ -194,9 +194,9 @@ model_processDataTier <- function(){
         load(file = f)
         COV <- gsub('.*covariate_(.*).RData', '\\1', f)
         lookup <- c(Tier5 = "tier_id",
-                    Tier5 = "Tier_ID",
-                    Value = "MaxDHW",
-                    Value = "Wave_hours(weighted)")
+          Tier5 = "Tier_ID",
+          Value = "MaxDHW",
+          Value = "Wave_hours(weighted)")
         ## The Date field represents the "event" date. If this date is after the
         ## benthic record Date, then the covariate fYEAR should be considered the
         ## year before. The wave height data is (I think) just the sum or average
@@ -215,12 +215,12 @@ model_processDataTier <- function(){
           slice(1) %>%
           ungroup() %>%
           mutate(fYEAR = factor(Year),
-                 Tier5 = factor(Tier5),
-                 ## If the Date field does not exist, make it the last day of the year
-                 Date = if(!exists('Date', where = .))
-                   as.Date(paste0(Year, "-12-31"))
-                 ## else as.Date(Date)) %>%
-                 else as.Date(lubridate::parse_date_time(Date, orders = c("ymd", "mdy", "dmy")))) %>%
+            Tier5 = factor(Tier5),
+            ## If the Date field does not exist, make it the last day of the year
+            Date = if(!exists('Date', where = .))
+              as.Date(paste0(Year, "-12-31"))
+            ## else as.Date(Date)) %>%
+            else as.Date(lubridate::parse_date_time(Date, orders = c("ymd", "mdy", "dmy")))) %>%
           dplyr::select(-Year) %>%
           suppressMessages()
         ## The above data will be used for two purposes:
@@ -260,8 +260,8 @@ model_processDataTier <- function(){
         covariate <- covariate %>% full_join(benthos.dates) %>%
           mutate(
             tempYear = ifelse(DATE > Date | is.na(DATE),
-                              as.numeric(as.character(fYEAR)),
-                              as.numeric(as.character(fYEAR))-1)) %>%
+              as.numeric(as.character(fYEAR)),
+              as.numeric(as.character(fYEAR))-1)) %>%
           mutate(fYEAR = factor(tempYear)) %>%
           dplyr::select(-Date, -DATE, -tempYear) %>%
           group_by(Tier5, fYEAR) %>%
@@ -276,9 +276,9 @@ model_processDataTier <- function(){
           suppressMessages()
         if (misTier > 0) {
           reefCloudPackage::log(status = 'WARNING',
-                        logFile=LOG_FILE,
-                        Category='--Processing routines--',
-                        msg=paste0('The ', COV, ' covariate has no data for ',misTier,' tier 5 hexagons')
+            logFile=LOG_FILE,
+            Category='--Processing routines--',
+            msg=paste0('The ', COV, ' covariate has no data for ',misTier,' tier 5 hexagons')
           )
           misTiers <- tiers.lookup %>% anti_join(covariate) %>% pull(Tier5) %>%
             suppressMessages()
@@ -288,10 +288,10 @@ model_processDataTier <- function(){
             geom_sf(data = tier.sf %>%
                       filter(Tier5 %in% misTiers) %>%
                       suppressMessages() ,
-                    colour = 'red') +
+                      colour = 'red') +
             theme_bw()
           ggsave(filename = paste0(OUTPUT_PATH, "figures/Missing_Tiers_", COV, ".pdf"),
-                 width = 5, plot = g1,) %>%
+            width = 5, plot = g1,) %>%
             suppressMessages()
         }
         ## If there are excessive tier 5 levels, flag how many
@@ -299,9 +299,9 @@ model_processDataTier <- function(){
           suppressMessages()
         if (misTier > 0) {
           reefCloudPackage::log(status = 'WARNING',
-                        logFile=LOG_FILE,
-                        Category='--Processing routines--',
-                        msg=paste0('The ', COV, ' covariate has ',misTier,' tier 5 hexagons that should not be in this region.')
+            logFile=LOG_FILE,
+            Category='--Processing routines--',
+            msg=paste0('The ', COV, ' covariate has ',misTier,' tier 5 hexagons that should not be in this region.')
           )
         }
         YRS <- benthos.dates %>%
@@ -310,7 +310,7 @@ model_processDataTier <- function(){
           modelr::seq_range(by = 1)
         covariate <- covariate %>%
           complete(fYEAR = factor(YRS),
-                   Tier5 = unique(tiers.lookup$Tier5)) %>%
+            Tier5 = unique(tiers.lookup$Tier5)) %>%
           arrange(Tier5, fYEAR) %>%
           filter(as.numeric(as.character(fYEAR)) %in% YRS) %>%
           filter(Tier5 %in% (tiers.lookup %>% pull(Tier5) %>% unique())) %>%
@@ -321,7 +321,7 @@ model_processDataTier <- function(){
         COVARIATES <<- c(COVARIATES, COV)
         save(covariate, file=paste0(DATA_PATH, "processed/covariate_",COV,".RData"))
         reefCloudPackage::add_status(1, item = "COVARIATES", label = "Covariates", status = "SUCCESS",
-                              update_display = FALSE)
+          update_display = FALSE)
       }
     }
     files <- list.files(path = paste0(DATA_PATH, "processed"), pattern = "covariate_.*.RData$", full.names = TRUE)
@@ -338,7 +338,7 @@ model_processDataTier <- function(){
     }
 
     files <- list.files(path = paste0(DATA_PATH, "processed"),
-                        pattern = "covariate.hexpred.*.RData$", full.names = TRUE)
+      pattern = "covariate.hexpred.*.RData$", full.names = TRUE)
     files <- gsub("//", "/", files)
     if (length(files)>0) {
       covs.hexpred <- vector('list', length(files))
@@ -350,13 +350,6 @@ model_processDataTier <- function(){
       covs.hexpred <- purrr::reduce(covs.hexpred, dplyr::left_join)
       save(covs.hexpred, file=paste0(DATA_PATH, "processed/covs.hexpred.RData"))
     }
-    }
-  },
-  logFile=LOG_FILE,
-  Category='--Processing routines--',
-  msg='Prepare covariates data',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Processing covariates")
+  }
 
 }
