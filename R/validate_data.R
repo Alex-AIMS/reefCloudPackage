@@ -49,7 +49,7 @@ benthic_rules <- tibble::tribble(
   "BENTHIC_CATEGORY", "BENTHIC_CATEGORY missing",  "BENTHIC_CATEGORY column is missing", '"BENTHIC_CATEGORY" %in% names(.)',
   "BENTHIC_CATEGORY char", "BENTHIC_CATEGORY not character", "BENTHIC_CATEGORY column is not character", 'is.character(BENTHIC_CATEGORY)',
   )
-benthic_rules <- validator(.data = benthic_rules)
+benthic_rules <- validate::validator(.data = benthic_rules)
 assign("benthic_rules", benthic_rules, envir = .GlobalEnv)
 
 ##' Validate benthic data
@@ -75,7 +75,7 @@ validate_benthic_data <- function(data, rules) {
 }
 
 validate_data <- function(data, rules) {
-  result <- confront(data, rules)
+  result <- validate::confront(data, rules)
   invalid_rows <- violating_rows(result)
   val <- tidy_validation(result, rules)
   if (any(val$fails)) {
