@@ -5,11 +5,25 @@
 #' @examples initialise_log
 #' @export
 initialise_log <- function() {
+  status::status_try_catch(
+  {
     ##Log file
     LOG_FILE <<- paste0(DATA_PATH, 'log/', FILENAME, '.log')
     ## LOG_FILE <<- paste0("../.mmp.reefCloudPackage::log")
     if (file.exists(LOG_FILE)) unlink(LOG_FILE)
-    reefCloudPackage::add_status(stage = "SETTINGS", item = "LOG_FILE",
-                          label = "Log file", status = "success",
-                          update_display = FALSE)
+    ## reefCloudPackage::add_status(stage = "SETTINGS", item = "LOG_FILE",
+    ##                       label = "Log file", status = "success",
+    ##                       update_display = FALSE)
+  if (is.null(status::get_setting("log_file"))) {
+    status::add_setting("log_file", LOG_FILE, "LOG file")
+  } else {
+   status::update_setting("log_file", LOG_FILE) 
+  }
+  },
+  stage_ = 1,
+  order_ = 5,
+  name_ = "Initialise log",
+  item_ = "initialise_log"
+  )
 }
+

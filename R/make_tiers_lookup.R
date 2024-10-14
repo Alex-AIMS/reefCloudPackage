@@ -20,6 +20,8 @@
 #' @examples examples 
 #' @export
 make_tiers_lookup <- function() {
+  status::status_try_catch(
+  {
     sf_use_s2(FALSE)
     load(paste0(DATA_PATH, 'primary/tier5.sf.RData'))
     tiers.sf <- tier.sf %>%
@@ -44,4 +46,10 @@ make_tiers_lookup <- function() {
         suppressWarnings()
 
     save(tiers.lookup, file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  },
+  stage_ = 3,
+  order_ = 4,
+  name_ = "Make tiers lookup",
+  item_ = "make_tiers_lookup"
+  )
 }

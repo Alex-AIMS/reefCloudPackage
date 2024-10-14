@@ -1,19 +1,3 @@
-
-lag_covariates <- function(cov, year_range, full_cov_lookup, cov_name) {
-  cov %>%
-    filter(year >= year_range[1] & year <= year_range[2]) %>% 
-    dplyr::select(-end_date) %>% 
-    full_join(full_cov_lookup) %>%
-    arrange(Tier5, year) %>%
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  ~ replace_na(.x, replace = 0))) %>% 
-    group_by(Tier5) %>%
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  list(lag1 = ~ lag(.x) ))) %>% 
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  list(lag2 = ~ lag(.x, n = 2) ))) %>%
-    ungroup() 
-}
 add_cov_to_data <- function(data, cov, cov_name) {
   data %>%
     left_join(cov, by = c("Tier5" = "Tier5",
@@ -38,6 +22,22 @@ add_cov_to_data <- function(data, cov, cov_name) {
                   .names = "{.col}.{.fn}")) %>%
     dplyr::select(-end_date) %>%
     ungroup()
+}
+
+lag_covariates <- function(cov, year_range, full_cov_lookup, cov_name) {
+  cov %>%
+    filter(year >= year_range[1] & year <= year_range[2]) %>% 
+    dplyr::select(-end_date) %>% 
+    full_join(full_cov_lookup) %>%
+    arrange(Tier5, year) %>%
+    mutate(across(paste0(c("severity_", "max_"), cov_name),
+                  ~ replace_na(.x, replace = 0))) %>% 
+    group_by(Tier5) %>%
+    mutate(across(paste0(c("severity_", "max_"), cov_name),
+                  list(lag1 = ~ lag(.x) ))) %>% 
+    mutate(across(paste0(c("severity_", "max_"), cov_name),
+                  list(lag2 = ~ lag(.x, n = 2) ))) %>%
+    ungroup() 
 }
 
 adjust_cov_for_after_surveys <- function(dt, end_date, cov, tier5, .x) {

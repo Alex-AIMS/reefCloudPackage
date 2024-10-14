@@ -1,6 +1,14 @@
-
+##' Get data from geoserver
+##'
+##' This function gets data from the geoserver
+##' @title Get data from geoserver 
+##' @param Tier - an integer indicating the tier of the data to be retrieved
+##' @param cov_name - a string indicating the name of the coverage to be retrieved
+##' @return a spatial data frame containing the data from the geoserver
+##' @author Murray
 get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
-  ## reefCloudPackage::ReefCloud_tryCatch({
+  status::status_try_catch(
+  {
     load(file=paste0(DATA_PATH,'primary/tier', Tier, '.sf.RData'))
     wch <- str_which(geo_info$rc_lyrs, cov_name)
 
@@ -30,11 +38,10 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
       suppressWarnings() %>%
       suppressMessages()
     return(cov_data)
-  ## },
-  ## logFile=LOG_FILE,
-  ## Category='--Processing routines--',
-  ## msg='Process covariates',
-  ## return=NULL,
-  ## stage = paste0("STAGE", CURRENT_STAGE),
-  ## item = "Get geoserver data")
+  },
+  stage_ = 2,
+  order_ = 10,
+  name_ = "Get geoserver data",
+  item_ = "get_geoserver_data"
+  )
 }

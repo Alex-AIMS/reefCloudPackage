@@ -8,74 +8,21 @@
 model_processDataTier <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
+  data <- get_data_and_legacy_for_processing()
 
   #############################################################
   ## Assign each observation to all available spatial Tiers  ##
   ## - join to the spatial lookup to add each Tier           ##
   ## - ** Consider aggregating the lat/longs to site level** ##
   #############################################################
-  reefCloudPackage::ReefCloud_tryCatch({
-    load(file=paste0(DATA_PATH, "processed/Part1_", RDATA_FILE))
-    data <- data %>%
-      mutate(DATA_TYPE = "Data",
-             COVER = NA)
-    if(LEGACY_DATA) {
-      load(file=paste0(DATA_PATH, "processed/Part1_",
-                       gsub("reef", "legacy", RDATA_FILE)))
-      data <- data %>%
-        mutate(DATA_TYPE = "Data") %>%
-        bind_rows(legacy_data %>% mutate(DATA_TYPE = "Legacy"))
-    }
-    data <- data %>% mutate(DATA_TYPE = factor(DATA_TYPE))
-
-    ## load(file=paste0(DATA_PATH,'primary/',RDATA_FILE))
-    ## This only needs to be done at the site level
-    data.site <- data %>%
-      group_by(P_CODE, REEF, SITE_NO) %>%
-      summarise(
-        LATITUDE = mean(LATITUDE),
-        LONGITUDE = mean(LONGITUDE))
-    sf_use_s2(FALSE)
-    data.site <-
-      data.site %>%
-      assignSpatialDomain_tier(tier = 2) %>%
-      assignSpatialDomain_tier(tier = 3) %>%
-      assignSpatialDomain_tier(tier = 4) %>%
-      assignSpatialDomain_tier(tier = 5) %>%
-      dplyr::select(-LONGITUDE, -LATITUDE) %>%
-      distinct() %>%
-      suppressMessages() %>%
-      suppressWarnings()
-    data <- data %>%
-      left_join(data.site) %>%
-      suppressMessages()
-    ## Tests ==============================================
-    ## data %>% filter(is.na(GROUP_DESC)) %>% head
-    ## ====================================================
-    data <- data %>% filter(!is.na(GROUP_DESC))  # this is necessary to counteract spurious joins to tiers
-    if (!DEBUG_MODE) cli_alert_success("Spatial domains successfully applied to the benthic data")
-  },
-  logFile=LOG_FILE,
-  Category='--Processing routines--',
-  msg='Assign spatial domains',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Processing tiers")
+  data <- assign_spatial_data(data)
 
   ## Use the following to reduce the data down to a single Tier 4 (1808)
   ## data <- dev_data_cut(data, tier4 = 1808)
 
   ## create a tiers lookup
   ## the following creates a lookup of tiers (primary/tiers_lookup.RData)
-  reefCloudPackage::ReefCloud_tryCatch({
-    reefCloudPackage::make_tiers_lookup()
-  },
-  logFile=LOG_FILE,
-  Category='--Processing routines--',
-  msg='Generate tiers lookup',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Tiers lookup")
+  make_tiers_lookup()
 
   ##########################################################################
   ## Prepare the data for modelling:                                      ##
@@ -86,102 +33,10 @@ model_processDataTier <- function(){
   ## - calculate the total number of points per transect/year/depth       ##
   ## - generate a Cover (proportion) for use in exploratory data analyses ##
   ##########################################################################
-  reefCloudPackage::ReefCloud_tryCatch({
-    data %>%
-      mutate(
-        P_CODE = factor(P_CODE),
-        ID = factor(ID),
-        fYEAR = factor(REPORT_YEAR),
-        SITE_DEPTH = ifelse(is.na(SITE_DEPTH),'_', SITE_DEPTH),  # replace missing depths with a non NA value
-        fDEPTH = factor(SITE_DEPTH),
-        across(c(SITE_NO, TRANSECT_NO, fYEAR, fDEPTH), function(x) factor(as.character(x))),
-        DATE = as.Date(SURVEY_DATE, format = '%Y-%m-%d %h:%m:%s'),
-        fGROUP = factor(GROUP_DESC)) %>%
-      group_by(P_CODE, REEF, SITE_NO, TRANSECT_NO,
-               DATA_TYPE,
-               LATITUDE, LONGITUDE,
-               across(matches("^Tier[2345]$")),
-               REPORT_YEAR, DATE, fYEAR, fDEPTH, REEF_ZONE,
-               fGROUP, GROUP_DESC) %>%
-      summarise(COUNT = n(),
-                COVER = mean(COVER)/100) %>% #for legacy data
-      ungroup(fGROUP, GROUP_DESC) %>%
-      mutate(TOTAL=sum(COUNT),
-             PERC_COVER=COUNT/TOTAL,
-             ZONE_DEPTH=interaction(REEF_ZONE, fDEPTH)) %>%
-      ungroup %>%
-      filter(!is.na(REPORT_YEAR)) %>% droplevels() %>%   # exclude any records that do not have a REPORT_YEAR
-      mutate(COUNT = ifelse(!is.na(COVER), NA, COUNT),                    ## for legacy data that only provides
-             TOTAL = ifelse(!is.na(COVER), NA, TOTAL),                    ## COVER, reset COUNT, TOTAL and
-             PERC_COVER = ifelse(!is.na(COVER), NA, PERC_COVER)) %>%      ## PERC_COVER to NA
-      suppressMessages() %>%
-      suppressWarnings() ->
-      data
-    ## Tests ==============================================
-    ## data %>% filter(is.na(fGROUP)) %>% head
-    ## ====================================================
-    save(data, file=paste0(DATA_PATH, "processed/", RDATA_FILE))
-    write_csv(data %>% dplyr::select(-fYEAR),
-              file = paste0(AWS_OUTPUT_PATH, gsub('.csv','_tier.csv', CSV_FILE)))
-    ## cat(paste0('Data successfully processed:\n'))
-    if (!DEBUG_MODE) cli_alert_success("Benthic data successfully processed")
-    ## if(!build_report(component = "prepare_tier")) cat("Tier maps will be excluded from the report!\n\n")
-    ## if(!build_report(component = 'prepare_tier'))
-    ##     cli_alert_danger("Tier processed data summaries are {col_red(style_bold('NOT'))} incorporated into report!")
-    if (GENERATE_REPORT) {
-      ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
-                           list(list(type='component', value = '32_prepare_tier'))) %>%
-        unique()
-      save(ANALYSIS_STAGE, file=paste0(DATA_PATH, "analysis_stage.RData"))
-    }
-  },
-  logFile=LOG_FILE,
-  Category='--Processing routines--',
-  msg='Prepare benthic data',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Processing data")
+  data <- prepare_data(data)
 
   ## Process covariates from geoserver =====================================
-  load(file=paste0(DATA_PATH, "processed/", RDATA_FILE))
-  load(paste0(DATA_PATH, 'primary/tier', 5, '.sf.RData'))
-  files <- list.files(path = paste0(DATA_PATH, "primary"),
-                      pattern = "covariate.*.RData$",
-                      full.names = TRUE)
-  files <- gsub("//", "/", files)
-  if (length(files)>0) {
-    cov_list <- vector("list", length(files)) 
-    names(cov_list) <- gsub('.*covariate_(.*).RData', '\\1', files)
-    for (f in files) {
-      cov_name <- gsub('.*covariate_(.*).RData', '\\1', f)
-      cov <- get(load(file = f))
-
-      ## join to benthic data
-      data <- data %>% add_cov_to_data(cov, cov_name)
-
-      ## fill in the missing years for each Tier5 in the covariates
-      year_range <- data %>% pull(REPORT_YEAR) %>% range()
-      full_cov_lookup <- data.frame(year = seq(year_range[1], year_range[2], by =  1)) %>%
-        crossing(Tier5 = unique(tier.sf$Tier5)) %>%
-        arrange(Tier5)
-      cov_list[[cov_name]] <-
-        cov %>% lag_covariates(year_range, full_cov_lookup, cov_name)
-    }
-    full_cov <- cov_list[[1]] %>%
-      dplyr::select(Tier5, year) %>%
-      bind_cols(lapply(cov_list,
-                       function(x) x %>%
-                                   ## ungroup() %>%
-                                   dplyr::select(-Tier5, -year)))
-    save(full_cov, file=paste0(DATA_PATH, "processed/", "covariates_full_tier5.RData"))
-    assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))
-    save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE))
-
-    covs.hexpred_tier_sf_v2_prep <- extract_reef_id_tier(full_cov)
-    
-    
-  }
-
+  prepare_covariates(data)
 
   
   if (1 == 2) {
@@ -350,6 +205,7 @@ model_processDataTier <- function(){
       covs.hexpred <- purrr::reduce(covs.hexpred, dplyr::left_join)
       save(covs.hexpred, file=paste0(DATA_PATH, "processed/covs.hexpred.RData"))
     }
+
   }
 
 }

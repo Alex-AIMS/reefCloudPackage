@@ -1,4 +1,5 @@
-extract_reef_id_tier <- function(full_cov) {
+
+extract_reef_id_tier <- function(full_cov, tier.sf) {
   load(file = paste0(DATA_PATH, "/primary/reef_layer.sf.RData"))
   full_cov.sf <-
     full_cov %>% 
@@ -41,7 +42,7 @@ extract_reef_id_tier <- function(full_cov) {
   if (missing_reefid$reefid[1] > 0) {
     msg <- (paste("Some Tier5 do not have a reefid for the",FOCAL_TIER,":", TIER))
     reefCloudPackage::log("WARNING", logFile = LOG_FILE,
-                          "--Fitting model 5 FRK--", msg = msg)
+      "--Fitting model 5 FRK--", msg = msg)
 
     covs.hexpred_tier_sf_v2_prep <- covs.hexpred_tier_sf_v2_prep[-which(is.na(covs.hexpred_tier_sf_v2_prep$reefid)),]
   }
