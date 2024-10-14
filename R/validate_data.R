@@ -1,5 +1,5 @@
 ## Create a list of rules to check if the required columns are present
-benthic_rules <- tribble(
+benthic_rules <- tibble::tribble(
   ~name,    ~label, ~description, ~rule,
   "P_CODE", "P_CODE missing", "P_CODE column is missing", '"P_CODE" %in% names(.)',
   "P_CODE char", "P_CODE not character", "P_CODE column is not character", 'is.character(P_CODE)',
