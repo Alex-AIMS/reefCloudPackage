@@ -105,38 +105,46 @@ model_fitModelTier <- function(){
 
     if (MODEL_TYPE == 5) {
 
-      reefCloudPackage::ReefCloud_tryCatch({
-        ## Load and incoporate the original covariates (the ones only for observed tier/year)
-        files <- list.files(path = paste0(DATA_PATH, "processed"),
-                            pattern = "covs.hexpred.RData", full.names = TRUE)
-        NCOVAR <- length(COVARIATES)
-        load(files)
-        data <- data %>%
-          left_join(covs.hexpred) %>%
-          suppressMessages() %>%
-          suppressWarnings()
-      },
-      logFile=LOG_FILE,
-      Category='--Modelling fitting routines--',
-      msg='Add the covariates to the predictive layer (hexpred)',
-      return=NULL,
-      stage = paste0("STAGE", CURRENT_STAGE),
-      item = "Add covariates to the predictive layer"
-      )
+    #  reefCloudPackage::ReefCloud_tryCatch({
+    #    ## Load and incoporate the original covariates (the ones only for observed tier/year)
+    #    files <- list.files(path = paste0(DATA_PATH, "processed"),
+    #                        pattern = "covariates_full_tier5.RData", full.names = TRUE)
+    #    NCOVAR <- length(COVARIATES)
+    #    load(files)
+    #    data <- data %>%
+    #      left_join(full_cov) %>%
+    #      suppressMessages() %>%
+    #      suppressWarnings()
+    #  },
+    #  logFile=LOG_FILE,
+    #  Category='--Modelling fitting routines--',
+    #  msg='Add the covariates to the predictive layer (hexpred)', 
+    #  return=NULL,
+   #   stage = paste0("STAGE", CURRENT_STAGE),
+    #  item = "Add covariates to the predictive layer"
+     # )
 
       data.grp <- data.grp%>%
         mutate(numYEAR = as.numeric(as.character(fYEAR)))
-      #we crop the years
-      covs.hexpred <- covs.hexpred %>%
-        mutate(across(c(DHW_t5:Lagstorm_t5_weight_wave_hours.2),
+
+    
+    # Load predictive layer with covariates 
+     files <- list.files(path = paste0(DATA_PATH, "processed"),
+                            pattern = "covariates_full_tier5.RData", full.names = TRUE)
+     load(files)
+  
+    #we crop the years to match with the range of ecological data 
+      full_cov<- full_cov %>%
+        mutate(across(severity_cyc:max_dhw_lag2,         # make it better - starts_with(c('severity', 'max') and map
                       ~ifelse(is.na(.x), 0, .x))) %>%
-        mutate(numYEAR = as.numeric(as.character(fYEAR)))%>%
+        mutate(numYEAR = as.numeric(as.character(year))) %>%
         filter((numYEAR>=min(data.grp$numYEAR) &
-                 numYEAR<=max(data.grp$numYEAR)))
+                 numYEAR<=max(data.grp$numYEAR))) %>%
+        rename(fYEAR = year)
 
       tier.sf <- tier.sf%>%
         merge(tiers.lookup)
-      reefCloudPackage::model_fitModelTier_type5(data.grp, covs.hexpred, tier.sf)
+      reefCloudPackage::model_fitModelTier_type5(data.grp, full_cov, tier.sf)
 
     }
     if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
