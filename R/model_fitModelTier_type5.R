@@ -31,8 +31,6 @@ join_covariates_to_tier_lookup <- function(tier.sf) {
 }
 
 
-
-
 #' @title Fit model at tier level
 #' @description Fits model to data at tier level
 #' @param data.grp data on which model is fitted
@@ -56,17 +54,21 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
 
   for (TIER in unique(data.grp[[FOCAL_TIER]])) {
     TIER <<- as.character(TIER)  #make this global
-    sf::sf_use_s2(TRUE)
+    sf::sf_use_s2(TRUE) |> 
+      suppressMessages()
 
     # for dev
-    # TIER <- 1808
+    # TIER <- as.character(unique(data.grp[[FOCAL_TIER]])[2])
 
     #subset for current TIER
     data.grp.tier <- data.grp |>
       dplyr::filter(data.grp[[FOCAL_TIER]]==TIER) |>
       dplyr::select(-COVER)
 
-    # Reproject predictive layer for the cropping
+    # Extract reefid for every tier5
+##################################################################### begining of make_reefid <- function(tier.sf, full_cov, reef_layer.sf){
+
+       # Reproject predictive layer for the cropping
     covs.hexpred_tier_sf <- full_cov |>
       dplyr::left_join(tier.sf, by = c("Tier5" = "Tier5")) 
 
@@ -85,6 +87,7 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
     #st_crs(reef_layer.sf)$units are metres
     testthat::expect_equal(sf::st_crs(covs.hexpred_tier_sf)$units, "m")
     testthat::expect_equal(sf::st_crs(reef_layer.sf)$units, "m")
+    
     Reef_layer_tier5_84 <- reef_layer.sf |>
       sf::st_crop(covs.hexpred_tier_sf ) |>
           sf::st_cast("POLYGON") |>
@@ -102,14 +105,22 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
     # sf_use_s2(TRUE)
     sf::sf_use_s2(FALSE) |> 
       suppressMessages()
+   
     covs.hexpred_tier_sf_v2_prep <-
       covs.hexpred_tier_sf_84 |>
       sf::st_join(Reef_layer_tier5_84) |>
       dplyr::select(Tier5, reefid, geometry)|>
       suppressMessages()|>
       suppressWarnings()
-    sf::sf_use_s2(TRUE) |> 
+   
+   sf::sf_use_s2(TRUE) |> 
       suppressMessages()
+
+# return(covs.hexpred_tier_sf_v2_prep)
+#}
+############################################################################### function returns a different result than running the codes... 
+#  make_reefid(tier.sf, full_cov, reef_layer.sf)
+
 
     # Check number of Tier5 without reefid
     missing_reefid <- covs.hexpred_tier_sf_v2_prep |>
@@ -159,51 +170,51 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
         # Applying control quality - finding extreme events values for tier5 without observations
         #############################
 
-        out_cycl <- quantile(HexPred_sf_raw$`Wave_hours(weighted)`,
-                             na.rm=TRUE,probs = 0.975)
-        out_bleach <- quantile(HexPred_sf_raw$MaxDHW, probs = 0.975, na.rm = TRUE)
+        out_cycl <- quantile(HexPred_sf_raw$max_cyc, na.rm=TRUE, probs = 0.975)
+        out_dhw <- quantile(HexPred_sf_raw$max_dhw, probs = 0.975, na.rm = TRUE)
 
-        HexPred_sf <- HexPred_sf_raw %>%
-          mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No"))%>%
-          mutate(across(c(`Wave_hours(weighted)`,`LagWave_hours(weighted).1`,
-                          `LagWave_hours(weighted).2`),
-                        ~ifelse(.x >= out_cycl & As.Data == "No", NA, .x))) %>%
-          mutate(across(c(MaxDHW,LagMaxDHW.1,LagMaxDHW.2),
-                        ~ifelse( .x >= out_bleach & As.Data == "No", NA,
-                                 ifelse(.x < out_bleach, .x, .x)))) %>%
-          mutate(across(c(MaxDHW:`LagWave_hours(weighted).2`), ~ as.numeric(scale(.)))) # scaling
-
+        HexPred_sf <- HexPred_sf_raw |>
+        mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
+        # adjusting values of cyclone exposure and dhw
+        dplyr::mutate(across(matches("^max_cyc.*"),
+                       ~ifelse(.x >= out_cycl & As.Data == "No", NA, .x))) |>
+        dplyr::mutate(across(matches("^max_dhw.*"),
+                       ~ifelse(.x >= out_dhw & As.Data == "No", NA,
+                                 ifelse(.x < out_dhw, .x, .x)))) |> # need to also adjust severity when corresponding values of cyclone exposure and dhw are NA 
+          mutate(across(matches("^severity.*|^max.*"), 
+                       ~ as.numeric(scale(.)))) # scaling 
+       
         msg <- (paste("Applying quality control for Tier:",
                       TIER))
         reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
                               "--Fitting model 5 FRK--", msg = msg)
 
         # Making reefid
-        HexPred_sf$reefid <- as.factor(HexPred_sf$reefid)
+        # HexPred_sf$reefid <- as.factor(HexPred_sf$reefid)
 
-        HexPred_reefid <- HexPred_sf %>%
-          filter(fYEAR == as.character(min(numYEAR)))%>%
-          group_by(Tier5)%>%
-          mutate(reefid_merged = as.factor(paste0(reefid, collapse = "_")))%>%
-          dplyr::select(Tier5, reefid_merged) %>%
-          distinct() %>%
-          st_drop_geometry()
+        # HexPred_reefid <- HexPred_sf %>%
+        #   filter(fYEAR == as.character(min(numYEAR)))%>%
+        #   group_by(Tier5)%>%
+        #   mutate(reefid_merged = as.factor(paste0(reefid, collapse = "_")))%>%
+        #   dplyr::select(Tier5, reefid_merged) %>%
+        #   distinct() %>%
+        #   st_drop_geometry()
 
-        HexPred_reefid2 <-inner_join(HexPred_sf %>% data.frame() ,
-                                     HexPred_reefid) %>%
-          group_by(Tier5, fYEAR) %>%
-          filter(row_number()==1) %>%
-          replace(is.na(.), 0) %>%
-          st_as_sf(sf_column_name = "geometry")%>%
-          dplyr::select(., - reefid) %>%
-          rename(reefid = reefid_merged)%>%
-          suppressWarnings()%>%
-          suppressWarnings()
+        # HexPred_reefid2 <-inner_join(HexPred_sf %>% data.frame() ,
+        #                              HexPred_reefid) %>%
+        #   group_by(Tier5, fYEAR) %>%
+        #   filter(row_number()==1) %>%
+        #   replace(is.na(.), 0) %>%
+        #   st_as_sf(sf_column_name = "geometry")%>%
+        #   dplyr::select(., - reefid) %>%
+        #   rename(reefid = reefid_merged)%>%
+        #   suppressWarnings()%>%
+        #   suppressWarnings()
 
-        msg <- (paste("Making reef id for Tier:",
-                      TIER))
-        reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
-                              "--Fitting model 5 FRK--", msg = msg)
+        # msg <- (paste("Making reef id for Tier:",
+        #               TIER))
+        # reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
+        #                       "--Fitting model 5 FRK--", msg = msg)
         # tal_reefid <- HexPred_sf %>%
         #   filter(fYEAR == as.character(min(numYEAR))) %>%
         #   group_by(Tier5) %>%
@@ -218,6 +229,9 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
 
         # Construct STIDF object from benthic data
         check_tier5 <- unique(data.grp.tier$Tier5) %in% unique(HexPred_sf$Tier5)
+        
+        data.grp.tier.cov <- data.grp.tier %>% left_join(HexPred_sf %>% st_drop_geometry(),
+        by = join_by(Tier5 == Tier5, REPORT_YEAR == fYEAR))
 
         if (FALSE %in% check_tier5){
           msg <- (paste("Data outside",FOCAL_TIER," for Tier:",
@@ -225,9 +239,10 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
           reefCloudPackage::log("WARNING", logFile = LOG_FILE,
                                 "--Fitting model 5 FRK--", msg = msg)
         }
+
         data.grp.tier$Year <- as.Date(paste0(as.character(data.grp.tier$fYEAR),
                                              "-01-01"))  # needs to be a Date object
-        data.grp.tier$k_Z <- data.grp.tier$TOTAL                                           # this is ntrials
+        data.grp.tier$k_Z <- data.grp.tier$TOTAL         # this is ntrials
         lon_idx <- which(names(data.grp.tier) == "LONGITUDE")
         lat_idx <- which(names(data.grp.tier) == "LATITUDE")
 
@@ -238,12 +253,12 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                              interval = TRUE)      # time reflects an interval
 
         # Making BAUs: the predicitons of the model will be on the tier 5 level
-        HexPred_sp <- as_Spatial(HexPred_reefid2)             # convert to sp
-        nHEX <-  nrow(subset(HexPred_sp, fYEAR == min(HexPred_sf_raw$numYEAR)))       # no. of hexagons
+        HexPred_sp <- as_Spatial(HexPred_sf)             # convert to sp
+        nHEX <-  nrow(subset(HexPred_sp, fYEAR == min(HexPred_sf_raw$REPORT_YEAR)))       # no. of hexagons
         nYEAR <- length(unique(HexPred_sp@data$fYEAR))        # no. of years
 
         HexPred_sp@data$n_spat <- rep(1:nHEX, each = nYEAR)   # index for each spatial BAU
-        BAUs_spat <- subset(HexPred_sp, fYEAR == as.character(min(numYEAR)))        # extract spatial grid (first year)
+        BAUs_spat <- subset(HexPred_sp, fYEAR == as.character(min(REPORT_YEAR)))        # extract spatial grid (first year)
         coordnames(BAUs_spat) <- c("LONGITUDE", "LATITUDE")
 
         # Construct spatio-temporal BAUs (will not contain covariate information for now)
@@ -253,7 +268,8 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                              tunit = "years")
 
         ST_BAUs <- ST_BAUs[, 1:nYEAR, 1:2]                 # remove last year (automatically inserted by FRK)
-        ST_BAUs$fYEAR <- as.character(ST_BAUs$t + min(HexPred_sf_raw$numYEAR)-1)    # create fYEAR variable
+        #ST_BAUs$fYEAR <- as.character(ST_BAUs$t + min(HexPred_sf_raw$REPORT_YEAR)-1)    # create fYEAR variable
+        ST_BAUs$fYEAR <- ST_BAUs$t + min(HexPred_sf_raw$REPORT_YEAR)-1   # create fYEAR variable
         ST_BAUs$n_spat <- rep(1:nHEX, nYEAR)               # create (spatial) index for each BAU
 
         # Update BAUs with covariate information
@@ -288,12 +304,14 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
         reefCloudPackage::ReefCloud_tryCatch({
           start_time <- Sys.time()
 
-          M <- FRK(f = COUNT ~ 1 + MaxDHW
-                   + LagMaxDHW.1 + LagMaxDHW.2
-                   + Wave_hours.weighted.
-                   + LagWave_hours.weighted..1
-                   + LagWave_hours.weighted..2
-                   + (1 | reefid),
+          M <- FRK(f = COUNT ~ 1, 
+                #   + max_dhw,
+                #   + max_dhw_lag1 
+                #   + max_dhw_lag2
+                #   + max_cyc
+                #   + max_cyc_lag1
+                #   + max_dhw_lag2
+                #   + (1 | reefid),
                    data = list(STObj),
                    BAUs = ST_BAUs,
                    basis =   basis,

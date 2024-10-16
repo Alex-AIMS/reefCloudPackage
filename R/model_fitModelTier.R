@@ -45,7 +45,7 @@ model_fitModelTier <- function(){
   ## ## )
 
   #sb <- cli_status
-
+# GROUP <- GROUPS[[2]]
   for (GROUP in GROUPS) {   # benthic groups
     if (!DEBUG_MODE) cli_alert("Modelling for {stringr::str_to_title(GROUP)}")
     ## if (DEBUG_MODE) reefCloudPackage::add_status(stage = paste0("STAGE", CURRENT_STAGE),
