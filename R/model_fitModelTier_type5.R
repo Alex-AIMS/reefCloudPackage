@@ -1,101 +1,159 @@
+
+load_predictive_layers <- function() {
+  files <- list.files(path = paste0(DATA_PATH, "processed"),
+    pattern = "covariates_full_tier5.RData", full.names = TRUE)
+  if (file.exists(files))
+    full_cov <- get(load(files))
+  else
+    stop("Predictive layers not found")
+  return(full_cov)
+}
+
+trim_years_from_predictive_layers <- function(full_cov) {
+  #we crop the years to match with the range of ecological data 
+  full_cov <- 
+    full_cov |>
+    dplyr::mutate(across(matches("^severity.*|^max.*"),
+      ~ifelse(is.na(.x), 0, .x))) |>
+    dplyr::mutate(REPORT_YEAR = as.numeric(as.character(year))) |>
+    dplyr::filter((REPORT_YEAR >= min(data.grp$REPORT_YEAR) &
+                     REPORT_YEAR <= max(data.grp$REPORT_YEAR))) |>
+    dplyr::rename(fYEAR = year)
+  return(full_cov)
+}
+
+join_covariates_to_tier_lookup <- function(tier.sf) {
+  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  tier.sf <- tier.sf |>
+    dplyr::left_join(tiers.lookup |> dplyr::select(-reef_area, -tier_id),
+      by = c("Tier5" = "Tier5")) 
+  return(tier.sf)
+}
+
+
+
+
 #' @title Fit model at tier level
 #' @description Fits model to data at tier level
 #' @param data.grp data on which model is fitted
 #' @param covs.hexpred covariates shapefile
 #' @examples model_fitModelTier()
 #' @export
-model_fitModelTier_type5 <- function(data.grp, covs.hexpred, tier.sf){
-  if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
+model_fitModelTier_type5 <- function(data.grp, tier.sf){
+  if (reefCloudPackage::isParent()) startMatter()
 
+  # 1. Load predictive layer with covariates 
+  full_cov <- load_predictive_layers()
+
+  ## 2. trim the predictive layer using the range of observed years
+  full_cov <- trim_years_from_predictive_layers(full_cov)
+  ## 3. join covariates to tier.lookup
+  tier.sf <- join_covariates_to_tier_lookup(tier.sf)
 
   load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
 
-      FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
+  FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
 
-      for (TIER in unique(data.grp[[FOCAL_TIER]])) {
-        TIER <<- as.character(TIER)  #make this global
-        sf_use_s2(TRUE)
+  for (TIER in unique(data.grp[[FOCAL_TIER]])) {
+    TIER <<- as.character(TIER)  #make this global
+    sf::sf_use_s2(TRUE)
 
-        # for dev
-        # TIER <- 1808
+    # for dev
+    # TIER <- 1808
 
-        #subset for current TIER
-        data.grp.tier <- data.grp %>%
-          filter(data.grp[[FOCAL_TIER]]==TIER) %>%
-          dplyr::select(-COVER)
+    #subset for current TIER
+    data.grp.tier <- data.grp |>
+      dplyr::filter(data.grp[[FOCAL_TIER]]==TIER) |>
+      dplyr::select(-COVER)
 
-        # Reproject predictive layer for the cropping
-        covs.hexpred_tier_sf <- covs.hexpred %>%
-          merge(tier.sf)
-        covs.hexpred_tier_sf <- covs.hexpred_tier_sf%>%
-          filter(covs.hexpred_tier_sf[[FOCAL_TIER]] == TIER) %>%
-          filter(numYEAR == min(numYEAR))%>%
-          droplevels() %>%
-          st_as_sf() %>%
-          st_cast("POLYGON")%>%
-          st_transform(crs = st_crs(reef_layer.sf))%>%
-          suppressMessages()%>%
+    # Reproject predictive layer for the cropping
+    covs.hexpred_tier_sf <- full_cov |>
+      dplyr::left_join(tier.sf, by = c("Tier5" = "Tier5")) 
+
+    covs.hexpred_tier_sf <- covs.hexpred_tier_sf |>
+      dplyr::filter(covs.hexpred_tier_sf[[FOCAL_TIER]] == TIER) |>
+      dplyr::filter(REPORT_YEAR == min(REPORT_YEAR))|>
+      droplevels() |>
+      sf::st_as_sf() |>
+      sf::st_cast("POLYGON")|>
+      sf::st_transform(crs = st_crs(reef_layer.sf)) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Crop Reef layer and create reefid. Make sure that
+    #st_crs(covs.hexpred_tier_sf)$units and
+    #st_crs(reef_layer.sf)$units are metres
+    testthat::expect_equal(sf::st_crs(covs.hexpred_tier_sf)$units, "m")
+    testthat::expect_equal(sf::st_crs(reef_layer.sf)$units, "m")
+    Reef_layer_tier5_84 <- reef_layer.sf |>
+      sf::st_crop(covs.hexpred_tier_sf ) |>
+          sf::st_cast("POLYGON") |>
+          dplyr::mutate(reefid = dplyr::row_number()) |>
+          dplyr::select(-GRIDCODE) |>
+          sf::st_transform(crs = 4326) |>
+          sf::st_buffer(dist = 450) |>#careful with the units and version of sf
+          suppressMessages() |>
           suppressWarnings()
 
-        # Crop Reef layer and create reefid
-        #Make sure that st_crs(covs.hexpred_tier_sf)$units
-        #and st_crs(reef_layer.sf)$units are metres
-        Reef_layer_tier5_84 <- st_crop(reef_layer.sf, covs.hexpred_tier_sf )%>%
-          suppressMessages()%>%
-          suppressWarnings()%>%
-          st_cast("POLYGON") %>%
-          mutate(reefid = row_number()) %>%
-          dplyr::select(.,-GRIDCODE)%>%
-          st_transform(crs = 4326) %>%
-          st_buffer(dist=450) %>%#careful with the units and version of sf
-          suppressMessages()%>%
-          suppressWarnings()
+    covs.hexpred_tier_sf_84 <- covs.hexpred_tier_sf |>
+      sf::st_transform(crs = 4326)
 
-        covs.hexpred_tier_sf_84 <- covs.hexpred_tier_sf %>%
-          st_transform(crs = 4326)
+    # Join the two shapefiles
+    # sf_use_s2(TRUE)
+    sf::sf_use_s2(FALSE) |> 
+      suppressMessages()
+    covs.hexpred_tier_sf_v2_prep <-
+      covs.hexpred_tier_sf_84 |>
+      sf::st_join(Reef_layer_tier5_84) |>
+      dplyr::select(Tier5, reefid, geometry)|>
+      suppressMessages()|>
+      suppressWarnings()
+    sf::sf_use_s2(TRUE) |> 
+      suppressMessages()
 
-        # Join the two shapefiles
-        # sf_use_s2(TRUE)
-        sf_use_s2(FALSE)
-        covs.hexpred_tier_sf_v2_prep <- covs.hexpred_tier_sf_84 %>%
-          st_join(Reef_layer_tier5_84) %>%
-          dplyr::select(Tier5, reefid, geometry)%>%
-          suppressMessages()%>%
-          suppressWarnings()
+    # Check number of Tier5 without reefid
+    missing_reefid <- covs.hexpred_tier_sf_v2_prep |>
+      sf::st_drop_geometry() |>
+      purrr::map_df(~sum(is.na(.)))
 
-        # Check number of Tier5 without reefid
-        missing_reefid <- covs.hexpred_tier_sf_v2_prep %>%
-          st_drop_geometry() %>%
-          map_df(~sum(is.na(.)))
+    if (missing_reefid$reefid[1] > 0) {
+      msg <- (paste("Some Tier5 do not have a reefid for the",FOCAL_TIER,":", TIER))
+      reefCloudPackage::log("WARNING", logFile = LOG_FILE,
+        "--Fitting model 5 FRK--", msg = msg)
+      covs.hexpred_tier_sf_v2_prep <- covs.hexpred_tier_sf_v2_prep[
+        -which(is.na(covs.hexpred_tier_sf_v2_prep$reefid)),
+        ]
+    }
 
-        if (missing_reefid$reefid[1] > 0) {
-          msg <- (paste("Some Tier5 do not have a reefid for the",FOCAL_TIER,":", TIER))
-          reefCloudPackage::log("WARNING", logFile = LOG_FILE,
-                                "--Fitting model 5 FRK--", msg = msg)
+    # Add other years
+    covs.hexpred_tier_sf_v2 <-
+      covs.hexpred_tier_sf_v2_prep |> 
+      dplyr::group_by(Tier5) |>
+      dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |> 
+      ungroup() |> 
+      dplyr::inner_join(full_cov,
+        relationship = "one-to-many",
+        by = dplyr::join_by(Tier5))
 
-          covs.hexpred_tier_sf_v2_prep <- covs.hexpred_tier_sf_v2_prep[-which(is.na(covs.hexpred_tier_sf_v2_prep$reefid)),]
-          }
+    ## covs.hexpred_tier_sf_v2.1 <-
+    ##   merge( full_cov %>% as.data.frame(),
+    ##     covs.hexpred_tier_sf_v2_prep %>% as.data.frame()) 
 
-        # Add other years
-        covs.hexpred_tier_sf_v2 <-
-          merge( covs.hexpred %>% as.data.frame(),
-                      covs.hexpred_tier_sf_v2_prep %>% as.data.frame())
+    ## covs.hexpred_tier_sf_v2 <-  covs.hexpred_tier_sf_v2 |>
+    ##   sf::st_sf(sf_column_name = 'geometry')
+    HexPred_sf_raw <- covs.hexpred_tier_sf_v2 
+        ## HexPred_sf_raw <- (covs.hexpred_tier_sf_v2)%>%
+        ##   dplyr::rename(MaxDHW = DHW_t5, # rename to align with covariate.hexpred table
+        ##                 LagMaxDHW.1 = LagDHW_t5.1,
+        ##                 LagMaxDHW.2 = LagDHW_t5.2,
+        ##                 `Wave_hours(weighted)` = storm_t5_weight_wave_hours,
+        ##                 `LagWave_hours(weighted).1` = Lagstorm_t5_weight_wave_hours.1,
+        ##                 `LagWave_hours(weighted).2` = Lagstorm_t5_weight_wave_hours.2)
 
-        covs.hexpred_tier_sf_v2 <-  covs.hexpred_tier_sf_v2 %>%
-          st_sf(sf_column_name = 'geometry')
-
-        HexPred_sf_raw <- (covs.hexpred_tier_sf_v2)%>%
-          dplyr::rename(MaxDHW = DHW_t5, # rename to align with covariate.hexpred table
-                        LagMaxDHW.1 = LagDHW_t5.1,
-                        LagMaxDHW.2 = LagDHW_t5.2,
-                        `Wave_hours(weighted)` = storm_t5_weight_wave_hours,
-                        `LagWave_hours(weighted).1` = Lagstorm_t5_weight_wave_hours.1,
-                        `LagWave_hours(weighted).2` = Lagstorm_t5_weight_wave_hours.2)
-
-        msg <- (paste("Preparing data for Tier:",
-                      TIER))
-        reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
-                              "--Fitting model 5 FRK--", msg = msg)
+    msg <- (paste("Preparing data for Tier:",
+      TIER))
+    reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
+      "--Fitting model 5 FRK--", msg = msg)
 
         #############################
         # Applying control quality - finding extreme events values for tier5 without observations

@@ -5,51 +5,53 @@
 model_fitModelTier <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
+  if(file.exists(paste0(DATA_PATH,'processed/',RDATA_FILE)))
     load(file=paste0(DATA_PATH,'processed/',RDATA_FILE))
+  RDATA_COV_FILE <- str_replace(RDATA_FILE, "_", "_with_covariates")
+  if(file.exists(paste0(DATA_PATH,'processed/',RDATA_COV_FILE))) {
+   assign("COVARIATES", TRUE, envir = .GlobalEnv) 
+  }
+  # GROUPS <- data %>% pull(fGROUP) %>% unique()
+  GROUPS <- c("CRUSTOSE CORALLINE ALGAE","HARD CORAL","MACROALGAE","TURF ALGAE","SOFT CORAL")
+  ## GROUPS <- c("HARD CORAL")
+  all.tiers <- vector('list', length(GROUPS))
+  ## },
+  ## logFile=LOG_FILE,
+  ## Category='--Modelling fitting routines--',
+  ## msg='Load data for modelling -- at tier level, only modelled on HARD CORAL',
+  ## return=NULL,
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "Load data"
+  ## )
 
-    # GROUPS <- data %>% pull(fGROUP) %>% unique()
-    ## GROUPS <- c("CRUSTOSE CORALLINE ALGAE","HARD CORAL","MACROALGAE","TURF ALGAE","SOFT CORAL")
-    GROUPS <- c("HARD CORAL")
-    all.tiers <- vector('list', length(GROUPS))
-  },
-  logFile=LOG_FILE,
-  Category='--Modelling fitting routines--',
-  msg='Load data for modelling -- at tier level, only modelled on HARD CORAL',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Load data"
-  )
-
-  reefCloudPackage::ReefCloud_tryCatch({
-    ## Load and incoporate the original covariates (the ones only for observed tier/year)
-    files <- list.files(path = paste0(DATA_PATH, "processed"),
-                        pattern = "covs.RData", full.names = TRUE)
-    NCOVAR <- length(COVARIATES)
-    load(files)
-    data <- data %>%
-      left_join(covs) %>%
-      suppressMessages() %>%
-      suppressWarnings()
-  },
-  logFile=LOG_FILE,
-  Category='--Modelling fitting routines--',
-  msg='Add the covariates',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Add covariates"
-  )
+  ## ## reefCloudPackage::ReefCloud_tryCatch({
+  ##   ## Load and incoporate the original covariates (the ones only for observed tier/year)
+  ##   files <- list.files(path = paste0(DATA_PATH, "processed"),
+  ##                       pattern = "covs.RData", full.names = TRUE)
+  ##   NCOVAR <- length(COVARIATES)
+  ##   load(files)
+  ##   data <- data %>%
+  ##     left_join(covs) %>%
+  ##     suppressMessages() %>%
+  ##     suppressWarnings()
+  ## ## },
+  ## ## logFile=LOG_FILE,
+  ## ## Category='--Modelling fitting routines--',
+  ## ## msg='Add the covariates',
+  ## ## return=NULL,
+  ## ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## ## item = "Add covariates"
+  ## ## )
 
   #sb <- cli_status
 
-  #for dev
-  GROUP <- GROUPS[1]
   for (GROUP in GROUPS) {   # benthic groups
     if (!DEBUG_MODE) cli_alert("Modelling for {stringr::str_to_title(GROUP)}")
-    if (DEBUG_MODE) reefCloudPackage::add_status(stage = paste0("STAGE", CURRENT_STAGE),
-                                          item = stringr::str_to_title(GROUP),
-                                          label = stringr::str_to_title(GROUP),
-                                          status = "progress")
+    ## if (DEBUG_MODE) reefCloudPackage::add_status(stage = paste0("STAGE", CURRENT_STAGE),
+    ##                                       item = stringr::str_to_title(GROUP),
+    ##                                       label = stringr::str_to_title(GROUP),
+    ##                                       status = "progress")
     ## Subset the data to the focal benthic group
     data.grp <- reefCloudPackage::prep_group_data_for_modelling(data, GROUP)
 
@@ -65,7 +67,7 @@ model_fitModelTier <- function(){
 
     ## Model type 1 - simple cell means
     if (MODEL_TYPE ==1) {
-      reefCloudPackage::model_fitModelTier_type1(data.grp)
+      model_fitModelTier_type1(data.grp)
     }
 
     ## ---- model 2 (simple INLA)
@@ -105,46 +107,19 @@ model_fitModelTier <- function(){
 
     if (MODEL_TYPE == 5) {
 
-    #  reefCloudPackage::ReefCloud_tryCatch({
-    #    ## Load and incoporate the original covariates (the ones only for observed tier/year)
-    #    files <- list.files(path = paste0(DATA_PATH, "processed"),
-    #                        pattern = "covariates_full_tier5.RData", full.names = TRUE)
-    #    NCOVAR <- length(COVARIATES)
-    #    load(files)
-    #    data <- data %>%
-    #      left_join(full_cov) %>%
-    #      suppressMessages() %>%
-    #      suppressWarnings()
-    #  },
-    #  logFile=LOG_FILE,
-    #  Category='--Modelling fitting routines--',
-    #  msg='Add the covariates to the predictive layer (hexpred)', 
-    #  return=NULL,
-   #   stage = paste0("STAGE", CURRENT_STAGE),
-    #  item = "Add covariates to the predictive layer"
-     # )
+      ## Steps
+      ## 1. load predictive layers (all tier5 within the focal tier 4)
+      ## 2. trim the predictive layer using the range of observed years
+      ## 3. join covariates to tier.lookup
+      ## 3. remove the tiers for which there are no data and the value of the
+      ##      covariates greater than 3rd quantile of covariates
+      ## 4. great the reef id for every tier 5
+      ## 5. prepare data for FRK
+      ## 6. fit the FRK model
+      ## 7. save the model object
+      ## 8. generate posteriors for year/tier 4
 
-      data.grp <- data.grp%>%
-        mutate(numYEAR = as.numeric(as.character(fYEAR)))
-
-    
-    # Load predictive layer with covariates 
-     files <- list.files(path = paste0(DATA_PATH, "processed"),
-                            pattern = "covariates_full_tier5.RData", full.names = TRUE)
-     load(files)
-  
-    #we crop the years to match with the range of ecological data 
-      full_cov<- full_cov %>%
-        mutate(across(severity_cyc:max_dhw_lag2,         # make it better - starts_with(c('severity', 'max') and map
-                      ~ifelse(is.na(.x), 0, .x))) %>%
-        mutate(numYEAR = as.numeric(as.character(year))) %>%
-        filter((numYEAR>=min(data.grp$numYEAR) &
-                 numYEAR<=max(data.grp$numYEAR))) %>%
-        rename(fYEAR = year)
-
-      tier.sf <- tier.sf%>%
-        merge(tiers.lookup)
-      reefCloudPackage::model_fitModelTier_type5(data.grp, full_cov, tier.sf)
+      reefCloudPackage::model_fitModelTier_type5(data.grp, tier.sf)
 
     }
     if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),

@@ -5,7 +5,7 @@
 #' @param TIERS tiers considered
 #' @export
 cellmeans_reconstruct <- function(data.sub, GROUP, TIERS) {
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     ## ---- reconstruct
     {
       load(paste0(DATA_PATH, "primary/tier5.sf.RData"))
@@ -52,10 +52,10 @@ cellmeans_reconstruct <- function(data.sub, GROUP, TIERS) {
       invisible(gc(full=TRUE))
     }
     ## ----end
-  }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-  msg=paste0('Binding all raw cell means for ', stringr::str_to_title(GROUP)),
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "bind_raw_cellmeans"
-  )
+  ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+  ## msg=paste0('Binding all raw cell means for ', stringr::str_to_title(GROUP)),
+  ## return=NULL,
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "bind_raw_cellmeans"
+  ## )
 }

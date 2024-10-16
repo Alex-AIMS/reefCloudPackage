@@ -3,11 +3,11 @@
 #' @param raw_cell_means boolean. If TRUE, runs raw cell means. If FALSE, runs simple INLA cell means. Default is TRUE.
 #' @examples model_fitModel()
 #' @export
-model_fitModel <- function(raw_cell_means=TRUE){
+model_fitModel <- function(raw_cell_means = TRUE){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
-  reefCloudPackage::read_status()
-  CURRENT_STAGE <<- 4
+  ## reefCloudPackage::read_status()
+  ## CURRENT_STAGE <<- 4
 
   ## There are sufficient differences in the processing of benthic data
   ## between 'site' and 'tier' level analyses to warrent forking off the

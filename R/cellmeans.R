@@ -6,7 +6,7 @@
 #' @param FOCAL_TIER tier lever on which predictions are made
 #' @export
 cellmeans <- function(data.sub, GROUP, TIER, FOCAL_TIER) {
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     ## ---- RawMeans
     {
       cli::cli_progress_bar("Raw cellmeans", type = "iterator", total = 4, clear = TRUE)
@@ -27,9 +27,9 @@ cellmeans <- function(data.sub, GROUP, TIER, FOCAL_TIER) {
       cli::cli_progress_update(inc = 1, set = 4, force = TRUE)
     }
     ## ----end
-  }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-  msg=paste0('Raw cell means for ', stringr::str_to_title(GROUP)),
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "rawCellmeans")
+  ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+  ## msg=paste0('Raw cell means for ', stringr::str_to_title(GROUP)),
+  ## return=NULL,
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "rawCellmeans")
 }

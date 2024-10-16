@@ -4,22 +4,22 @@
 #' @examples model_fitModelTier()
 #' @export
 model_fitModelTier_type1 <- function(data.grp){
-    if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
+    if (reefCloudPackage::isParent()) startMatter()
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       for (TIER in unique(data.grp[[FOCAL_TIER]])) {
         data.sub <- data.grp %>%
           filter(!!sym(FOCAL_TIER) == TIER) %>%
           droplevels()
-        reefCloudPackage::cellmeans(data.sub, GROUP, TIER, FOCAL_TIER)
+        cellmeans(data.sub, GROUP, TIER, FOCAL_TIER)
       }
-      reefCloudPackage::cellmeans_reconstruct(data.grp, GROUP, TIERS = unique(data.grp[[FOCAL_TIER]]))
-    },
-    logFile=LOG_FILE,
-    Category='--Modelling fitting routines--',
-    msg='Fit simple model (Type 1)',
-    return=NULL,
-    stage = paste0("STAGE", CURRENT_STAGE),
-    item = "model_type1"
-    )
+      cellmeans_reconstruct(data.grp, GROUP, TIERS = unique(data.grp[[FOCAL_TIER]]))
+    ## },
+    ## logFile=LOG_FILE,
+    ## Category='--Modelling fitting routines--',
+    ## msg='Fit simple model (Type 1)',
+    ## return=NULL,
+    ## stage = paste0("STAGE", CURRENT_STAGE),
+    ## item = "model_type1"
+    ## )
 }
