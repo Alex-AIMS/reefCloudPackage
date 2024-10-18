@@ -66,7 +66,9 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
       dplyr::select(-COVER)
 
     # Extract reefid for every tier5
-##################################################################### begining of make_reefid <- function(tier.sf, full_cov, reef_layer.sf){
+##################################################################### MAKE IT AS A FUNCTION
+
+# make_reefid <- function(tier.sf, full_cov, reef_layer.sf){
 
        # Reproject predictive layer for the cropping
     covs.hexpred_tier_sf <- full_cov |>
@@ -118,7 +120,7 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
 
 # return(covs.hexpred_tier_sf_v2_prep)
 #}
-############################################################################### function returns a different result than running the codes... 
+
 #  make_reefid(tier.sf, full_cov, reef_layer.sf)
 
 
@@ -253,7 +255,7 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                              interval = TRUE)      # time reflects an interval
 
         # Making BAUs: the predicitons of the model will be on the tier 5 level
-        HexPred_sp <- as_Spatial(HexPred_sf)             # convert to sp
+        HexPred_sp <- as_Spatial(HexPred_sf_raw)             # convert to sp
         nHEX <-  nrow(subset(HexPred_sp, fYEAR == min(HexPred_sf_raw$REPORT_YEAR)))       # no. of hexagons
         nYEAR <- length(unique(HexPred_sp@data$fYEAR))        # no. of years
 
@@ -304,14 +306,14 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
         reefCloudPackage::ReefCloud_tryCatch({
           start_time <- Sys.time()
 
-          M <- FRK(f = COUNT ~ 1, 
-                #   + max_dhw,
+          M <- FRK(f = COUNT ~ 1 
+                   + max_dhw
                 #   + max_dhw_lag1 
                 #   + max_dhw_lag2
-                #   + max_cyc
+                   + max_cyc
                 #   + max_cyc_lag1
                 #   + max_dhw_lag2
-                #   + (1 | reefid),
+                  + (1 | reefid),
                    data = list(STObj),
                    BAUs = ST_BAUs,
                    basis =   basis,
