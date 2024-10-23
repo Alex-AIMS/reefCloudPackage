@@ -19,7 +19,6 @@ model_fitModelTier <- function(){
       "MACROALGAE", "TURF ALGAE", "SOFT CORAL"
     )
     all.tiers <- vector('list', length(GROUPS))
-    return(NULL)
   },
   stage_ = 4,
   order_ = 1,
