@@ -1,4 +1,10 @@
-
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @return 
+##' @author Murray
+##' @export
 load_predictive_layers <- function() {
   status::status_try_catch(
   {
@@ -16,7 +22,14 @@ load_predictive_layers <- function() {
   )
   return(full_cov)
 }
-
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @param full_cov 
+##' @return 
+##' @author Murray
+##' @export
 trim_years_from_predictive_layers <- function(full_cov) {
   status::status_try_catch(
   {
@@ -37,7 +50,14 @@ trim_years_from_predictive_layers <- function(full_cov) {
   )
   return(full_cov)
 }
-
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @param tier.sf 
+##' @return 
+##' @author Murray
+##' @export
 join_covariates_to_tier_lookup <- function(tier.sf) {
   status::status_try_catch(
   {
