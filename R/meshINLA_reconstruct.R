@@ -8,7 +8,7 @@
 #' @examples examples
 #' @export
 meshINLA_reconstruct <- function(GROUP, TIERS) {
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     ## ---- reconstruct
     {
       load(paste0(DATA_PATH, "primary/tier5.sf.RData"))
@@ -46,8 +46,8 @@ meshINLA_reconstruct <- function(GROUP, TIERS) {
       ## ----end
     }
     ## ----end
-  }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-  msg=paste0('Binding all simple INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
+  ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+  ## msg=paste0('Binding all simple INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
 
   return(cellmeans)
 }

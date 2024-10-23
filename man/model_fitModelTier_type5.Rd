@@ -4,7 +4,7 @@
 \alias{model_fitModelTier_type5}
 \title{Fit model at tier level}
 \usage{
-model_fitModelTier_type5(data.grp, covs.hexpred, tier.sf)
+model_fitModelTier_type5(data.grp, tier.sf)
 }
 \arguments{
 \item{data.grp}{data on which model is fitted}

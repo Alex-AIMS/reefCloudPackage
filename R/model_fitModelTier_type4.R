@@ -6,12 +6,12 @@
 model_fitModelTier_type4 <- function(data.grp){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
 
     tiers.lookup <<- get(load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData')))
     tier5.sf <- get(load(file=paste0(DATA_PATH,'primary/tier5.sf.RData')))
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       TIERS <- NULL
       for (TIER in unique(data.grp[[FOCAL_TIER]])) {
         TIER <<- TIER  #make this global
@@ -29,16 +29,16 @@ model_fitModelTier_type4 <- function(data.grp){
                         msg = paste0(DOMAIN_NAME, ": ", stringr::str_to_title(GROUP),"/Tier:", TIER, "/Mesh INLA cellmeans not calculated - not enough data"))
         }
       }
-    }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-    msg=paste0('Mesh (with covariates) INLA cell means for ', stringr::str_to_title(GROUP))
-    )
+    ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+    ## msg=paste0('Mesh (with covariates) INLA cell means for ', stringr::str_to_title(GROUP))
+    ## )
 
-  },
-  logFile=LOG_FILE,
-  Category='--Modelling fitting routines--',
-  msg='Fit simple model (Type 2)',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "model_type2"
-  )
+  ## },
+  ## logFile=LOG_FILE,
+  ## Category='--Modelling fitting routines--',
+  ## msg='Fit simple model (Type 2)',
+  ## return=NULL,
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "model_type2"
+  ## )
 }

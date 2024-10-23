@@ -347,7 +347,7 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                               "--Fitting model 5 FRK--", msg = msg)
 
         #run model
-        reefCloudPackage::ReefCloud_tryCatch({
+        ## reefCloudPackage::ReefCloud_tryCatch({
           start_time <- Sys.time()
 
           M <- FRK(f = COUNT ~ 1 
@@ -374,18 +374,18 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
           reefCloudPackage::log("INFO", logFile = LOG_FILE,
                                 "--Fitting model 5 FRK--", msg = msg)
 
-          },
-        logFile=LOG_FILE,
-        Category=paste0('--Fit FRK model, tier level: ', FOCAL_TIER, ', for tier id: ', TIER, '--'),
-        msg='Fit spatio temporal model (Type 5)',
-        return=NULL,
-        stage = paste0("STAGE", CURRENT_STAGE),
-        item = "model_type5"
-        )
+        ##   },
+        ## logFile=LOG_FILE,
+        ## Category=paste0('--Fit FRK model, tier level: ', FOCAL_TIER, ', for tier id: ', TIER, '--'),
+        ## msg='Fit spatio temporal model (Type 5)',
+        ## return=NULL,
+        ## stage = paste0("STAGE", CURRENT_STAGE),
+        ## item = "model_type5"
+        ## )
 
         ## predictions ####
 
-        reefCloudPackage::ReefCloud_tryCatch({
+        ## reefCloudPackage::ReefCloud_tryCatch({
             pred <- predict(M, type = c("mean"))
             # Extracting posterior distributions of predictive locations
 
@@ -415,14 +415,14 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                                   "modelled/",
                                   "FRK",
                                   "_",FOCAL_TIER,"_", TIER, ".RData"))
-          },
-          logFile=LOG_FILE,
-          Category=paste0('--Saving output of FRK model, tier level: ', FOCAL_TIER, ', for tier id: ', TIER, '--'),
-          msg='Fit spatio temporal model (Type 5)',
-          return=NULL,
-          stage = paste0("STAGE", CURRENT_STAGE),
-          item = "model_type5"
-        )
+        ##   },
+        ##   logFile=LOG_FILE,
+        ##   Category=paste0('--Saving output of FRK model, tier level: ', FOCAL_TIER, ', for tier id: ', TIER, '--'),
+        ##   msg='Fit spatio temporal model (Type 5)',
+        ##   return=NULL,
+        ##   stage = paste0("STAGE", CURRENT_STAGE),
+        ##   item = "model_type5"
+        ## )
 
       }
 }

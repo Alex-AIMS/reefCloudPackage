@@ -8,14 +8,14 @@ model_fitModelSite <- function(raw_cell_means=TRUE){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
   ## load in the data
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     load(file=paste0(DATA_PATH,'processed/',RDATA_FILE))
     SITES <- data %>% pull(SITE) %>% unique()
     data <- data %>%
       mutate(SITE_ZONE_DEPTH = interaction(SITE, ZONE_DEPTH, sep=';'))
 
     SITE_ZONE_DEPTHS <- data %>% pull(SITE_ZONE_DEPTH) %>% unique()
-  }, logFile=LOG_FILE, Category='--Modelling fitting routines--', msg='Load data for modelling', return=NULL)
+  ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--', msg='Load data for modelling', return=NULL)
 
   for (iSITE_ZONE_DEPTH in SITE_ZONE_DEPTHS) {
     nSITE <- gsub('([^;]*);.*','\\1',iSITE_ZONE_DEPTH, perl=TRUE)
@@ -24,7 +24,7 @@ model_fitModelSite <- function(raw_cell_means=TRUE){
 
     cli_alert("Modelling for {stringr::str_to_title(nSITE)}, at {nDEPTH}m depth in the {nREEF_ZONE} zone")
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       ## ---- data_sub.sites
       data.sub <- data %>%
         ## filter(SITE == iSITE) %>%
@@ -43,12 +43,12 @@ model_fitModelSite <- function(raw_cell_means=TRUE){
       ## data.sub %>% filter(DATA_TYPE == 'Legacy', SITE == 'Angaur', fGROUP == 'CRUSTOSE CORALLINE ALGAE') %>% pull(REPORT_YEAR) %>% unique
       ## -----------------------
       ## ----end
-    }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-    msg=paste0('Prepare ', stringr::str_to_title(nSITE),'/', nDEPTH, 'm depth/',nREEF_ZONE,' zone sub data for modelling'), return=NULL)
+    ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+    ## msg=paste0('Prepare ', stringr::str_to_title(nSITE),'/', nDEPTH, 'm depth/',nREEF_ZONE,' zone sub data for modelling'), return=NULL)
 
 
     if (raw_cell_means){
-      reefCloudPackage::ReefCloud_tryCatch({
+      ## reefCloudPackage::ReefCloud_tryCatch({
         ## ---- RawMeans.sites
         {
           cli::cli_progress_bar("Raw cellmeans", type = "iterator", total = 1, clear = TRUE)
@@ -98,10 +98,10 @@ model_fitModelSite <- function(raw_cell_means=TRUE){
           cli::cli_progress_done()
         }
         ## ----end
-      }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-      msg=paste0('Raw cell means for ', stringr::str_to_title(nSITE),'/', nDEPTH, 'm depth/',nREEF_ZONE,' zone'), return=NULL)
+      ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+      ## msg=paste0('Raw cell means for ', stringr::str_to_title(nSITE),'/', nDEPTH, 'm depth/',nREEF_ZONE,' zone'), return=NULL)
     } else {
-      reefCloudPackage::ReefCloud_tryCatch({
+      ## reefCloudPackage::ReefCloud_tryCatch({
         ## ---- reefCloudPackage::simpleINLA.sites
         {
           cli::cli_progress_bar("Simple INLA cellmeans", type = "iterator", total = 7, clear = TRUE)
@@ -280,13 +280,13 @@ model_fitModelSite <- function(raw_cell_means=TRUE){
           cli::cli_progress_done()
         }
         ## ----end
-      }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-      msg=paste0('Simple INLA cell means for ', stringr::str_to_title(nSITE),'/', nDEPTH, 'm depth/',nREEF_ZONE,' zone'), return=NULL)
+      ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+      ## msg=paste0('Simple INLA cell means for ', stringr::str_to_title(nSITE),'/', nDEPTH, 'm depth/',nREEF_ZONE,' zone'), return=NULL)
     }
   }
 
   ## Now compile all the results
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     cellmeans.all <- vector('list', length=length(SITE_ZONE_DEPTHS))
     names(cellmeans.all) <- SITE_ZONE_DEPTHS
     for (iSITE_ZONE_DEPTH in SITE_ZONE_DEPTHS) {
@@ -311,15 +311,15 @@ model_fitModelSite <- function(raw_cell_means=TRUE){
         suppressWarnings()
     }
     cellmeans.all <- do.call('rbind', cellmeans.all)
-  }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-  msg=paste0('Compile all results'), return=NULL)
+  ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+  ## msg=paste0('Compile all results'), return=NULL)
 
   ## Write/export all results
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     write_csv(cellmeans.all, file=paste0(AWS_OUTPUT_PATH, "output_sites.csv"), quote = "none")
     rm(data.sub, cellmeans) %>% suppressWarnings()
     invisible(gc(full=TRUE))
     cli_alert_success("Modelled data compiled into outputs")
-  }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-  msg=paste0('Write all results'), return=NULL)
+  ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+  ## msg=paste0('Write all results'), return=NULL)
 }
