@@ -6,22 +6,23 @@
 #' @examples prep_group_data_for_modelling(data, GROUP)
 #' @export
 prep_group_data_for_modelling <- function(data, GROUP) {
-  ## reefCloudPackage::ReefCloud_tryCatch({
-        ## ---- data_sub
-        data.grp <- data %>%
-            filter(fGROUP == GROUP) %>%
-            droplevels() %>%
-            mutate(
-                Tier5 = factor(Tier5),
-                Tier4 = factor(Tier4),
-                Tier3 = factor(Tier3),
-                Tier2 = factor(Tier2),
-                P_CODE = factor(P_CODE),
-                Site = factor(paste(Tier5, SITE_NO)),
-                Transect = factor(paste(Site, TRANSECT_NO))) %>%
-            arrange(Tier4, Tier5, Site, Transect, desc(as.numeric(as.character(fYEAR)))) %>%
-            mutate(fYEAR = factor(fYEAR, levels=unique(fYEAR)))
-        ## ----end
+  status::status_try_catch(
+  {
+    ## ---- data_sub
+    data.grp <- data %>%
+      filter(fGROUP == GROUP) %>%
+      droplevels() %>%
+      mutate(
+        Tier5 = factor(Tier5),
+        Tier4 = factor(Tier4),
+        Tier3 = factor(Tier3),
+        Tier2 = factor(Tier2),
+        P_CODE = factor(P_CODE),
+        Site = factor(paste(Tier5, SITE_NO)),
+        Transect = factor(paste(Site, TRANSECT_NO))) %>%
+      arrange(Tier4, Tier5, Site, Transect, desc(as.numeric(as.character(fYEAR)))) %>%
+      mutate(fYEAR = factor(fYEAR, levels=unique(fYEAR)))
+    ## ----end
     ## },
     ## logFile=LOG_FILE,
     ## Category='--Modelling fitting routines--',
@@ -30,5 +31,11 @@ prep_group_data_for_modelling <- function(data, GROUP) {
     ## stage = paste0("STAGE", CURRENT_STAGE),
     ## item = "SubsetGroups"
     ## )
-    return(data.grp)
+  },
+  stage_ = 4,
+  order_ = 1,
+  name_ = paste0("Prepare group data for modelling"),
+  item_ = "fill_group_data_for_modelling"
+  )
+  return(data.grp)
 }
