@@ -1,32 +1,56 @@
 
 load_predictive_layers <- function() {
-  files <- list.files(path = paste0(DATA_PATH, "processed"),
-    pattern = "covariates_full_tier5.RData", full.names = TRUE)
-  if (file.exists(files))
-    full_cov <- get(load(files))
-  else
-    stop("Predictive layers not found")
+  status::status_try_catch(
+  {
+    files <- list.files(path = paste0(DATA_PATH, "processed"),
+      pattern = "covariates_full_tier5.RData", full.names = TRUE)
+    if (file.exists(files))
+      full_cov <- get(load(files))
+    else
+      stop("Predictive layers not found")
+  },
+  stage_ = 4,
+  order_ = 2,
+  name_ = "Load predictive layers",
+  item_ = "load_predictive_layers"
+  )
   return(full_cov)
 }
 
 trim_years_from_predictive_layers <- function(full_cov) {
-  #we crop the years to match with the range of ecological data 
-  full_cov <- 
-    full_cov |>
-    dplyr::mutate(across(matches("^severity.*|^max.*"),
-      ~ifelse(is.na(.x), 0, .x))) |>
-    dplyr::mutate(REPORT_YEAR = as.numeric(as.character(year))) |>
-    dplyr::filter((REPORT_YEAR >= min(data.grp$REPORT_YEAR) &
-                     REPORT_YEAR <= max(data.grp$REPORT_YEAR))) |>
-    dplyr::rename(fYEAR = year)
+  status::status_try_catch(
+  {
+    #we crop the years to match with the range of ecological data 
+    full_cov <- 
+      full_cov |>
+      dplyr::mutate(across(matches("^severity.*|^max.*"),
+        ~ifelse(is.na(.x), 0, .x))) |>
+      dplyr::mutate(REPORT_YEAR = as.numeric(as.character(year))) |>
+      dplyr::filter((REPORT_YEAR >= min(data.grp$REPORT_YEAR) &
+                       REPORT_YEAR <= max(data.grp$REPORT_YEAR))) |>
+      dplyr::rename(fYEAR = year)
+  },
+  stage_ = 4,
+  order_ = 3,
+  name_ = "Trim predictive layers",
+  item_ = "trim_predictive_layers"
+  )
   return(full_cov)
 }
 
 join_covariates_to_tier_lookup <- function(tier.sf) {
-  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
-  tier.sf <- tier.sf |>
-    dplyr::left_join(tiers.lookup |> dplyr::select(-reef_area, -tier_id),
-      by = c("Tier5" = "Tier5")) 
+  status::status_try_catch(
+  {
+    load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+    tier.sf <- tier.sf |>
+      dplyr::left_join(tiers.lookup |> dplyr::select(-reef_area, -tier_id),
+        by = c("Tier5" = "Tier5")) 
+  },
+  stage_ = 4,
+  order_ = 4,
+  name_ = "Join covariates to tier lookup",
+  item_ = "join_covariates_to_tier_lookup"
+  )
   return(tier.sf)
 }
 
