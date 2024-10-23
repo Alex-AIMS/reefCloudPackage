@@ -8,3 +8,4 @@ data/analysis_stage.RData
 data/global_settings.RData
 data/log/
 old.R
+tests/data
