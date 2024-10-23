@@ -6,6 +6,7 @@
 model_fitModel <- function(raw_cell_means = TRUE){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
+  status::status_set_stage(stage = 4, title = "Model data")
   ## reefCloudPackage::read_status()
   ## CURRENT_STAGE <<- 4
 
