@@ -33,7 +33,7 @@ prep_group_data_for_modelling <- function(data, GROUP) {
     ## )
   },
   stage_ = 4,
-  order_ = 1,
+  order_ = 2,
   name_ = "Prepare group data for modelling",
   item_ = "fill_group_data_for_modelling"
   )

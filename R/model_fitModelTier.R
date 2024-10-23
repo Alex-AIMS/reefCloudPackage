@@ -123,9 +123,9 @@ model_fitModelTier <- function(){
       reefCloudPackage::model_fitModelTier_type5(data.grp, tier.sf)
 
     }
-    if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
-                                             item = stringr::str_to_title(GROUP),
-                                             status = "SUCCESS")
+    ## if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
+    ##                                          item = stringr::str_to_title(GROUP),
+    ##                                          status = "SUCCESS")
   }
 
 

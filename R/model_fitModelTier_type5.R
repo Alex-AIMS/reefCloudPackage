@@ -10,7 +10,7 @@ load_predictive_layers <- function() {
       stop("Predictive layers not found")
   },
   stage_ = 4,
-  order_ = 2,
+  order_ = 5,
   name_ = "Load predictive layers",
   item_ = "load_predictive_layers"
   )
@@ -31,7 +31,7 @@ trim_years_from_predictive_layers <- function(full_cov) {
       dplyr::rename(fYEAR = year)
   },
   stage_ = 4,
-  order_ = 3,
+  order_ = 6,
   name_ = "Trim predictive layers",
   item_ = "trim_predictive_layers"
   )
@@ -47,7 +47,7 @@ join_covariates_to_tier_lookup <- function(tier.sf) {
         by = c("Tier5" = "Tier5")) 
   },
   stage_ = 4,
-  order_ = 4,
+  order_ = 7,
   name_ = "Join covariates to tier lookup",
   item_ = "join_covariates_to_tier_lookup"
   )
