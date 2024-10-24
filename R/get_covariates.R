@@ -13,7 +13,7 @@ get_covariates <- function() {
   load(file=paste0(DATA_PATH,'primary/tier', 5, '.sf.RData'))
   ## get the degree heating weeks
   cov_dhw <- get_geoserver_data(Tier = 4, cov_name = "degrees_heating_weeks_tier")   
-  if (exists("cov_dhw")) {
+  if (exists("cov_dhw") & !is.null(cov_dhw)) {
     cov_dhw <- tier.sf %>% st_intersection(cov_dhw) |>
       suppressMessages() |>
       suppressWarnings()
@@ -35,7 +35,7 @@ get_covariates <- function() {
   ## Cyclones
   cov_cyc <- get_geoserver_data(Tier = 4, cov_name = "storm4m_exposure_year_tier")   
   print(paste0("cov_cyc ", cov_cyc))
-  if (exists("cov_cyc")) {
+  if (exists("cov_cyc" & !is.null(cov_cyc))) {
     cov_cyc <- tier.sf %>% st_intersection(cov_cyc) |>
       suppressMessages() |>
       suppressWarnings()
