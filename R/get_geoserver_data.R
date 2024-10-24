@@ -34,12 +34,13 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
     print(paste0("Cov name ", cov_name))
     print(paste0("file exists ", file.exists(temp_file)))
     print(paste0("File size ", file.size(temp_file)))
-    cov_data <- read_sf(temp_file) %>% 
-      st_set_crs(4326) %>%
-      filter(tier == Tier, tier_id %in% wch_tier_id) %>%
-      suppressWarnings() %>%
-      suppressMessages()
-    return(cov_data)
+    ## cov_data <- read_sf(temp_file) %>%
+    ##   st_set_crs(4326) %>%
+    ##   filter(tier == Tier, tier_id %in% wch_tier_id) %>%
+    ##   suppressWarnings() %>%
+    ##   suppressMessages()
+    ## return(cov_data)
+    return(NULL)
   },
   stage_ = 2,
   order_ = 10,
