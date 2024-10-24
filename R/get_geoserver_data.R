@@ -20,13 +20,13 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
       paste(.,collapse = ',')
     url <- geo_info$url
     url$query <- list(service = "WFS",
-                      version = "1.0.0",
-                      request = "GetFeature",
-                      typename = geo_info$rc_lyrs[wch], 
-                      bbox = bbox,
-                      srs="EPSG%3A4326",
-                      styles='',
-                      format="application/openlayers")
+      version = "1.0.0",
+      request = "GetFeature",
+      typename = geo_info$rc_lyrs[wch], 
+      bbox = bbox,
+      srs="EPSG%3A4326",
+      styles='',
+      format="application/openlayers")
 
     request <- build_url(url)
     temp_file <- tempfile()
@@ -35,12 +35,16 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
     print(paste0("file exists ", file.exists(temp_file)))
     print(paste0("File size ", file.size(temp_file)))
     print(paste0("err ", err))
-    cov_data <- read_sf(temp_file) %>%
-      st_set_crs(4326) %>%
-      filter(tier == Tier, tier_id %in% wch_tier_id) %>%
-      suppressWarnings() %>%
-      suppressMessages()
-    return(cov_data)
+    if (inherits(err, "try-error")) {
+      stop(err)
+    } else {
+      cov_data <- read_sf(temp_file) %>%
+        st_set_crs(4326) %>%
+        filter(tier == Tier, tier_id %in% wch_tier_id) %>%
+        suppressWarnings() %>%
+        suppressMessages()
+      return(cov_data)
+    }
   },
   stage_ = 2,
   order_ = 10,
