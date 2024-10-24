@@ -31,10 +31,10 @@ get_covariates <- function() {
     save(cov_dhw, file = paste0(DATA_PATH, "primary/covariate_dhw.RData"))
   }
   ## print("DHW done")
-  status::duplicate_status_item(
-    stage = "2", order = "current", item = "DHW", name = "(DHW)",
-    original_item = "get_geoserver_data"
-  )
+  ## status::duplicate_status_item(
+  ##   stage = "2", order = "current", item = "DHW", name = "(DHW)",
+  ##   original_item = "get_geoserver_data"
+  ## )
 
   ## Cyclones
   cov_cyc <- get_geoserver_data(Tier = 4, cov_name = "storm4m_exposure_year_tier")   
@@ -58,9 +58,9 @@ get_covariates <- function() {
       suppressWarnings()
     save(cov_cyc, file = paste0(DATA_PATH, "primary/covariate_cyc.RData"))
   }
-  status::duplicate_status_item(
-    stage = "2", order = "current", item = "CYC", name = "(Storms)",
-    original_item = "get_geoserver_data"
-  )
-  status::remove_status_item(stage = 2, item = "get_geoserver_data") 
+  ## status::duplicate_status_item(
+  ##   stage = "2", order = "current", item = "CYC", name = "(Storms)",
+  ##   original_item = "get_geoserver_data"
+  ## )
+  ## status::remove_status_item(stage = 2, item = "get_geoserver_data") 
 }
