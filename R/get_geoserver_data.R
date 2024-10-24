@@ -31,7 +31,8 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
     request <- build_url(url)
     temp_file <- tempfile()
     download.file(request, temp_file, quiet = TRUE) 
-    print(paste0("file exists", file.exists(temp_file)))
+    print(paste0("Cov name ", cov_name))
+    print(paste0("file exists ", file.exists(temp_file)))
     print(paste0("File size ", file.size(temp_file)))
     cov_data <- read_sf(temp_file) %>% 
       st_set_crs(4326) %>%
