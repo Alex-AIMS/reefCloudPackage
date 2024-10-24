@@ -59,7 +59,7 @@ model_loadData_unix <- function(){
 
   ## Unzip and load the Coral Reefs of the World code
   if (DOMAIN_CATEGORY == "tier") {
-    get_coral_reef_shape_files()
+    null <- get_coral_reef_shape_files()
   }
 
 
