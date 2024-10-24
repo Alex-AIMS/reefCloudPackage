@@ -14,7 +14,9 @@ get_covariates <- function() {
   ## get the degree heating weeks
   cov_dhw <- get_geoserver_data(Tier = 4, cov_name = "degrees_heating_weeks_tier")   
   if (exists("cov_dhw")) {
-    cov_dhw <- tier.sf %>% st_intersection(cov_dhw) 
+    cov_dhw <- tier.sf %>% st_intersection(cov_dhw) |>
+      suppressMessages() |>
+      suppressWarnings()
     cov_dhw <- cov_dhw %>%
       st_drop_geometry() %>%
       group_by(Tier5, year) %>%
@@ -31,8 +33,10 @@ get_covariates <- function() {
 
   ## Cyclones
   cov_cyc <- get_geoserver_data(Tier = 4, cov_name = "storm4m_exposure_year_tier")   
-  if (exists("cov_dhw")) {
-    cov_cyc <- tier.sf %>% st_intersection(cov_cyc)
+  if (exists("cov_cyc")) {
+    cov_cyc <- tier.sf %>% st_intersection(cov_cyc) |>
+      suppressMessages() |>
+      suppressWarnings()
     cov_cyc <- cov_cyc %>%
       st_drop_geometry() %>%
       group_by(Tier5, end_year) %>%
