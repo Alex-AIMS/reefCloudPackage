@@ -36,6 +36,7 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
     print(paste0("File size ", file.size(temp_file)))
     print(paste0("err ", err))
     if (inherits(err, "try-error")) {
+      cov_data <- NULL
       stop(err)
     } else {
       cov_data <- read_sf(temp_file) %>%
@@ -43,7 +44,6 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
         filter(tier == Tier, tier_id %in% wch_tier_id) %>%
         suppressWarnings() %>%
         suppressMessages()
-      return(cov_data)
     }
   },
   stage_ = 2,
@@ -51,4 +51,5 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
   name_ = "Get geoserver data",
   item_ = "get_geoserver_data"
   )
+  return(cov_data)
 }
