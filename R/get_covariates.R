@@ -30,12 +30,12 @@ get_covariates <- function() {
       suppressWarnings()
     save(cov_dhw, file = paste0(DATA_PATH, "primary/covariate_dhw.RData"))
   }
-  print("DHW done")
+  ## print("DHW done")
 
   ## Cyclones
   cov_cyc <- get_geoserver_data(Tier = 4, cov_name = "storm4m_exposure_year_tier")   
-  print(paste0("cov_cyc ", cov_cyc))
-  print(paste0("Exists cov_cyc ", exists("cov_cyc")))
+  ## print(paste0("cov_cyc ", cov_cyc))
+  ## print(paste0("Exists cov_cyc ", exists("cov_cyc")))
   if (exists("cov_cyc") & !is.null(cov_cyc)) {
     cov_cyc <- tier.sf %>% st_intersection(cov_cyc) |>
       suppressMessages() |>

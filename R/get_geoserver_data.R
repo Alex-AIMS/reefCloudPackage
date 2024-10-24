@@ -31,10 +31,10 @@ get_geoserver_data <- function(Tier = 4, cov_name = NULL) {
     request <- build_url(url)
     temp_file <- tempfile()
     err <- try(download.file(request, temp_file, quiet = TRUE))
-    print(paste0("Cov name ", cov_name))
-    print(paste0("file exists ", file.exists(temp_file)))
-    print(paste0("File size ", file.size(temp_file)))
-    print(paste0("err ", err))
+    ## print(paste0("Cov name ", cov_name))
+    ## print(paste0("file exists ", file.exists(temp_file)))
+    ## print(paste0("File size ", file.size(temp_file)))
+    ## print(paste0("err ", err))
     if (inherits(err, "try-error")) {
       cov_data <- NULL
       stop(err)
