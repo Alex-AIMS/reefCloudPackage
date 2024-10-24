@@ -64,6 +64,9 @@ model_processData <- function(){
     name_ = "Load legacy data",
     item_ = "load_legacy_data"
     )
+  } else {
+    status::remove_status_item(stage = 3, item = "load_legacy_data")
+    
   }
 
   ## There are sufficient differences in the processing of benthic data
@@ -73,6 +76,7 @@ model_processData <- function(){
   if (DOMAIN_CATEGORY == "site") {
     reefCloudPackage::model_processDataSite()
   } else { # tier
+    status::remove_status_item(stage = 3, item = "fill_data_gaps")  # this is only relevant for site level analysis
     reefCloudPackage::model_processDataTier()
   }
 }
