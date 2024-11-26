@@ -1,4 +1,11 @@
-
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @param tier.sf 
+##' @return 
+##' @author Murray
+##' @export
 load_predictive_layers <- function() {
   status::status_try_catch(
   {
@@ -38,14 +45,7 @@ trim_years_from_predictive_layers <- function(full_cov) {
   )
   return(full_cov)
 }
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
-##' @title 
-##' @param tier.sf 
-##' @return 
-##' @author Murray
-##' @export
+
 join_covariates_to_tier_lookup <- function(tier.sf) {
   status::status_try_catch(
   {
@@ -148,7 +148,6 @@ select_covariates <- function(HexPred_sf_raw) {
 #' @param covs.hexpred covariates shapefile
 #' @examples model_fitModelTier()
 #' @export
-
 model_fitModelTier_type5 <- function(data.grp, tier.sf){
   if (reefCloudPackage::isParent()) startMatter()
 
