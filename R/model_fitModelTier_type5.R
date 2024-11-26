@@ -1,3 +1,4 @@
+
 load_predictive_layers <- function() {
   status::status_try_catch(
   {
@@ -9,14 +10,14 @@ load_predictive_layers <- function() {
       stop("Predictive layers not found")
   },
   stage_ = 4,
-  order_ = 2,
+  order_ = 5,
   name_ = "Load predictive layers",
   item_ = "load_predictive_layers"
   )
   return(full_cov)
 }
 
-trim_years_from_predictive_layers <- function(full_cov, data.grp.tier) {
+trim_years_from_predictive_layers <- function(full_cov) {
   status::status_try_catch(
   {
     #we crop the years to match with the range of ecological data 
@@ -31,13 +32,20 @@ trim_years_from_predictive_layers <- function(full_cov, data.grp.tier) {
       dplyr::rename(fYEAR = year)
   },
   stage_ = 4,
-  order_ = 3,
+  order_ = 6,
   name_ = "Trim predictive layers",
   item_ = "trim_predictive_layers"
   )
   return(full_cov)
 }
-
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @param tier.sf 
+##' @return 
+##' @author Murray
+##' @export
 join_covariates_to_tier_lookup <- function(tier.sf) {
   status::status_try_catch(
   {
@@ -47,7 +55,7 @@ join_covariates_to_tier_lookup <- function(tier.sf) {
         by = c("Tier5" = "Tier5")) 
   },
   stage_ = 4,
-  order_ = 4,
+  order_ = 7,
   name_ = "Join covariates to tier lookup",
   item_ = "join_covariates_to_tier_lookup"
   )
@@ -302,7 +310,7 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                               "--Fitting model 5 FRK--", msg = msg)
 
         #run model
-        reefCloudPackage::ReefCloud_tryCatch({
+        ## reefCloudPackage::ReefCloud_tryCatch({
           start_time <- Sys.time()
 
         # Call model formula 
@@ -336,18 +344,18 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
           reefCloudPackage::log("INFO", logFile = LOG_FILE,
                                 "--Fitting model 5 FRK--", msg = msg)
 
-          },
-        logFile=LOG_FILE,
-        Category=paste0('--Fit FRK model, tier level: ', FOCAL_TIER, ', for tier id: ', TIER, '--'),
-        msg='Fit spatio temporal model (Type 5)',
-        return=NULL,
-        stage = paste0("STAGE", CURRENT_STAGE),
-        item = "model_type5"
-        )
+        ##   },
+        ## logFile=LOG_FILE,
+        ## Category=paste0('--Fit FRK model, tier level: ', FOCAL_TIER, ', for tier id: ', TIER, '--'),
+        ## msg='Fit spatio temporal model (Type 5)',
+        ## return=NULL,
+        ## stage = paste0("STAGE", CURRENT_STAGE),
+        ## item = "model_type5"
+        ## )
 
         ## predictions ####
 
-        reefCloudPackage::ReefCloud_tryCatch({
+        ## reefCloudPackage::ReefCloud_tryCatch({
             pred <- predict(M, type = c("mean"))
             # Extracting posterior distributions of predictive locations
 
@@ -377,14 +385,14 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                                   "modelled/",
                                   "FRK",
                                   "_",FOCAL_TIER,"_", TIER, ".RData"))
-          },
-          logFile=LOG_FILE,
-          Category=paste0('--Saving output of FRK model, tier level: ', FOCAL_TIER, ', for tier id: ', TIER, '--'),
-          msg='Fit spatio temporal model (Type 5)',
-          return=NULL,
-          stage = paste0("STAGE", CURRENT_STAGE),
-          item = "model_type5"
-        )
+        ##   },
+        ##   logFile=LOG_FILE,
+        ##   Category=paste0('--Saving output of FRK model, tier level: ', FOCAL_TIER, ', for tier id: ', TIER, '--'),
+        ##   msg='Fit spatio temporal model (Type 5)',
+        ##   return=NULL,
+        ##   stage = paste0("STAGE", CURRENT_STAGE),
+        ##   item = "model_type5"
+        ## )
 
       }
 }

@@ -6,7 +6,7 @@
 model_fitModelTier_type2 <- function(data.grp){
     if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       TIERS <- NULL
       for (TIER in unique(data.grp[[FOCAL_TIER]])) {
         Tier5_levels <- tiers.lookup %>%
@@ -36,14 +36,14 @@ model_fitModelTier_type2 <- function(data.grp){
       .data.tier3 <- reefCloudPackage::simpleINLA_tier3(data.sub, GROUP, .data.tier5)
       .data.tier2 <- reefCloudPackage::simpleINLA_tier2(data.sub, GROUP, .data.tier5)
 
-    },
-    logFile=LOG_FILE,
-    Category='--Modelling fitting routines--',
-    msg='Fit hierachical model (Type 2)',
-    return=NULL,
-    stage = paste0("STAGE", CURRENT_STAGE),
-    item = "model_type2"
-    )
+    ## },
+    ## logFile=LOG_FILE,
+    ## Category='--Modelling fitting routines--',
+    ## msg='Fit hierachical model (Type 2)',
+    ## return=NULL,
+    ## stage = paste0("STAGE", CURRENT_STAGE),
+    ## item = "model_type2"
+    ## )
 
     stop("end of type 2")
 }

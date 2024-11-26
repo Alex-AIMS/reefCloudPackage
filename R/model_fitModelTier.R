@@ -5,25 +5,27 @@
 model_fitModelTier <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
-  ## reefCloudPackage::ReefCloud_tryCatch({
-  if(file.exists(paste0(DATA_PATH,'processed/',RDATA_FILE)))
-    load(file=paste0(DATA_PATH,'processed/',RDATA_FILE))
-  RDATA_COV_FILE <- str_replace(RDATA_FILE, "_", "_with_covariates")
-  if(file.exists(paste0(DATA_PATH,'processed/',RDATA_COV_FILE))) {
-   assign("COVARIATES", TRUE, envir = .GlobalEnv) 
-  }
-  # GROUPS <- data %>% pull(fGROUP) %>% unique()
-  GROUPS <- c("CRUSTOSE CORALLINE ALGAE","HARD CORAL","MACROALGAE","TURF ALGAE","SOFT CORAL")
-  ## GROUPS <- c("HARD CORAL")
-  all.tiers <- vector('list', length(GROUPS))
-  ## },
-  ## logFile=LOG_FILE,
-  ## Category='--Modelling fitting routines--',
-  ## msg='Load data for modelling -- at tier level, only modelled on HARD CORAL',
-  ## return=NULL,
-  ## stage = paste0("STAGE", CURRENT_STAGE),
-  ## item = "Load data"
-  ## )
+  null <- ## Ensures that nothing is printed as a return value
+    status::status_try_catch(
+    {
+      if(file.exists(paste0(DATA_PATH, "processed/", RDATA_FILE)))
+        load(file = paste0(DATA_PATH, "processed/", RDATA_FILE))
+      # GROUPS <- data %>% pull(fGROUP) %>% unique()
+      GROUPS <- c(
+        "CRUSTOSE CORALLINE ALGAE", "HARD CORAL",
+        "MACROALGAE", "TURF ALGAE", "SOFT CORAL"
+      )
+      all.tiers <- vector('list', length(GROUPS))
+      RDATA_COV_FILE <- str_replace(RDATA_FILE, "_", "_with_covariates")
+      if(file.exists(paste0(DATA_PATH, "processed/", RDATA_COV_FILE))) {
+        assign("COVARIATES", TRUE, envir = .GlobalEnv) 
+      }
+    },
+    stage_ = 4,
+    order_ = 1,
+    name_ = "Load benthic data",
+    item_ = "model_load_benthic_data"
+    )
 
   ## ## reefCloudPackage::ReefCloud_tryCatch({
   ##   ## Load and incoporate the original covariates (the ones only for observed tier/year)
@@ -122,9 +124,9 @@ model_fitModelTier <- function(){
       reefCloudPackage::model_fitModelTier_type5(data.grp, tier.sf)
 
     }
-    if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
-                                             item = stringr::str_to_title(GROUP),
-                                             status = "SUCCESS")
+    ## if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
+    ##                                          item = stringr::str_to_title(GROUP),
+    ##                                          status = "SUCCESS")
   }
 
 

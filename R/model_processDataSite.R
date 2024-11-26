@@ -90,20 +90,20 @@ model_processDataSite <- function(){
   ## Fill in the gaps
   data <- fill_gaps(data)
 
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     save(data,  file=paste0(DATA_PATH,'processed/',RDATA_FILE))
     write_csv(data %>% dplyr::select(-fYEAR),  file=paste0(DATA_PATH, 'processed/', CSV_FILE))
     write_csv(data %>% dplyr::select(-fYEAR), file = paste0(AWS_OUTPUT_PATH, gsub('.csv','_site.csv', CSV_FILE)))
     # ask Murray? on repart jamais dans le AWS bucket,
     ## reefCloudPackage::write_aws(file=CSV_FILE,  level='processed/')
     cat(paste0('Data successfully processed:\n'))
-  },
-  logFile=LOG_FILE,
-  Category='--Site level processing routines--',
-  msg='Saved processed data',
-  return=NULL,
-  stage = paste0("STAGE", CURRENT_STAGE),
-  item = "Save processed data")
+  ## },
+  ## logFile=LOG_FILE,
+  ## Category='--Site level processing routines--',
+  ## msg='Saved processed data',
+  ## return=NULL,
+  ## stage = paste0("STAGE", CURRENT_STAGE),
+  ## item = "Save processed data")
 
   ## Garbage collection
   if(exists('data')) rm(data)

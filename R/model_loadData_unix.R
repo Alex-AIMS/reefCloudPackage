@@ -41,7 +41,7 @@ model_loadData_unix <- function(){
     get_legacy_data()
   } else {
     LEGACY_DATA <<- FALSE
-    status::remove_status_item(stage = 1, item = "legacy_data")
+    status::remove_status_item(stage = 2, item = "legacy_data")
     ## reefCloudPackage::remove_predicates()
   }
   ## reefCloudPackage::save_status()
@@ -59,7 +59,7 @@ model_loadData_unix <- function(){
 
   ## Unzip and load the Coral Reefs of the World code
   if (DOMAIN_CATEGORY == "tier") {
-    get_coral_reef_shape_files()
+    null <- get_coral_reef_shape_files()
   }
 
 

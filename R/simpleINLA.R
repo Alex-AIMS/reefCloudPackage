@@ -8,7 +8,7 @@
 #' @examples examples
 #' @export
 simpleINLA <- function(data.sub, GROUP, TIER) {
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     ## ---- simpleINLA
     {
       cli::cli_progress_bar("Simple INLA cellmeans", type = "iterator", total = 7, clear = TRUE)
@@ -38,6 +38,6 @@ simpleINLA <- function(data.sub, GROUP, TIER) {
       ## cli::cli_progress_update(force=TRUE)
     }
     ## ----end
-  }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-  msg=paste0('Simple INLA cell means for ', stringr::str_to_title(GROUP), ' Tier ', TIER), return=NULL)
+  ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+  ## msg=paste0('Simple INLA cell means for ', stringr::str_to_title(GROUP), ' Tier ', TIER), return=NULL)
 }

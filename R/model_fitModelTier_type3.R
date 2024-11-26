@@ -7,11 +7,11 @@ model_fitModelTier_type3 <- function(data.grp){
 
     if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       tiers.lookup <<- get(load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData')))
       tier5.sf <- get(load(file=paste0(DATA_PATH,'primary/tier5.sf.RData')))
 
-      reefCloudPackage::ReefCloud_tryCatch({
+      ## reefCloudPackage::ReefCloud_tryCatch({
         TIERS <- NULL
         for (TIER in unique(data.grp[[FOCAL_TIER]])) {
           TIER <<- TIER  #make this global
@@ -45,11 +45,11 @@ model_fitModelTier_type3 <- function(data.grp){
         reefCloudPackage::meshINLA_tier2TemporalFocal(cellmeans.full.tier2)
         reefCloudPackage::meshINLA_tier2Spatiotemporal(cellmeans.full.tier2)
 
-      }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-      msg=paste0('Mesh INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
+      ## }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+      ## msg=paste0('Mesh INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
 
       if (1==2) {
-        reefCloudPackage::ReefCloud_tryCatch({
+        ## reefCloudPackage::ReefCloud_tryCatch({
           ## ---- MeshINLA
           {
             cli::cli_progress_bar("SPDE INLA cellmeans", type = "iterator", total = 19, clear = TRUE)
@@ -476,16 +476,16 @@ model_fitModelTier_type3 <- function(data.grp){
           cli::cli_progress_done()
           ## ----end
           cat(paste0('Modelling complete:\n'))
-        }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-        msg=paste0('Mesh INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
+      ##   }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+      ##   msg=paste0('Mesh INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
       }
-    },
-    logFile=LOG_FILE,
-    Category='--Modelling fitting routines--',
-    msg='Fit simple model (Type 3)',
-    return=NULL,
-    stage = paste0("STAGE", CURRENT_STAGE),
-    item = "model_type3"
-    )
+    ## },
+    ## logFile=LOG_FILE,
+    ## Category='--Modelling fitting routines--',
+    ## msg='Fit simple model (Type 3)',
+    ## return=NULL,
+    ## stage = paste0("STAGE", CURRENT_STAGE),
+    ## item = "model_type3"
+    ## )
 
 }

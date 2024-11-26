@@ -6,20 +6,20 @@ model_summariseModelTier <- function(){
 
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     cli_h1("Summarising the data")
     load(file=paste0(DATA_PATH,'processed/',RDATA_FILE))
 
     GROUPS <- data %>% pull(fGROUP) %>% unique()
     ## GOUPS <- c("CRUSTOSE CORALLINE ALGAE","HARD CORAL","MACROALGAE","TURF ALGAE","SOFT CORAL")
     all.tiers <- vector('list', length(GROUPS))
-  }, logFile=LOG_FILE, Category='--Summarising routines--', msg='Load data for modelling', return=NULL)
+  ## }, logFile=LOG_FILE, Category='--Summarising routines--', msg='Load data for modelling', return=NULL)
 
 
   for (GROUP in GROUPS) {
     cli_alert("Modelling for {stringr::str_to_title(GROUP)}")
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       ## ---- RawMeans
       {
         ## ---- RawMeansTemporal
@@ -102,10 +102,10 @@ model_summariseModelTier <- function(){
         rm(g, g2, cellmeans) %>% suppressWarnings()
       }
       ## ----end
-    }, logFile=LOG_FILE, Category='--Summarising routines--',
-    msg=paste0('Raw cell means for ', stringr::str_to_title(GROUP)), return=NULL)
+    ## }, logFile=LOG_FILE, Category='--Summarising routines--',
+    ## msg=paste0('Raw cell means for ', stringr::str_to_title(GROUP)), return=NULL)
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       ## ---- reefCloudPackage::simpleINLA
       if (length(list.files(path = paste0(DATA_PATH, "modelled"),
                             pattern = paste0("cellmeans_simple.*", DOMAIN_NAME, "_", GROUP, "\\.RData"))) >0) {
@@ -302,10 +302,10 @@ model_summariseModelTier <- function(){
           suppressWarnings()
       }
       ## ----end
-    }, logFile=LOG_FILE, Category='--Summarising routines--',
-    msg=paste0('Simple INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
+    ## }, logFile=LOG_FILE, Category='--Summarising routines--',
+    ## msg=paste0('Simple INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       ## ---- reefCloudPackage::meshINLA
       if (length(list.files(path = paste0(DATA_PATH, "modelled"),
                             pattern = paste0("cellmeans_mesh.*", DOMAIN_NAME, "_", GROUP, "\\.RData"))) >0) {
@@ -509,10 +509,10 @@ model_summariseModelTier <- function(){
           suppressWarnings()
       }
       ## ----end
-    }, logFile=LOG_FILE, Category='--Summarising routines--',
-    msg=paste0('Mesh INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
+    ## }, logFile=LOG_FILE, Category='--Summarising routines--',
+    ## msg=paste0('Mesh INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
 
-    reefCloudPackage::ReefCloud_tryCatch({
+    ## reefCloudPackage::ReefCloud_tryCatch({
       ## ---- meshCINLA
       if (length(list.files(path = paste0(DATA_PATH, "modelled"),
                             pattern = paste0("cellmeans_mesh.*", DOMAIN_NAME, "_", GROUP, "\\.RData"))) >0) {
@@ -724,14 +724,14 @@ model_summariseModelTier <- function(){
           suppressWarnings()
       }
       ## ----end
-    }, logFile=LOG_FILE, Category='--Summarising routines--',
-    msg=paste0('Mesh INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
+    ## }, logFile=LOG_FILE, Category='--Summarising routines--',
+    ## msg=paste0('Mesh INLA cell means for ', stringr::str_to_title(GROUP)), return=NULL)
   }
 
 
 
 
-  reefCloudPackage::ReefCloud_tryCatch({
+  ## reefCloudPackage::ReefCloud_tryCatch({
     ## if(!reefCloudPackage::build_report(string = "\n# Fit Models {.tabset .tabset-faded}\n\n"))
     ##     cat("Modelling title will not be incorporated in the report!\n\n")
     ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
@@ -788,8 +788,8 @@ model_summariseModelTier <- function(){
       save(ANALYSIS_STAGE, file=paste0(DATA_PATH, "reefCloudPackage::analysis_stage.RData"))
     }
 
-  }, logFile=LOG_FILE, Category='--Summarising routines--',
-  msg=paste0('Patch in the modelling summaries into the report'), return=NULL)
+  ## }, logFile=LOG_FILE, Category='--Summarising routines--',
+  ## msg=paste0('Patch in the modelling summaries into the report'), return=NULL)
 
 
 }
