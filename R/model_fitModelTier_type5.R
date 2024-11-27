@@ -1,11 +1,10 @@
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
-##' @title 
-##' @param tier.sf 
-##' @return 
-##' @author Murray
-##' @export
+        
+#' @title Fit model at tier level
+#' @description Fits model to data at tier level
+#' @param data.grp data on which model is fitted
+#' @param covs.hexpred covariates shapefile
+#' @examples model_fitModelTier()
+#' @export
 load_predictive_layers <- function() {
   status::status_try_catch(
   {
@@ -24,19 +23,14 @@ load_predictive_layers <- function() {
   return(full_cov)
 }
 
-trim_years_from_predictive_layers <- function(full_cov) {
+trim_years_from_predictive_layers <- function(full_cov_raw, data.grp.tier) {
   status::status_try_catch(
   {
-    #we crop the years to match with the range of ecological data 
-    full_cov <- 
-      full_cov |>
-      dplyr::mutate(across(matches("^severity.*|^max.*"),
-        ~ifelse(is.na(.x), 0, .x))) |>
-      #dplyr::mutate(REPORT_YEAR = as.numeric(as.character(year))) |>
-      dplyr::mutate(REPORT_YEAR = year) |>
-      dplyr::filter((REPORT_YEAR >= min(data.grp.tier$REPORT_YEAR) &
-                       REPORT_YEAR <= max(data.grp.tier$REPORT_YEAR))) |>
-      dplyr::rename(fYEAR = year)
+     full_cov <- full_cov_raw |>
+        dplyr::mutate(across(matches("^severity.*|^max.*"), ~replace_na(.x, 0)),
+         REPORT_YEAR = year) |>
+         dplyr::filter(between(REPORT_YEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR))) |>
+         dplyr::rename(fYEAR = year)
   },
   stage_ = 4,
   order_ = 6,
@@ -49,9 +43,9 @@ trim_years_from_predictive_layers <- function(full_cov) {
 join_covariates_to_tier_lookup <- function(tier.sf) {
   status::status_try_catch(
   {
-    load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
-    tier.sf <- tier.sf |>
-      dplyr::left_join(tiers.lookup |> dplyr::select(-reef_area, -tier_id, -Tier2, -Tier3, -Tier4),
+ #   load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+    tier.sf.joined <- tier.sf |>
+      dplyr::left_join(tiers.lookup |> dplyr::select(-reef_area, -tier_id),
         by = c("Tier5" = "Tier5")) 
   },
   stage_ = 4,
@@ -59,10 +53,10 @@ join_covariates_to_tier_lookup <- function(tier.sf) {
   name_ = "Join covariates to tier lookup",
   item_ = "join_covariates_to_tier_lookup"
   )
-  return(tier.sf)
+  return(tier.sf.joined)
 }
 
- make_reefid <- function(tier.sf, full_cov, reef_layer.sf){
+ make_reefid <- function(tier.sf.joined, full_cov, reef_layer.sf){
   status::status_try_catch(
   {
    sf::sf_use_s2(TRUE) |> 
@@ -70,7 +64,7 @@ join_covariates_to_tier_lookup <- function(tier.sf) {
 
     # Reproject predictive layer for the cropping
     covs.hexpred_tier_sf <- full_cov |>
-      dplyr::left_join(tier.sf, by = c("Tier5" = "Tier5")) 
+      dplyr::left_join(tier.sf.joined, by = c("Tier5" = "Tier5")) 
 
     covs.hexpred_tier_sf <- covs.hexpred_tier_sf |>
       dplyr::filter(covs.hexpred_tier_sf[[FOCAL_TIER]] == TIER) |>
@@ -124,7 +118,7 @@ join_covariates_to_tier_lookup <- function(tier.sf) {
 select_covariates <- function(HexPred_sf_raw) {
     status::status_try_catch(
   {
-  variables_name_full <- names(HexPred_sf_raw)|>
+  variables_name_full <- names(HexPred_sf_raw) %>%
       grep("^max", ., value = TRUE)
         
   # Select covariates if 75% quantiles > 0 only  
@@ -141,22 +135,34 @@ select_covariates <- function(HexPred_sf_raw) {
   )
    return(filtered_data)
 }
-        
-#' @title Fit model at tier level
-#' @description Fits model to data at tier level
-#' @param data.grp data on which model is fitted
-#' @param covs.hexpred covariates shapefile
-#' @examples model_fitModelTier()
-#' @export
-model_fitModelTier_type5 <- function(data.grp, tier.sf){
-  if (reefCloudPackage::isParent()) startMatter()
 
-  # 1. Load predictive layer with covariates 
-  full_cov <- load_predictive_layers()
+model_fitModelTier_type5 <- function(data.grp, tier.sf){
+#  if (reefCloudPackage::isParent()) startMatter()
+
+  # Load predictive layer with covariates 
+  full_cov_raw <- load_predictive_layers()
 
   load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
-
+  
+  # Define spatial scale on which the model will be computed, keep the ones with at least two distinct locations  
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
+
+  tal_tier <- data.grp %>%
+  count(!!sym(FOCAL_TIER), LONGITUDE, LATITUDE) %>%
+  count(!!sym(FOCAL_TIER)) %>%
+  filter(n>1)
+
+ data.grp <- data.grp %>%
+  filter(!!sym(FOCAL_TIER) %in% tal_tier[[FOCAL_TIER]]) %>%
+  droplevels
+
+# for dev 
+ data.grp <- data.grp %>% 
+  filter(!Tier4 %in% c("1874", "1875", "1882")) # problematic tiers 
+
+   #############################
+   # Starting the loop 
+   #############################
 
   for (TIER in unique(data.grp[[FOCAL_TIER]])) {
     TIER <<- as.character(TIER)  #make this global
@@ -171,25 +177,39 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
       dplyr::filter(data.grp[[FOCAL_TIER]]==TIER) |>
       dplyr::select(-COVER)
 
-    ## 2. trim the predictive layer using the range of observed years
-    full_cov <- trim_years_from_predictive_layers(full_cov, data.grp.tier)
+    ## trim the predictive layer using the range of observed years
    
-    ## 3. join covariates to tier.lookup
-    tier.sf <- join_covariates_to_tier_lookup(tier.sf)
+   # full_cov <- trim_years_from_predictive_layers(full_cov_raw, data.grp.tier) # function not working
+   # "Error in trim_years_from_predictive_layers(full_cov, data.grp.tier) : unused argument (data.grp.tier)"
+   
+    full_cov <- full_cov_raw |>
+        dplyr::mutate(across(matches("^severity.*|^max.*"), ~replace_na(.x, 0)),
+         REPORT_YEAR = year) |>
+         dplyr::filter(between(REPORT_YEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR))) |>
+         dplyr::rename(fYEAR = year)
 
-    # Extract reefid for every tier5
+    ## join covariates to tier.lookup
+    tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf)
 
-    covs.hexpred_tier_sf_v2_prep <-   make_reefid(tier.sf, full_cov, reef_layer.sf)
+    #############################
+    # Making predictive layer  
+    #############################
+        
+    ## Extract reefid for every tier5
 
-    # Check number of Tier5 without reefid
+    covs.hexpred_tier_sf_v2_prep <-   make_reefid(tier.sf.joined, full_cov, reef_layer.sf)
+
+    ## Check number of Tier5 without reefid
     missing_reefid <- covs.hexpred_tier_sf_v2_prep |>
       sf::st_drop_geometry() |>
       purrr::map_df(~sum(is.na(.)))
 
     if (missing_reefid$reefid[1] > 0) {
-      msg <- (paste("Some Tier5 do not have a reefid for the",FOCAL_TIER,":", TIER))
-      reefCloudPackage::log("WARNING", logFile = LOG_FILE,
-        "--Fitting model 5 FRK--", msg = msg)
+
+   #   msg <- (paste("Some Tier5 do not have a reefid for the",FOCAL_TIER,":", TIER))
+   #   reefCloudPackage::log("WARNING", logFile = LOG_FILE,
+   #     "--Fitting model 5 FRK--", msg = msg)
+
       covs.hexpred_tier_sf_v2_prep <- covs.hexpred_tier_sf_v2_prep[
         -which(is.na(covs.hexpred_tier_sf_v2_prep$reefid)),
         ]
@@ -207,15 +227,16 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
 
     HexPred_sf_raw <- covs.hexpred_tier_sf_v2 
 
-    msg <- (paste("Preparing data for Tier:",
-      TIER))
-    reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
-      "--Fitting model 5 FRK--", msg = msg)
+   # msg <- (paste("Preparing data for Tier:",
+   #   TIER))
+   # reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
+   #   "--Fitting model 5 FRK--", msg = msg)
 
-        #############################
-        # Applying control quality - finding extreme events values for tier5 without observations
-        #############################
-
+      #############################
+      # Applying control quality 
+      #############################
+        
+        ## finding extreme events values for tier5 without observations
         out_cycl <- quantile(HexPred_sf_raw$max_cyc, na.rm=TRUE, probs = 0.975)
         out_dhw <- quantile(HexPred_sf_raw$max_dhw, probs = 0.975, na.rm = TRUE)
 
@@ -230,10 +251,21 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
           mutate(across(matches("^severity.*|^max.*"), 
                        ~ as.numeric(scale(.)))) # scaling 
        
-        msg <- (paste("Applying quality control for Tier:",
-                      TIER))
-        reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
-                              "--Fitting model 5 FRK--", msg = msg)
+         ## adjusting if tier5 has no reefid (mismatch between TropicalCoralReefsOfTheWorld and tier5.sf)
+        
+       HexPred_sf <-  HexPred_sf %>%
+       group_by(Tier5) %>%
+       mutate(reefid = case_when(
+                reefid == "NA" ~ paste0(
+                sample(1:100, 1), "_", 
+                sample(1:100, 1)
+              ),TRUE ~ reefid)) %>%
+                    ungroup()
+
+       # msg <- (paste("Applying quality control for Tier:",
+       #               TIER))
+       # reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
+       #                       "--Fitting model 5 FRK--", msg = msg)
 
         # Construct STIDF object from benthic data
         check_tier5 <- unique(data.grp.tier$Tier5) %in% unique(HexPred_sf$Tier5)
@@ -241,13 +273,16 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
         data.grp.tier.cov <- data.grp.tier |> left_join(HexPred_sf |> st_drop_geometry(),
         by = join_by(Tier5 == Tier5, REPORT_YEAR == fYEAR))
 
-        if (FALSE %in% check_tier5){
-          msg <- (paste("Data outside",FOCAL_TIER," for Tier:",
-                        TIER))
-          reefCloudPackage::log("WARNING", logFile = LOG_FILE,
-                                "--Fitting model 5 FRK--", msg = msg)
-        }
+       # if (FALSE %in% check_tier5){
+       #   msg <- (paste("Data outside",FOCAL_TIER," for Tier:",
+       #                 TIER))
+       #  reefCloudPackage::log("WARNING", logFile = LOG_FILE,
+       #                         "--Fitting model 5 FRK--", msg = msg)
+       # }
 
+      #############################
+      # Model prep  
+      #############################  
         data.grp.tier$Year <- as.Date(paste0(as.character(data.grp.tier$fYEAR),
                                              "-01-01"))  
         data.grp.tier$k_Z <- data.grp.tier$TOTAL       
@@ -303,14 +338,17 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                             nres = 2L,#for dev
                             regular = TRUE)
 
-        msg <- (paste("Construct STIDF object for Tier:",
-                      TIER))
-        reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
-                              "--Fitting model 5 FRK--", msg = msg)
+      #  msg <- (paste("Construct STIDF object for Tier:",
+      #               TIER))
+      #  reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
+      #                        "--Fitting model 5 FRK--", msg = msg)
 
-        #run model
+      #############################
+      # Model fit 
+      #############################
+
         ## reefCloudPackage::ReefCloud_tryCatch({
-          start_time <- Sys.time()
+        start_time <- Sys.time()
 
         # Call model formula 
 
@@ -338,10 +376,11 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                    est_error = FALSE)
           end_time <- Sys.time()
           run_time <- difftime( end_time, start_time, units = "mins")
-          msg <- (paste("Run time for the", FOCAL_TIER,":",
-                        TIER, "is ", round(run_time, digits=2), "mins"))
-          reefCloudPackage::log("INFO", logFile = LOG_FILE,
-                                "--Fitting model 5 FRK--", msg = msg)
+
+       #   msg <- (paste("Run time for the", FOCAL_TIER,":",
+       #                 TIER, "is ", round(run_time, digits=2), "mins"))
+       #   reefCloudPackage::log("INFO", logFile = LOG_FILE,
+        #                        "--Fitting model 5 FRK--", msg = msg)
 
         ##   },
         ## logFile=LOG_FILE,
@@ -355,10 +394,10 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
         ## predictions ####
 
         ## reefCloudPackage::ReefCloud_tryCatch({
-            pred <- predict(M, type = c("mean"))
+          pred <- predict(M, type = c("mean"))
             # Extracting posterior distributions of predictive locations
 
-            post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
+          post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
               mutate(fYEAR = ST_BAUs@data$fYEAR) |>
               mutate(Tier5 = ST_BAUs@data$Tier5) |>
               mutate(id_loc = row_number()) |>
@@ -369,14 +408,14 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
 
             # Summary predictions at tier5
 
-            pred_sum_sf <- post_dist_df |> group_by(fYEAR,Tier5) |>
+          pred_sum_sf <- post_dist_df |> group_by(fYEAR,Tier5) |>
               ggdist::median_hdci(pred)|>
               inner_join(tier.sf |> dplyr::select(geometry,Tier5)) |>
               st_as_sf(sf_column_name = "geometry") |>
               mutate(Unc = .upper - .lower) |>
               mutate(Tier5_fYEAR = paste0(Tier5,fYEAR))
 
-            saveRDS(list(pred_sum_sf=pred_sum_sf,
+          saveRDS(list(pred_sum_sf=pred_sum_sf,
                          post_dist_df=post_dist_df,
                          data.grp.tier=data.grp.tier,
                          M=M),
