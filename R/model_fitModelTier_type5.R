@@ -11,7 +11,7 @@ load_predictive_layers <- function() {
     files <- list.files(path = paste0(DATA_PATH, "processed"),
       pattern = "covariates_full_tier5.RData", full.names = TRUE)
     if (file.exists(files))
-      full_cov <- get(load(files))
+       full_cov_raw <- get(load(files))
     else
       stop("Predictive layers not found")
   },
@@ -20,7 +20,7 @@ load_predictive_layers <- function() {
   name_ = "Load predictive layers",
   item_ = "load_predictive_layers"
   )
-  return(full_cov)
+  return( full_cov_raw)
 }
 
 trim_years_from_predictive_layers <- function(full_cov_raw, data.grp.tier) {
@@ -115,14 +115,14 @@ join_covariates_to_tier_lookup <- function(tier.sf) {
  return(covs.hexpred_tier_sf_v2_prep)
 }
 
-select_covariates <- function( HexPred_sf ) {
+select_covariates <- function(x) {
     status::status_try_catch(
   {
-  variables_name_full <- names( HexPred_sf ) %>%
+  variables_name_full <- names(x) %>%
       grep("^max", ., value = TRUE)
         
   # Select covariates if 75% quantiles > 0 only  
-  filtered_data <-    HexPred_sf   %>% dplyr::select(variables_name_full) %>% st_drop_geometry %>%
+  filtered_data <-    x %>% dplyr::select(variables_name_full) %>% st_drop_geometry %>%
                         summarise(across(everything(), ~ quantile(.x, probs = 0.70, na.rm = T))) %>%
                         pivot_longer(everything(), names_to = "column", values_to = "q70_value") %>%
                         filter(q70_value != 0) %>%
@@ -142,17 +142,20 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
   # Load predictive layer with covariates 
   full_cov_raw <- load_predictive_layers()
   
-  # Load MEOW layer
-  load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
+  # Load MEOW layer named reef_layer.sf
+  reef_layer.sf <- load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
   
+  # join covariates to tier.lookup
+  tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf)
+
   # Define spatial scale on which the model will be computed
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
 
-  # Keep FOCAL_TIER with at least two distinct locations  
+  # Keep FOCAL_TIER with at least three distinct locations  
   tal_tier_spat <- data.grp %>%
   count(!!sym(FOCAL_TIER), LONGITUDE, LATITUDE) %>%
   count(!!sym(FOCAL_TIER)) %>%
-  filter(n>1)
+  filter(n>2)
 
  data.grp <- data.grp %>%
   filter(!!sym(FOCAL_TIER) %in% tal_tier_spat[[FOCAL_TIER]]) %>%
@@ -178,20 +181,21 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
    #############################
 
   for (TIER in unique(data.grp[[FOCAL_TIER]])) {
-    #TIER <<- as.character(TIER)  #make this global
-    TIER <<- 1874
-    sf::sf_use_s2(TRUE) |> 
-      suppressMessages()
+    #TIER <<- as.character(TIER[2])  #make this global
+    TIER <<- 1871
+   # sf::sf_use_s2(TRUE) |> 
+   #   suppressMessages()
 
     # for dev
     # TIER <- as.character(unique(data.grp[[FOCAL_TIER]])[2])
 
-    ## subset for current TIER
+    ## subset for current TIER or go to next if no data 
     data.grp.tier <- data.grp |>
       dplyr::filter(data.grp[[FOCAL_TIER]]==TIER) |>
-      dplyr::select(-COVER)
+      dplyr::select(-COVER) 
 
-     if(nrow(data.grp.tier)==0) next
+   # if(nrow(data.grp.tier)==0) next
+
     ## trim the predictive layer using the range of observed years
    
    # full_cov <- trim_years_from_predictive_layers(full_cov_raw, data.grp.tier) # function not working
@@ -202,9 +206,6 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
          REPORT_YEAR = year) |>
          dplyr::filter(between(REPORT_YEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR))) |>
          dplyr::rename(fYEAR = year)
-
-    ## join covariates to tier.lookup
-    tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf)
 
     #############################
     # Making predictive layer  
@@ -262,23 +263,32 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                        ~ifelse(.x >= out_cycl & As.Data == "No", NA, .x))) |>
         dplyr::mutate(across(matches("^max_dhw.*"),
                        ~ifelse(.x >= out_dhw & As.Data == "No", NA,
-                                 ifelse(.x < out_dhw, .x, .x)))) #|> # need to also adjust severity when corresponding values of cyclone exposure and dhw are NA 
-         # mutate(across(matches("^severity.*|^max.*"), 
-          #             ~ as.numeric(scale(.)))) # scaling 
+                                 ifelse(.x < out_dhw, .x, .x)))) # need to also adjust severity when corresponding values of cyclone exposure and dhw are NA 
+      
+       # Extract model formula 
+
+        # Select covariates if 75% quantiles is greater than 0 - otherwise assume to not be spatially representative 
+        selected_covar <- select_covariates(HexPred_sf)
+
+       # Scale continous covariates
+       HexPred_sf <-  HexPred_sf %>%
+         mutate(across(matches("^severity.*|^max.*"), 
+                      ~ as.numeric(scale(.)))) # scaling covariates 
 
       mean(is.na(HexPred_sf$max_cyc))
       mean(is.na(HexPred_sf$max_dhw))
+
          ## adjusting if tier5 has no reefid (mismatch between TropicalCoralReefsOfTheWorld and tier5.sf)
         
-       HexPred_sf <-  HexPred_sf %>%
-       group_by(Tier5) %>%
-       mutate(reefid = case_when(
-                reefid == "NA" ~ paste0(
-                sample(1:100, 1), "_", 
-                sample(1:100, 1)
-              ),TRUE ~ reefid)) %>%
-                    ungroup()
-      
+      # HexPred_sf <-  HexPred_sf %>%
+      # group_by(Tier5) %>%
+      # mutate(reefid = case_when(
+      #          reefid == "NA" ~ paste0(
+      #          sample(1:100, 1), "_", 
+      ##          sample(1:100, 1)
+       #       ),TRUE ~ reefid)) %>%
+       #             ungroup()
+
        # msg <- (paste("Applying quality control for Tier:",
        #               TIER))
        # reefCloudPackage::log("SUCCESS", logFile = LOG_FILE,
@@ -287,8 +297,8 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
         # Construct STIDF object from benthic data
         check_tier5 <- unique(data.grp.tier$Tier5) %in% unique(HexPred_sf$Tier5)
         
-        data.grp.tier.cov <- data.grp.tier |> left_join(HexPred_sf |> st_drop_geometry(),
-        by = join_by(Tier5 == Tier5, REPORT_YEAR == fYEAR))
+       # data.grp.tier.cov <- data.grp.tier |> left_join(HexPred_sf |> st_drop_geometry(),
+      #  by = join_by(Tier5 == Tier5, REPORT_YEAR == fYEAR))
 
        # if (FALSE %in% check_tier5){
        #   msg <- (paste("Data outside",FOCAL_TIER," for Tier:",
@@ -300,7 +310,7 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
       #############################
       # Model prep  
       #############################  
-        data.grp.tier$Year <- as.Date(paste0(as.character(data.grp.tier$fYEAR),
+        data.grp.tier$Year <- as.Date(paste0(as.character(data.grp.tier$REPORT_YEAR),
                                              "-01-01"))  
         data.grp.tier$k_Z <- data.grp.tier$TOTAL       
         lon_idx <- which(names(data.grp.tier) == "LONGITUDE")
@@ -313,12 +323,12 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                              interval = TRUE)    
 
         # Making BAUs: the predicitons of the model will be on the tier 5 level
-        HexPred_sp <- as_Spatial(HexPred_sf_raw)         
-        nHEX <-  nrow(subset(HexPred_sp, fYEAR == min(HexPred_sf_raw$REPORT_YEAR)))     
-        nYEAR <- length(unique(HexPred_sp@data$fYEAR))      
+        HexPred_sp <- as_Spatial(HexPred_sf)         
+        nHEX <-  nrow(subset(HexPred_sp, REPORT_YEAR == min(HexPred_sf$REPORT_YEAR)))     
+        nYEAR <- length(unique(HexPred_sp@data$REPORT_YEAR))      
 
         HexPred_sp@data$n_spat <- rep(1:nHEX, each = nYEAR)   
-        BAUs_spat <- subset(HexPred_sp, fYEAR == as.character(min(REPORT_YEAR)))        
+        BAUs_spat <- subset(HexPred_sp, REPORT_YEAR == min(HexPred_sf$REPORT_YEAR))        
         coordnames(BAUs_spat) <- c("LONGITUDE", "LATITUDE")
 
         # Construct spatio-temporal BAUs (will not contain covariate information for now)
@@ -327,8 +337,8 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
                              spatial_BAUs = BAUs_spat,
                              tunit = "years")
 
-        ST_BAUs <- ST_BAUs[, 1:nYEAR, 1:2]                 
-        ST_BAUs$fYEAR <- ST_BAUs$t + min(HexPred_sf_raw$REPORT_YEAR)-1  
+        ST_BAUs <- ST_BAUs[, 1:nYEAR, 1:2]  # remove last year (automatically inserted by FRK)                 
+        ST_BAUs$fYEAR <- ST_BAUs$t + min(HexPred_sf$REPORT_YEAR)-1  
         ST_BAUs$n_spat <- rep(1:nHEX, nYEAR)              
 
         # Update BAUs with covariate information
@@ -365,14 +375,9 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
       #############################
 
         ## reefCloudPackage::ReefCloud_tryCatch({
-        start_time <- Sys.time()
-
-        # Call model formula 
-
-        # Select covariates if 75% quantiles is greater than 0 - otherwise assume to not be spatially representative 
-        selected_covar <- select_covariates(HexPred_sf)
-
-        if (length(selected_covar) == 0){
+        
+        # Call model formula
+         if (length(selected_covar) == 0){
         formula_string <- "COUNT ~ 1 + (1 | reefid)"   
         }else{
         # Combine variable names into a formula string
@@ -382,6 +387,7 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
         # Convert the string into a formula object
         model_formula <- as.formula(formula_string)
 
+        start_time <- Sys.time()
         M <- FRK(f = model_formula,
                    data = list(STObj),
                    BAUs = ST_BAUs,
