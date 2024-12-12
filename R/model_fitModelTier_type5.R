@@ -143,7 +143,7 @@ model_fitModelTier_type5 <- function(data.grp, tier.sf){
   full_cov_raw <- load_predictive_layers()
   
   # Load MEOW layer named reef_layer.sf
-  reef_layer.sf <- load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
+  load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
   
   # join covariates to tier.lookup
   tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf)
