@@ -207,18 +207,18 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
 #data.grp <- read.csv("data/PLW/NEW/data.grp.csv") %>%
 #  filter(!Tier4 == "1874") # not working but most data 
 
+model_fitModelTier_type5 <- function(data.grp, tier.sf){
+  #status::status_try_catch(
+  #  {
+ 
 # Import reef layer 
 
 #reef_layer.sf <- st_read("data/PLW/NEW/reef_layer.sf.shp", quiet = TRUE)
 load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
 
 # Define spatial scale on which the model will be computed
-  FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
-
-#model_fitModelTier_type5 <- function(data.grp, tier.sf){
-  #status::status_try_catch(
-  #  {
-  
+FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
+ 
 # Keep FOCAL_TIER with at least three distinct locations  
 tal_tier_spat <- data.grp  %>%
   count(!!sym(FOCAL_TIER), LONGITUDE, LATITUDE) %>%
@@ -402,4 +402,4 @@ pred_sum_sf <- post_dist_df |> group_by(fYEAR,Tier5) |>
 # )
 }
 
-#}
+}
