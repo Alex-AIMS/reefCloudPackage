@@ -238,11 +238,8 @@ tal_tier_spat <- data.grp  %>%
 
  data.grp <- data.grp %>%
   filter(!!sym(FOCAL_TIER) %in% tal_tier_temp[[FOCAL_TIER]]) %>%
-  droplevels
-
-######## TO FIX
-data.grp <- data.grp %>%
-  filter(!Tier4 == "1874") # not working but most data 
+  droplevels %>%
+  data.frame()
 
 ######################
 ###################### START THE LOOP 
@@ -250,7 +247,7 @@ data.grp <- data.grp %>%
 for (TIER in unique(data.grp[[FOCAL_TIER]])) {
 
 #TIER <<- as.character(TIER)
-TIER <<- "1870"
+TIER <<- "41313"
 
 # Filter data.grp
 data.grp.tier <- data.grp |>
@@ -370,7 +367,7 @@ post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
 
 # Summary predictions at tier5
 
-tier.sf.joined$Tier5 <- as.integer(tier.sf.joined$Tier5)
+tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
 
 pred_sum_sf <- post_dist_df |> group_by(fYEAR,Tier5) |>
   ggdist::median_hdci(pred)|>
