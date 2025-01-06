@@ -5,6 +5,37 @@
 #' @examples model_fitModelTier()
 #' @export
 
+filter_focaltier <- function(data.grp, FOCAL_TIER) {
+  #status::status_try_catch(
+  #  {
+tal_tier_spat <- data.grp  |>
+  dplyr::count(!!sym(FOCAL_TIER), LONGITUDE, LATITUDE) |>
+  dplyr::count(!!sym(FOCAL_TIER)) |>
+  filter(n>3)
+
+ data.grp <- data.grp |>
+  filter(!!sym(FOCAL_TIER) %in% tal_tier_spat[[FOCAL_TIER]]) |>
+  droplevels()
+
+ tal_tier_temp <- data.grp |>
+  dplyr::count(!!sym(FOCAL_TIER), fYEAR) |>
+  dplyr::count(!!sym(FOCAL_TIER)) |>
+  filter(n>2)
+
+ data.grp <- data.grp |>
+  dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_temp[[FOCAL_TIER]]) |>
+  droplevels() |>
+  data.frame()
+  #   },
+  #   stage_ = 4,
+  #   order_ = 6,
+  #   name_ = "Filter locations without enough spatio-temporal replicates",
+  #   item_ = "Filter locations"
+  # )
+  return(data.grp)
+}
+
+
 load_predictive_layers <- function() {
  # status::status_try_catch(
  #   {
@@ -57,15 +88,16 @@ trim_years_from_predictive_layers <- function(full_cov_raw, data.grp.tier) {
 }
 
 select_covariates <- function(x) {
-  variables_name_full <- names(x) %>%
-    grep("^max", ., value = TRUE)
-  
-  # Select covariates if 75% quantiles > 0 only  
-  filtered_data <-    x %>% dplyr::select(all_of(variables_name_full)) %>% st_drop_geometry %>%
-    summarise(across(everything(), ~ quantile(.x, probs = 0.70, na.rm = T))) %>%
-    tidyr::pivot_longer(everything(), names_to = "column", values_to = "q70_value") %>%
-    filter(q70_value != 0) %>%
-    pull(column) 
+ variables_name_full <- names(x)
+ variables_name_full <- grep("^max", variables_name_full, value = TRUE)
+ 
+  # Select covariates if 70% quantiles > 0 only  
+  filtered_data <-    x |> 
+    dplyr::select(all_of(variables_name_full)) |> 
+    dplyr::summarise(across(everything(), ~ quantile(.x, probs = 0.70, na.rm = T))) |>
+    tidyr::pivot_longer(everything(), names_to = "column", values_to = "q70_value") |>
+    filter(q70_value != 0) |>
+    dplyr::pull(column) 
   return(filtered_data)
 }
 
@@ -186,8 +218,8 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
   basis <- auto_basis(STplane(),
                       ST_BAUs,
                       tunit = "years",
-                      nres = 2L, # for development (model runs in ~2min)
-                      #nres = 3L, # for final run (model runs in ~15min)
+                      #nres = 2L, # for development 
+                      nres = 3L, # for final run 
                       regular = TRUE)
 
   #p_basis <- show_basis(basis@Basis1) + show_basis(basis@Basis2)
@@ -203,9 +235,35 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
   return(obj_frk)
 }
 
-## Import benthic data and filter by focus tier4
-#data.grp <- read.csv("data/PLW/NEW/data.grp.csv") %>%
-#  filter(!Tier4 == "1874") # not working but most data 
+
+rm_obs_outside <- function(data.grp.tier, HexPred_reefid2) {
+  #status::status_try_catch(
+  #  {
+
+data.grp.tier.sf <- data.grp.tier |>
+  sf::st_as_sf(coords = c("LONGITUDE", "LATITUDE"),
+               crs = 4326)
+
+within_check <- sf::st_within(data.grp.tier.sf, HexPred_reefid2)
+
+# Get points that are not inside the polygons
+# Identify points that are inside the polygons
+inside_indices <- which(lengths(within_check) > 0)
+
+# Filter the points table to keep only the inside points
+data.grp.tier.filtered  <- data.grp.tier.sf[inside_indices, ] %>%
+    dplyr::mutate(LONGITUDE = st_coordinates(.)[, 1],  
+                  LATITUDE = st_coordinates(.)[, 2]  ) %>%
+    sf::st_drop_geometry()
+
+ #   },
+ #   stage_ = 4,
+ #   order_ = 5,
+ #   name_ = "rm obs outside tier5 cells",
+ #   item_ = "rm obs outside tier5 cells"
+ # )
+  return(data.grp.tier.filtered)
+}
 
 model_fitModelTier_type5 <- function(data.grp, tier.sf){
   #status::status_try_catch(
@@ -219,69 +277,40 @@ load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
 # Define spatial scale on which the model will be computed
 FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
  
-# Keep FOCAL_TIER with at least three distinct locations  
-tal_tier_spat <- data.grp  %>%
-  count(!!sym(FOCAL_TIER), LONGITUDE, LATITUDE) %>%
-  count(!!sym(FOCAL_TIER)) %>%
-  filter(n>3)
-
- data.grp <- data.grp %>%
-  filter(!!sym(FOCAL_TIER) %in% tal_tier_spat[[FOCAL_TIER]]) %>%
-  droplevels
-
-  # Keep FOCAL_TIER with at least three temporal replicates distinct locations  
-
- tal_tier_temp <- data.grp %>%
-  count(!!sym(FOCAL_TIER), fYEAR) %>%
-  count(!!sym(FOCAL_TIER)) %>%
-  filter(n>2)
-
- data.grp <- data.grp %>%
-  filter(!!sym(FOCAL_TIER) %in% tal_tier_temp[[FOCAL_TIER]]) %>%
-  droplevels %>%
-  data.frame()
+# Keep FOCAL_TIER with at least three distinct monitoring locations and two temporal replicates  
+data.grp <- filter_focaltier(data.grp, FOCAL_TIER)
 
 ######################
 ###################### START THE LOOP 
 
 for (TIER in unique(data.grp[[FOCAL_TIER]])) {
 
-#TIER <<- as.character(TIER)
-TIER <<- "41313"
+TIER <<- as.character(TIER)
 
 # Filter data.grp
 data.grp.tier <- data.grp |>
       dplyr::filter(data.grp[[FOCAL_TIER]]==TIER) |>
-      dplyr::select(-COVER) 
-
-data.grp.tier$Tier5 <- as.character(data.grp.tier$Tier5)
-data.grp.tier$fYEAR <- as.character(data.grp.tier$fYEAR)
+      dplyr::select(-COVER) |>
+      dplyr::mutate(across(Tier5, as.character))
 
 # join covariates to tier.lookup
-tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf) %>%
-  filter(!!sym(FOCAL_TIER) == TIER)
+tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf) |>
+  dplyr::filter(!!sym(FOCAL_TIER) == TIER)
 
 # Import predictive layer and trim the years
-data.grp.tier$fYEAR <- as.integer(data.grp.tier$fYEAR)
-
-full_cov_raw <- load_predictive_layers() %>%
-  filter(Tier5 %in% tier.sf.joined$Tier5) %>%
-  rename(fYEAR = year) %>%
-  dplyr::filter(between(fYEAR, min(data.grp.tier$fYEAR), max(data.grp.tier$fYEAR)))
-
-#full_cov <- full_cov_raw |>
-#  dplyr::mutate(across(matches("^severity.*|^max.*"), ~ tidyr::replace_na(.x, 0)),
-#                fYEAR = year) 
+full_cov_raw <- load_predictive_layers() |>
+  dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) |>
+  dplyr::rename(fYEAR = year) |>
+  dplyr::filter(between(fYEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR)))
 
 # Applying control quality - finding extreme events values for tier5 without observations 
-out_cycl <- quantile(  full_cov_raw$max_cyc, probs = 0.975)
-out_dhw <- quantile(  full_cov_raw$max_dhw, probs = 0.975)
+out_cycl <- quantile(full_cov_raw$max_cyc, probs = 0.975)
+out_dhw <- quantile(full_cov_raw$max_dhw, probs = 0.975)
 
-HexPred_sf <-   full_cov_raw %>%  
-  mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) %>%
-  # adjusting values of cyclone exposure and dhw
+HexPred_sf <-   full_cov_raw |>  
+  dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
   dplyr::mutate(across(matches("^max_cyc.*"),
-                       ~ifelse(.x >= out_cycl & As.Data == "No", NA, .x)))%>%
+                       ~ifelse(.x >= out_cycl & As.Data == "No", NA, .x))) |>
   dplyr::mutate(across(matches("^max_dhw.*"),
                        ~ifelse(.x >= out_dhw & As.Data == "No", NA,
                                ifelse(.x < out_dhw, .x, .x))))
@@ -290,8 +319,8 @@ HexPred_sf <-   full_cov_raw %>%
 selected_covar <- select_covariates(HexPred_sf)
 
 # Scale continous covariates
-HexPred_sf <-  HexPred_sf %>%
-  mutate(across(matches("^severity.*|^max.*"), 
+HexPred_sf <-  HexPred_sf |>
+  dplyr::mutate(across(matches("^severity.*|^max.*"), 
                 ~ as.numeric(scale(.)))) # scaling covariates 
 
 # Making reefid 
@@ -313,21 +342,32 @@ covs.hexpred_tier_sf_v2_prep <- covs.hexpred_tier_sf_v2_prep[
    ]
  }
 
-## Add other years
- HexPred_reefid  <-
-   covs.hexpred_tier_sf_v2_prep |>
+# Add other years
+HexPred_reefid  <- covs.hexpred_tier_sf_v2_prep |>
    dplyr::group_by(Tier5) |>
    dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
    ungroup()
 
- HexPred_reefid2 <-inner_join(HexPred_sf %>% data.frame() , HexPred_reefid) %>%
-   group_by(Tier5, fYEAR) %>%
-   filter(row_number()==1) %>%
-   replace(is.na(.), 0) %>%
-   st_as_sf(sf_column_name = "geometry")
+HexPred_reefid2 <-inner_join(HexPred_sf |> data.frame() , HexPred_reefid) |>
+   dplyr::group_by(Tier5, fYEAR) |>
+   dplyr::filter(row_number()==1) |>
+   dplyr::mutate(across(everything(), ~ replace(.x, is.na(.x), 0)))  |>
+   sf::st_as_sf(sf_column_name = "geometry")
+
+# Remove observations outside tier5 cells 
+data.grp.tier.ready <- rm_obs_outside(data.grp.tier, HexPred_reefid2)
+
+diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
+
+if (nrow(diff_db) > 0) {
+# #   #   msg <- (paste(nrow(diff_db), "observations have been removed for the",FOCAL_TIER,":", TIER))
+# #   #   reefCloudPackage::log("WARNING", logFile = LOG_FILE,
+# #   #     "--Fitting model 5 FRK--", msg = msg)
+
+ }
 
 # Prepare objects for the model 
-obj_frk <- frk_prep(data.grp.tier, HexPred_reefid2) 
+obj_frk <- frk_prep(data.grp.tier.ready, HexPred_reefid2) 
  
 # Call model formula
 if (length(selected_covar) == 0){
@@ -350,16 +390,17 @@ M <- FRK(f = model_formula,
          K_type = "precision", 
          method = "TMB", 
          est_error = FALSE)
-## predictions ####
 
+# Predictions
 ## reefCloudPackage::ReefCloud_tryCatch({
 pred <- predict(M, type = c("mean"))
+
 # Extracting posterior distributions of predictive locations
 
 post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
-  mutate(fYEAR = obj_frk$ST_BAUs@data$fYEAR) |>
-  mutate(Tier5 = obj_frk$ST_BAUs@data$Tier5) |>
-  mutate(id_loc = row_number()) |>
+   dplyr::mutate(fYEAR = obj_frk$ST_BAUs@data$fYEAR) |>
+   dplyr::mutate(Tier5 = obj_frk$ST_BAUs@data$Tier5) |>
+   dplyr::mutate(id_loc = row_number()) |>
   tidyr::pivot_longer(!c(fYEAR,Tier5,id_loc),
                       names_to = "draw",
                       values_to = "pred"
@@ -371,10 +412,10 @@ tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
 
 pred_sum_sf <- post_dist_df |> group_by(fYEAR,Tier5) |>
   ggdist::median_hdci(pred)|>
-  inner_join(tier.sf.joined |> dplyr::select(geometry,Tier5)) |>
-  st_as_sf(sf_column_name = "geometry") |>
-  mutate(Unc = .upper - .lower) |>
-  mutate(Tier5_fYEAR = paste0(Tier5,fYEAR))
+   dplyr::inner_join(tier.sf.joined |> dplyr::select(geometry,Tier5)) |>
+  sf::st_as_sf(sf_column_name = "geometry") |>
+   dplyr::mutate(Unc = .upper - .lower) |>
+   dplyr::mutate(Tier5_fYEAR = paste0(Tier5,fYEAR))
 
 #saveRDS(list(pred_sum_sf=pred_sum_sf,
 #             post_dist_df=post_dist_df,
