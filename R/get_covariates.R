@@ -41,6 +41,8 @@ get_covariates <- function() {
   ## print(paste0("cov_cyc ", cov_cyc))
   ## print(paste0("Exists cov_cyc ", exists("cov_cyc")))
   if (exists("cov_cyc") & !is.null(cov_cyc)) {
+    cov_cyc <- st_simplify(cov_cyc, dTolerance = 0.001)
+  #  cov_cyc <- st_make_valid(cov_cyc)
     cov_cyc <- tier.sf %>% st_intersection(cov_cyc) |>
       suppressMessages() |>
       suppressWarnings()

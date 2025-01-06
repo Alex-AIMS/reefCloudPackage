@@ -286,7 +286,7 @@ data.grp <- filter_focaltier(data.grp, FOCAL_TIER)
 for (TIER in unique(data.grp[[FOCAL_TIER]])) {
 
 TIER <<- as.character(TIER)
-
+TIER <<- 1808
 # Filter data.grp
 data.grp.tier <- data.grp |>
       dplyr::filter(data.grp[[FOCAL_TIER]]==TIER) |>
