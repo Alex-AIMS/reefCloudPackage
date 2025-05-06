@@ -286,7 +286,7 @@ data.grp <- filter_focaltier(data.grp, FOCAL_TIER)
 for (TIER in unique(data.grp[[FOCAL_TIER]])) {
 
 TIER <<- as.character(TIER)
-TIER <<- 1808
+#TIER <<- 1808
 # Filter data.grp
 data.grp.tier <- data.grp |>
       dplyr::filter(data.grp[[FOCAL_TIER]]==TIER) |>
@@ -417,14 +417,14 @@ pred_sum_sf <- post_dist_df |> group_by(fYEAR,Tier5) |>
    dplyr::mutate(Unc = .upper - .lower) |>
    dplyr::mutate(Tier5_fYEAR = paste0(Tier5,fYEAR))
 
-#saveRDS(list(pred_sum_sf=pred_sum_sf,
-#             post_dist_df=post_dist_df,
-#             data.grp.tier=data.grp.tier,
-#             M=M),
-#        file = paste0(DATA_PATH,
-#                      "modelled/",
-#                      "FRK",
-#                      "_",FOCAL_TIER,"_", TIER, ".RData"))
+saveRDS(list(pred_sum_sf=pred_sum_sf,
+             post_dist_df=post_dist_df,
+             data.grp.tier=data.grp.tier,
+             M=M),
+        file = paste0(DATA_PATH,
+                      "modelled/",
+                      "FRK",
+                      "_",FOCAL_TIER,"_", TIER, ".RData"))
 
 # },
 ##OLD   logFile=LOG_FILE,
