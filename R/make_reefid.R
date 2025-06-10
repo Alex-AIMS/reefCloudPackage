@@ -1,11 +1,11 @@
-##' Generate reefid variable for the random effect
-##' @title make reefid
-##' @param tier.sf.joined spatial layer
-##' @param HexPred_sf covariates shapefile
-##' @param reef_layer.sf imported reef layer 
-##' @return covs.hexpred_tier_sf_v2_prep covariates shapefile
-##' @author Julie Vercelloni
-##' @export
+#' Generate reefid variable for the random effect
+#' @title make reefid
+#' @param tier.sf.joined spatial layer
+#' @param HexPred_sf covariates shapefile
+#' @param reef_layer.sf imported reef layer 
+#' @return covs.hexpred_tier_sf_v2_prep covariates shapefile
+#' @author Julie Vercelloni
+#' @export
 
 make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf){
   status::status_try_catch(

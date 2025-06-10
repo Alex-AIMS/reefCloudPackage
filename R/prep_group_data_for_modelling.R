@@ -23,14 +23,6 @@ prep_group_data_for_modelling <- function(data, GROUP) {
       arrange(Tier4, Tier5, Site, Transect, desc(as.numeric(as.character(fYEAR)))) %>%
       mutate(fYEAR = factor(fYEAR, levels=unique(fYEAR)))
     ## ----end
-    ## },
-    ## logFile=LOG_FILE,
-    ## Category='--Modelling fitting routines--',
-    ## msg=paste0('Prepare ', stringr::str_to_title(GROUP),' sub data for modelling'),
-    ## return=NULL,
-    ## stage = paste0("STAGE", CURRENT_STAGE),
-    ## item = "SubsetGroups"
-    ## )
   },
   stage_ = 4,
   order_ = 2,

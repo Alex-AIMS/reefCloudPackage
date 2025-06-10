@@ -5,23 +5,6 @@
 #' @examples model_fitModelTier()
 #' @export
 
-# trim_years_from_predictive_layers <- function(full_cov_raw, data.grp.tier) {
-#  # status::status_try_catch(
-#  #   {
-#       full_cov <- full_cov_raw |>
-#         dplyr::mutate(across(matches("^severity.*|^max.*"), ~replace_na(.x, 0)),
-#                       fYEAR = year) |>
-#         dplyr::filter(between(fYEAR, min(data.grp.tier$fYEAR), max(data.grp.tier$fYEAR))) |>
-#         dplyr::rename(fYEAR = year)
-#  #   },
-#  #   stage_ = 4,
-#  #   order_ = 6,
-#  #   name_ = "Trim predictive layers",
-#  #   item_ = "trim_predictive_layers"
-#  # )
-#   return(full_cov)
-# }
-
 model_fitModelTier_type5 <- function(data.grp, tier.sf){
   status::status_try_catch(
     {
@@ -32,8 +15,8 @@ load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
 # Define spatial scale on which the model will be computed
 FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
  
-# Keep FOCAL_TIER with at least three distinct monitoring locations and two temporal replicates  
-data.grp <- filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
+# Keep FOCAL_TIER with at least three distinct monitoring locations and two temporal replicates  MOVED FROM HERE NOW
+#data.grp <- filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
 
 ######################
 ###################### START THE LOOP 

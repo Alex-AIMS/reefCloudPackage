@@ -1,11 +1,9 @@
-##' Load predictive layers with covariates
-##' 
-##' 
-##' @title load predictive layers 
-##' @param NULL
-##' @return covariate tables 
-##' @author Julie Vercelloni
-##' @export
+#' Load predictive layers with covariates 
+#' @title load predictive layers 
+#' @param NULL
+#' @return full_cov_raw covariate tables 
+#' @author Julie Vercelloni
+#' @export
 
 load_predictive_layers <- function() {
   status::status_try_catch(

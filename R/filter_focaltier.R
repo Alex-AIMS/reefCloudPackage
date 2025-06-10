@@ -1,12 +1,12 @@
-##' Filter FOCAL_TIER without enough observations in space and time
-##' 
-##' Split FOCAL_TIER to be sent to different models
-##' @title filter focal tier 
-##' @param data.grp data on which model is fitted
-##' @param FOCAL_TIER tier being modelled
-##' @return list with filtered data and list of removed FOCAL_TIER 
-##' @author Julie Vercelloni
-##' @export
+#' Filter FOCAL_TIER without enough observations in space and time
+#' Split FOCAL_TIER to be sent to different models
+#' @title filter focal tier 
+#' @param data.grp data on which model is fitted
+#' @param FOCAL_TIER tier being modelled
+#' @return list with filtered data and list of removed FOCAL_TIER 
+#' @examples examples
+#' @author Julie Vercelloni
+#' @export
 
  filter_focaltier <- function(data.grp, FOCAL_TIER) {
    status::status_try_catch(

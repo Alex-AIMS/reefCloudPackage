@@ -1,11 +1,9 @@
-##' Select covariates if 70% quantiles is greater than 0 - otherwise assume to not be spatially representative 
-##' 
-##' 
-##' @title select_covariates
-##' @param HexPred_sf covariates shapefile
-##' @return filtered_data
-##' @author Julie Vercelloni
-##' @export
+#' Select covariates if 70% quantiles is greater than 0 - otherwise assume to not be spatially representative 
+#' @title select_covariates
+#' @param HexPred_sf covariates shapefile
+#' @return filtered_data
+#' @author Julie Vercelloni
+#' @export
 
 select_covariates <- function(x) {
     status::status_try_catch(

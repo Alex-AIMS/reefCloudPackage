@@ -1,11 +1,9 @@
-##' Processing covariates
-##' 
-##' 
-##' @title join covariates to tier lookup
-##' @param tier.sf spatial layer
-##' @return tier.sf.joined spatial layer
-##' @author Julie Vercelloni
-##' @export
+#' Processing covariates
+#' @title join covariates to tier lookup
+#' @param tier.sf spatial layer
+#' @return tier.sf.joined spatial layer
+#' @author Julie Vercelloni
+#' @export
 
 join_covariates_to_tier_lookup <- function(tier.sf) {
   status::status_try_catch(

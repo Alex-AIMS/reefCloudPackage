@@ -1,13 +1,12 @@
-##' Add covariates to data
-##' 
-##' Process spatial layers including time lags and adjusting values depending on survey dates
-##' @title add cov to data 
-##' @param data data on which model is fitted
-##' @param cov refers to the extracted disturbance layer corresponding to the monitored years
-##' @param cov_name is the disturbance layer name
-##' @return data with adjusted disturbance values 
-##' @author Julie Vercelloni
-##' @export
+#' Process spatial layers including time lags and adjusting values depending on survey dates
+#' @title Add covariates to data
+#' @param data data on which model is fitted
+#' @param cov refers to the extracted disturbance layer corresponding to the monitored years
+#' @param cov_name is the disturbance layer name
+#' @return data with adjusted disturbance values 
+#' @examples examples
+#' @author Julie Vercelloni
+#' @export
 
 add_cov_to_data <- function(data, cov, cov_name) {
   data %>%
