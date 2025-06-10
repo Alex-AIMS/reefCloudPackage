@@ -205,8 +205,7 @@ model_fitModelTier <- function(){
           ggdist::median_hdci(cover_prop)%>%
           dplyr::select(fYEAR:.upper)%>%
           data.frame()
-
-        write_csv(pred_tierIndex, file=paste0(AWS_OUTPUT_PATH, "output_tiers", tierIndex,".csv"), quote = "none")
+        write_csv(pred_tierIndex, file=paste0(AWS_OUTPUT_PATH, "output", tierIndex,".csv"), quote = "none")
         invisible(gc(full=TRUE))
         cli_alert_success("Modelled data compiled into outputs")
       }

@@ -1,3 +1,14 @@
+##' Add covariates to data
+##' 
+##' Process spatial layers including time lags and adjusting values depending on survey dates
+##' @title add cov to data 
+##' @param data data on which model is fitted
+##' @param cov refers to the extracted disturbance layer corresponding to the monitored years
+##' @param cov_name is the disturbance layer name
+##' @return data with adjusted disturbance values 
+##' @author Julie Vercelloni
+##' @export
+
 add_cov_to_data <- function(data, cov, cov_name) {
   data %>%
     left_join(cov, by = c("Tier5" = "Tier5",
@@ -24,31 +35,3 @@ add_cov_to_data <- function(data, cov, cov_name) {
     ungroup()
 }
 
-lag_covariates <- function(cov, year_range, full_cov_lookup, cov_name) {
-  cov %>%
-    filter(year >= year_range[1] & year <= year_range[2]) %>% 
-    dplyr::select(-end_date) %>% 
-    full_join(full_cov_lookup) %>%
-    arrange(Tier5, year) %>%
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  ~ replace_na(.x, replace = 0))) %>% 
-    group_by(Tier5) %>%
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  list(lag1 = ~ lag(.x) ))) %>% 
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  list(lag2 = ~ lag(.x, n = 2) ))) %>%
-    ungroup() 
-}
-
-adjust_cov_for_after_surveys <- function(dt, end_date, cov, tier5, .x) {
-  if (is.na(end_date)) return(0)
-  yr <- year(dt)
-  yr_1 <- yr - 1
-  if (end_date > dt) yr <- yr_1
-  return(get_lag_cov(yr, cov, tier5, .x))
-}
-
-get_lag_cov <- function(yr, cov, tier5, .x) {
-  val <- cov %>% filter(Tier5 == tier5, year == yr) %>% pull(.x)
-  return(ifelse(length(val) == 0, 0, val))
-}
