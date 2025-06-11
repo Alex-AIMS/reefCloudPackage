@@ -129,7 +129,7 @@ model_fitModelTier <- function(){
     ##                                          status = "SUCCESS")
   }
 
-   if (MODEL_TYPE == 6)
+   if (MODEL_TYPE == 6){
    
     # FOCAL_TIER with at least three distinct monitoring locations and two temporal replicates  - to be send to MODEL_TYPE = 5
     data.grp.enough <- filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
