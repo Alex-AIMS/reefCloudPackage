@@ -13,7 +13,7 @@ scale_up_pred <- function(whichModel) {
   if (whichModel == "type5") {
     files <- list.files(
       path = paste0(DATA_PATH, "modelled"),
-      pattern = paste0(whichModel, "*"),
+      pattern = paste0(FRK, "*"),
       full.names = TRUE
     )
     files <- files[!grepl('TIER', files, perl = TRUE)]
