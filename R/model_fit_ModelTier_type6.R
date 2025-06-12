@@ -1,11 +1,9 @@
 #' @title Fit model at tier level
 #' @description Fits model to data at tier level
 #' @param data.grp data on which model is fitted
-#' @param covs.hexpred covariates shapefile
 #' @examples model_fitModelTier()
 #' @export
-
-model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
+model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf){
  # status::status_try_catch(
  #   {
 
@@ -15,8 +13,8 @@ load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'))
 # Define spatial scale on which the model will be computed
 FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
  
-# Keep FOCAL_TIER with at least three distinct monitoring locations and two temporal replicates  MOVED FROM HERE NOW
-data.grp <- data.grp.enough
+# Keep FOCAL_TIER with less than three distinct monitoring locations and two temporal replicates 
+data.grp <- data.grp.not.enough
 
 ######################
 ###################### START THE LOOP 
@@ -24,7 +22,7 @@ data.grp <- data.grp.enough
 for (TIER in unique(data.grp[[FOCAL_TIER]])) {
 
 TIER <<- as.character(TIER)
-
+#TIER <<- "1869"
 # Filter data.grp
 data.grp.tier <- data.grp |>
       dplyr::filter(data.grp[[FOCAL_TIER]]==TIER) |>
@@ -102,33 +100,76 @@ reefCloudPackage::log("WARNING", logFile = LOG_FILE,
 }
 
 # Prepare objects for the model 
-obj_frk <- frk_prep(data.grp.tier.ready, HexPred_reefid2) 
- 
+obj_inla <- inla_prep(data.grp.tier.ready, HexPred_reefid2) 
+data.sub <- obj_inla$data.sub 
+
 # Call model formula
 if (length(selected_covar) == 0){
-  formula_string <- "COUNT ~ 1 + (1 | reefid)"   
+formula_string <- paste(
+  "COUNT ~ fYEAR +",
+  "f(reefid, model = 'iid') +",
+  "f(P_CODE, model = 'iid') +",
+  "f(Site, model = 'iid') +",
+  "f(Transect, model = 'iid') +",
+  "f(fDEPTH, model = 'iid', hyper = list(prec = list(param = c(0.001, 0.001))))"
+) 
 }else{
   # Combine variable names into a formula string
-  formula_string <- paste("COUNT ~ 1 + (1 | reefid) +", paste(selected_covar, collapse = " + "))
+formula_string <- paste(
+  "COUNT ~ fYEAR +", 
+  paste(selected_covar, collapse = " + "), "+",
+  "f(reefid, model = 'iid') +",
+  "f(P_CODE, model = 'iid') +",
+  "f(Site, model = 'iid') +",
+  "f(Transect, model = 'iid') +",
+  "f(fDEPTH, model = 'iid', hyper = list(prec = list(param = c(0.001, 0.001))))"
+)
 }
-
 # Convert the string into a formula object
-model_formula <- as.formula(formula_string)
+model_formula_full <- as.formula(formula_string)
 
-# Fit FRK model 
-M <- FRK(f = model_formula, 
-         data = list(obj_frk$STObj), 
-         BAUs = obj_frk$ST_BAUs, 
-         basis = obj_frk$basis, 
-         response = "binomial", 
-         link = "logit", 
-         K_type = "precision", 
-         method = "TMB", 
-         est_error = FALSE)
+# Remove iid terms with less than 2 levels
+model_formula <- rm_factor(model_formula_full, data.sub)
 
-# Predictions
+family <- 'binomial' 
+ ################################################################################################
+# Fit INLA model   
 
-pred <- predict(M, type = c("mean"))
+ #fit <- function(model_formula, family, data.sub) {
+M <- inla(model_formula,
+            family=family,
+            Ntrials=TOTAL,
+            data=data.sub,
+            control.predictor=list(link=1, compute=TRUE),
+            control.compute=list(config=TRUE),
+            silent = 2L
+                )
+# if(length(M)==1)  {## if the model fails, try without depth
+   #   cat('Trying again!\n\n')
+   #   form1 <- form
+   #   term.labels <- attr(terms(form1), 'term.labels')
+   #   form <- update(form, paste0(".~.-", term.labels[[2]]))
+   #   mod <- fit(form,
+    #             family,
+     #            data.sub)
+    #}
+    #mod
+ # }
+ # M <- fit(model_formula, family, data.sub)
+  ## check if the model successfully fitted
+
+# Extracting predictions at data locations
+pred_summary <- M$summary.linear.predictor
+
+post_dist_df <- data.frame(
+  Tier5 = data.sub$Tier5,
+  fYEAR = data.sub$fYEAR,
+  pred = plogis(pred_summary$mean),
+  .lower = plogis(pred_summary$`0.025quant`),
+  .upper = plogis(pred_summary$`0.975quant`)
+)
+
+#draws <- inla.posterior.sample(1000, result=M, seed=123) %>% suppressWarnings()
 
 # Extracting posterior distributions of predictive locations
 
@@ -153,22 +194,20 @@ pred_sum_sf <- post_dist_df |> group_by(fYEAR,Tier5) |>
    dplyr::mutate(Tier5_fYEAR = paste0(Tier5,fYEAR))
 
 saveRDS(list(form=model_formula,
+             data.sub= data.sub,
              pred_sum_sf=pred_sum_sf,
              post_dist_df=post_dist_df,
-             data.grp.tier=data.grp.tier,
              M=M),
         file = paste0(DATA_PATH,
                       "modelled/",
-                      "FRK",
+                      "INLA",
                       "_",FOCAL_TIER,"_", TIER, ".RData"))
-
  }
  #   },
 # stage_ = 4,
 # order_ = 7,
-# name_ = "Fit FRK models",
-# item_ = "FRK_fit"
+# name_ = "Fit INLA models",
+# item_ = "INLA_fit"
 # )
 }
-
 

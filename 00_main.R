@@ -48,25 +48,6 @@ startMatter(args)
 ## load data
 model_loadData()
 
-## ## TODO
-## ## - need to add TropicalCoralReefsOfTheWorld.zip to the package in
-## ##   the ../parameters folder.  Lets do this manually here
-## system("mkdir ../parameters")
-## system("mv ../TropicalCoralReefsOfTheWorld.zip ../parameters/")
-
-## ## get covariates
-## #install.packages("ows4R")
-## library(ows4R)
-## library(httr)
-
-## rc_geo<-"https://geoserver.apps.aims.gov.au/reefcloud/ows"
-## rc_client <- WFSClient$new(rc_geo, 
-##                            serviceVersion = "2.0.0")
-## rc_client$getFeatureTypes(pretty = TRUE)
-## rc_lyrs<-rc_client$getFeatureTypes() %>%
-##   map_chr(function(x){x$getName()})
-## url <- parse_url(rc_geo)
-
 ## process data
 model_processData()
 

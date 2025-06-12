@@ -19,7 +19,7 @@
     dplyr::count(!!sym(FOCAL_TIER)) |>
     filter(n > 3)
   
-  data.grp <- data.grp |>
+  data.grp.filtered <- data.grp |>
     filter(!!sym(FOCAL_TIER) %in% tal_tier_spat[[FOCAL_TIER]]) |>
     droplevels()
   
@@ -29,19 +29,23 @@
     dplyr::count(!!sym(FOCAL_TIER)) |>
     filter(n > 2)
   
-  data.grp <- data.grp |>
+  data.grp.filtered <- data.grp.filtered |>
     dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_temp[[FOCAL_TIER]]) |>
     droplevels() |>
     data.frame()
   
-  # Step 3: Identify Removed Tiers
-  remaining_tiers <- unique(data.grp[[FOCAL_TIER]])
+  # Step 3: Identify Removed Tiers and 
+  remaining_tiers <- unique(data.grp.filtered[[FOCAL_TIER]])
   removed_tiers <- setdiff(original_tiers, remaining_tiers)
+
+  data.grp.removed <- data.grp |>
+     filter(!!sym(FOCAL_TIER) %in% removed_tiers)
+
      },
      stage_ = 4,
      order_ = 1,
      name_ = "Filter locations without enough spatio-temporal replicates",
      item_ = "Filter locations"
    )
-  return(list(filtered_data = data.grp, removed_tiers = removed_tiers))
+  return(list(filtered_data = data.grp.filtered, removed_tiers = data.grp.removed))
 }

@@ -55,7 +55,8 @@ model_fitModelTier <- function(){
     ##                                       label = stringr::str_to_title(GROUP),
     ##                                       status = "progress")
     ## Subset the data to the focal benthic group
-    data.grp <- reefCloudPackage::prep_group_data_for_modelling(data, GROUP)
+   
+   data.grp <- reefCloudPackage::prep_group_data_for_modelling(data, GROUP)
 
     ## Some locations (e.g. AUS are too large both with regards of geography and data bytes)
     ## to support full modelling.  Therefore, we have introduced a command line argument (TIER_LOOP)
@@ -70,6 +71,7 @@ model_fitModelTier <- function(){
     ## Model type 1 - simple cell means
     if (MODEL_TYPE ==1) {
       model_fitModelTier_type1(data.grp)
+      reefCloudPackage::scale_up_pred("type1") 
     }
 
     ## ---- model 2 (simple INLA)
@@ -83,7 +85,7 @@ model_fitModelTier <- function(){
       ## At the posterior accumulation stage, Tiers 3 and 2 will be constructed from Tier5.
       ##
       reefCloudPackage::model_fitModelTier_type2(data.grp)
-
+      reefCloudPackage::scale_up_pred("type2") 
       ## for the nominated FOCAL_TIER (e.g. 4),
       ## - get a vector of corresponding Tier 5 levels (from tiers.lookup - which is completely nested)
       ## - loop through each level and gather posteriors only for Tier5
@@ -100,28 +102,17 @@ model_fitModelTier <- function(){
       ## train on the data in the Tier as well as data that at within a buffered
       ## distance
       reefCloudPackage::model_fitModelTier_type3(data.grp)
-
+      reefCloudPackage::scale_up_pred("type3") 
     }
 
     if (MODEL_TYPE == 4) {
       reefCloudPackage::model_fitModelTier_type4(data.grp)
+      reefCloudPackage::scale_up_pred("type4") 
     }
 
     if (MODEL_TYPE == 5) {
-
-      ## Steps
-      ## 1. load predictive layers (all tier5 within the focal tier 4)
-      ## 2. trim the predictive layer using the range of observed years
-      ## 3. join covariates to tier.lookup
-      ## 3. remove the tiers for which there are no data and the value of the
-      ##      covariates greater than 3rd quantile of covariates
-      ## 4. great the reef id for every tier 5
-      ## 5. prepare data for FRK
-      ## 6. fit the FRK model
-      ## 7. save the model object
-      ## 8. generate posteriors for year/tier 4
-
-      reefCloudPackage::model_fitModelTier_type5(data.grp, tier.sf)
+    reefCloudPackage::model_fitModelTier_type5(data.grp, tier.sf)
+    reefCloudPackage::scale_up_pred("type5") 
 
     }
     ## if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
@@ -130,102 +121,110 @@ model_fitModelTier <- function(){
   }
 
    if (MODEL_TYPE == 6){
-   
-    # FOCAL_TIER with at least three distinct monitoring locations and two temporal replicates  - to be send to MODEL_TYPE = 5
+    # Hybrid modelling approach according the data volume of focal tier 4 following the conditions:
+    # If more than 3 sites surveyed for at least 2 years - then model type 5 is fitted (corresponding to the full spatio-temporal model with covariates)
+    # If less than the above conditions - model type 6 is fitted (corresponding to the quasi spatio-temporal model with covariates)
+
+    # Define spatial scale on which the model will be computed
+    FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER)-1)
+    
+    # FOCAL_TIER with at least three distinct monitoring locations and two temporal replicates  
     data.grp.enough <- filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
     reefCloudPackage::model_fitModelTier_type5_v2(data.grp.enough, tier.sf)
+    scale_up_pred("type5") 
 
     # FOCAL_TIER with less three distinct monitoring locations and two temporal replicates  - to be send to MODEL_TYPE = 2(???)
     data.grp.not.enough <- filter_focaltier(data.grp, FOCAL_TIER)$removed_tiers
-    reefCloudPackage::model_fitModelTier_type2(data.grp.not.enough, tier.sf)
+    reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
+    scale_up_pred("type6")
   }
 
 
-  if (MODEL_TYPE == 5) whichModel <- 'FRK'
-  if (MODEL_TYPE == 4) whichModel <- 'SPDEC'
-  if (MODEL_TYPE == 3) whichModel <- 'SPDE'
-  if (MODEL_TYPE == 2) whichModel <- 'simpleTemporal'
-  if (MODEL_TYPE == 1) whichModel <- 'means'
+  # if (MODEL_TYPE == 5) whichModel <- 'FRK'
+  # if (MODEL_TYPE == 4) whichModel <- 'SPDEC'
+  # if (MODEL_TYPE == 3) whichModel <- 'SPDE'
+  # if (MODEL_TYPE == 2) whichModel <- 'simpleTemporal'
+  # if (MODEL_TYPE == 1) whichModel <- 'means'
 
   ## Pack all the results together into a single csv file for output
   ## aggregation
   
   
-  reefCloudPackage::ReefCloud_tryCatch({
-    load(file=paste0(DATA_PATH,'processed/',RDATA_FILE))
-    if (MODEL_TYPE != 5){
+#   reefCloudPackage::ReefCloud_tryCatch({
+#     load(file=paste0(DATA_PATH,'processed/',RDATA_FILE))
+#     if (MODEL_TYPE != 5){
 
-    files <- list.files(path = paste0(DATA_PATH, "summarised"),
-                        pattern = paste0("cellmeans_INLA",whichModel,".*_Tier.*"),
-                        full.names = TRUE)
-    files <- files[!grepl('TIER', files, perl=TRUE)]
-    data.list <- vector('list', length(files))
-    ## ---- outputTiers
-    for (i in 1:length(data.list)) {
-      GROUP <- unique(gsub(paste0('.*cellmeans_INLA', whichModel,'_.*_(.*)_Tier.*'),'\\1',files[i]))
-      tier <- unique(gsub(paste0('.*cellmeans_INLA', whichModel,'_.*_.*_(Tier.*)\\..*'),'\\1',files[i]))
-      cellmeans.sum <- get(load(file = files[i]))
-      data.tmp <- data %>%
-        group_by(Tier2, fYEAR) %>%
-        summarise(DATE = mean(DATE)) %>%
-        suppressMessages()
+#     files <- list.files(path = paste0(DATA_PATH, "summarised"),
+#                         pattern = paste0("cellmeans_INLA",whichModel,".*_Tier.*"),
+#                         full.names = TRUE)
+#     files <- files[!grepl('TIER', files, perl=TRUE)]
+#     data.list <- vector('list', length(files))
+#     ## ---- outputTiers
+#     for (i in 1:length(data.list)) {
+#       GROUP <- unique(gsub(paste0('.*cellmeans_INLA', whichModel,'_.*_(.*)_Tier.*'),'\\1',files[i]))
+#       tier <- unique(gsub(paste0('.*cellmeans_INLA', whichModel,'_.*_.*_(Tier.*)\\..*'),'\\1',files[i]))
+#       cellmeans.sum <- get(load(file = files[i]))
+#       data.tmp <- data %>%
+#         group_by(Tier2, fYEAR) %>%
+#         summarise(DATE = mean(DATE)) %>%
+#         suppressMessages()
 
-      cellmeans.sum <- cellmeans.sum %>%
-        mutate(ISO = DOMAIN_NAME,
-               Tier = tier,
-               Year = as.numeric(as.character(fYEAR)),
-               Variable = GROUP) %>%
-        left_join(data.tmp %>%
-                    mutate(Year = as.numeric(as.character(fYEAR))) %>%
-                    dplyr::select(-fYEAR)) %>%
-        dplyr::select(Tier, Tier_ID = !!sym(tier),
-                      Year, Survey_Date = DATE,
-                      Variable,
-                      mean, lower, upper, median) %>%
-        suppressMessages()
-      data.list[[i]] = cellmeans.sum
-    }
+#       cellmeans.sum <- cellmeans.sum %>%
+#         mutate(ISO = DOMAIN_NAME,
+#                Tier = tier,
+#                Year = as.numeric(as.character(fYEAR)),
+#                Variable = GROUP) %>%
+#         left_join(data.tmp %>%
+#                     mutate(Year = as.numeric(as.character(fYEAR))) %>%
+#                     dplyr::select(-fYEAR)) %>%
+#         dplyr::select(Tier, Tier_ID = !!sym(tier),
+#                       Year, Survey_Date = DATE,
+#                       Variable,
+#                       mean, lower, upper, median) %>%
+#         suppressMessages()
+#       data.list[[i]] = cellmeans.sum
+#     }
 
-    data.sum <- do.call('rbind', data.list)
-    } else {
-      files <- list.files(path = paste0(DATA_PATH, "modelled"),
-                          pattern = paste0(whichModel,"*"),
-                          full.names = TRUE)
-      files <- files[!grepl('TIER', files, perl=TRUE)]
-      data.list <- vector('list', length(files))
-      ## ---- outputTiers
-      post_dist_df_list <- list()
-      for (i in 1:length(data.list)) {
-        GROUP <- "HARD CORAL"
-        tier <- str_extract(files[i], "(?<=_)(\\d+)(?=.RData)")
-        obj <- readRDS(files[i])
+#     data.sum <- do.call('rbind', data.list)
+#     } else {
+#       files <- list.files(path = paste0(DATA_PATH, "modelled"),
+#                           pattern = paste0(whichModel,"*"),
+#                           full.names = TRUE)
+#       files <- files[!grepl('TIER', files, perl=TRUE)]
+#       data.list <- vector('list', length(files))
+#       ## ---- outputTiers
+#       post_dist_df_list <- list()
+#       for (i in 1:length(data.list)) {
+#         GROUP <- "HARD CORAL"
+#         tier <- str_extract(files[i], "(?<=_)(\\d+)(?=.RData)")
+#         obj <- readRDS(files[i])
 
-        post_dist_df_list[[i]] <- obj$post_dist_df
-      }
+#         post_dist_df_list[[i]] <- obj$post_dist_df
+#       }
 
-      post_dist_df_all <- bind_rows(post_dist_df_list)
-      post_dist_df_all <- left_join(post_dist_df_all,
-                                      tiers.lookup)%>%
-                mutate(reef_area=reef_area/1000000)%>%
-                mutate(weighted_pred = pred * reef_area)
-      for (tierIndex in seq(as.numeric(BY_TIER)-1, 2)){
-        pred_tierIndex <- post_dist_df_all %>%
-          group_by_at(c("fYEAR", "draw",paste0("Tier", tierIndex))) %>%
-          summarize(reef_total_area=sum(reef_area),
-                    cover = sum(weighted_pred, na.rm = TRUE),
-                    cover_prop=cover/reef_total_area)%>%
-          group_by_at(c("fYEAR",paste0("Tier", tierIndex))) %>%
-          ggdist::median_hdci(cover_prop)%>%
-          dplyr::select(fYEAR:.upper)%>%
-          data.frame()
-        write_csv(pred_tierIndex, file=paste0(AWS_OUTPUT_PATH, "output", tierIndex,".csv"), quote = "none")
-        invisible(gc(full=TRUE))
-        cli_alert_success("Modelled data compiled into outputs")
-      }
-    }
+#       post_dist_df_all <- bind_rows(post_dist_df_list)
+#       post_dist_df_all <- left_join(post_dist_df_all,
+#                                       tiers.lookup)%>%
+#                 mutate(reef_area=reef_area/1000000)%>%
+#                 mutate(weighted_pred = pred * reef_area)
+#       for (tierIndex in seq(as.numeric(BY_TIER)-1, 2)){
+#         pred_tierIndex <- post_dist_df_all %>%
+#           group_by_at(c("fYEAR", "draw",paste0("Tier", tierIndex))) %>%
+#           summarize(reef_total_area=sum(reef_area),
+#                     cover = sum(weighted_pred, na.rm = TRUE),
+#                     cover_prop=cover/reef_total_area)%>%
+#           group_by_at(c("fYEAR",paste0("Tier", tierIndex))) %>%
+#           ggdist::median_hdci(cover_prop)%>%
+#           dplyr::select(fYEAR:.upper)%>%
+#           data.frame()
+#         write_csv(pred_tierIndex, file=paste0(AWS_OUTPUT_PATH, "output", tierIndex,".csv"), quote = "none")
+#         invisible(gc(full=TRUE))
+#         cli_alert_success("Modelled data compiled into outputs")
+#       }
+#     }
 
 
-  }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
-  msg=paste0('Generate output file and write to bucket'), return=NULL)
+#   }, logFile=LOG_FILE, Category='--Modelling fitting routines--',
+#   msg=paste0('Generate output file and write to bucket'), return=NULL)
 
-}
+# }
