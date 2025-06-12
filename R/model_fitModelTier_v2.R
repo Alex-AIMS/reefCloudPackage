@@ -133,7 +133,7 @@ model_fitModelTier <- function(){
    
     # FOCAL_TIER with at least three distinct monitoring locations and two temporal replicates  - to be send to MODEL_TYPE = 5
     data.grp.enough <- filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
-    reefCloudPackage::model_fitModelTier_type5(data.grp.enough, tier.sf)
+    reefCloudPackage::model_fitModelTier_type5_v2(data.grp.enough, tier.sf)
 
     # FOCAL_TIER with less three distinct monitoring locations and two temporal replicates  - to be send to MODEL_TYPE = 2(???)
     data.grp.not.enough <- filter_focaltier(data.grp, FOCAL_TIER)$removed_tiers
@@ -149,6 +149,8 @@ model_fitModelTier <- function(){
 
   ## Pack all the results together into a single csv file for output
   ## aggregation
+  
+  
   reefCloudPackage::ReefCloud_tryCatch({
     load(file=paste0(DATA_PATH,'processed/',RDATA_FILE))
     if (MODEL_TYPE != 5){

@@ -5,7 +5,7 @@
 #' @examples model_fitModelTier()
 #' @export
 
-model_fitModelTier_type5 <- function(data.grp, tier.sf){
+model_fitModelTier_type5_v2 <- function(data.grp, tier.sf){
   status::status_try_catch(
     {
 
@@ -141,7 +141,7 @@ post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
                       values_to = "pred"
   )
 
-# Summary predictions at tier5
+# Summary predictions at tier5 # ADD MODEL NAME
 
 tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
 
