@@ -34,6 +34,9 @@ scale_up_pred <- function(whichModel) {
       post_dist_df_list[[i]] <- obj$post_dist_df
     }
 
+      post_dist_df_list <- post_dist_df_list |> 
+      keep(~ "model_name" %in% names(.x))
+      
     post_dist_df_list <- map(post_dist_df_list, ~ .x |>
       mutate(
         fYEAR = as.factor(fYEAR),
@@ -41,9 +44,9 @@ scale_up_pred <- function(whichModel) {
         id_loc = as.integer(id_loc),
         draw = as.character(draw),
         pred = as.numeric(pred),
-        model_name = as.character(model_name)
+        model_name = as.integer(model_name)
       ) |>
-      select(fYEAR, Tier5, id_loc, draw, pred)
+      dplyr::select(fYEAR, Tier5, id_loc, draw, pred, model_name)
     )
 
     post_dist_df_all <- bind_rows(post_dist_df_list) %>%
