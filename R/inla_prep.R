@@ -7,6 +7,8 @@
 #' @examples examples
 #' @export
 inla_prep <- function(data.grp.tier.ready, HexPred_reefid2) {
+  # status::status_try_catch(
+  # {
 
 data.grp.tier.ready <- data.grp.tier.ready %>%
   mutate(fYEAR = as.character(fYEAR))
@@ -27,4 +29,10 @@ data.sub <- left_join(data.grp.tier.ready, HexPred_reefid2) %>%
   droplevels()
 
 return(list(data.sub = data.sub))
+  # },
+  # stage_ = 4,
+  # order_ = 10,
+  # name_ = "Prep INLA objects",
+  # item_ = "Prep INLA objects"
+  # )
 }

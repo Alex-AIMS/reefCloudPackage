@@ -19,7 +19,7 @@ model_fitModel <- function(raw_cell_means = TRUE){
   if (DOMAIN_CATEGORY == "site") {
     reefCloudPackage::model_fitModelSite(raw_cell_means)
   } else {
-    reefCloudPackage::model_fitModelTier()
+    reefCloudPackage::model_fitModelTier_v2()
     if (GENERATE_REPORT) reefCloudPackage::model_summariseModelTier()
   }
 
