@@ -10,11 +10,12 @@
 #' 
 #' @examples
 #' years <- 2010:2015
-#' annual.contrasts.lags(years, lags = c(1,2))
+#' annual_contrasts_lags(years, lags = c(1,2))
 #' 
 #' @author Murray Logan
 #' @export
-annual.contrasts.lags <- function(x, lags = 1) {
+annual_contrasts_lags <- function(x, lags = 1) {
+
   k <- length(x)
   M <- matrix(0, nrow = k, ncol = k * length(lags))
   nm <- vector("character", k * length(lags))

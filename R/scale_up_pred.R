@@ -12,9 +12,10 @@ scale_up_pred <- function(whichModel) {
 
   # status::status_try_catch(
   # {
-
   # Load Required Data
-  load(file = paste0(DATA_PATH, 'processed/', RDATA_FILE))
+ # load(file = paste0(DATA_PATH, 'processed/', RDATA_FILE))
+  # ---- Load input data tables for modelling ----
+ reefCloudPackage::load_data_for_model()
 
   # CASE 1: FRK/INLA model output (type5/type6)
   if (whichModel %in% c("type5", "type6")) {
@@ -44,7 +45,7 @@ scale_up_pred <- function(whichModel) {
         id_loc = as.integer(id_loc),
         draw = as.character(draw),
         pred = as.numeric(pred),
-        model_name = as.integer(model_name)
+        model_name = as.character(model_name)
       ) |>
       dplyr::select(fYEAR, Tier5, id_loc, draw, pred, model_name)
     )
@@ -56,20 +57,44 @@ scale_up_pred <- function(whichModel) {
         weighted_pred = pred * reef_area
       )
 
-    for (tierIndex in seq(as.numeric(BY_TIER) - 1, 2)) {
-      pred_tierIndex <- post_dist_df_all %>%
-        group_by_at(c("fYEAR", "draw", paste0("Tier", tierIndex))) %>%
-        summarize(
-          reef_total_area = sum(reef_area),
-          cover = sum(weighted_pred, na.rm = TRUE),
-          cover_prop = cover / reef_total_area,
-          .groups = "drop"
-        ) %>%
-        group_by_at(c("fYEAR", paste0("Tier", tierIndex))) %>%
-        ggdist::median_hdci(cover_prop) %>%
-        select(fYEAR:.upper) %>%
-        data.frame()
+for (tierIndex in seq(as.numeric(BY_TIER) - 1, 2)) {
 
+  tier_col <- paste0("Tier", tierIndex)
+
+  if (tier_col == "Tier4") {
+    pred_tierIndex <- post_dist_df_all %>%
+      group_by_at(c("fYEAR", "draw", tier_col, "model_name")) %>%
+      summarize(
+        reef_total_area = sum(reef_area),
+        cover = sum(weighted_pred, na.rm = TRUE),
+        cover_prop = cover / reef_total_area,
+        .groups = "drop"
+      ) %>%
+      group_by_at(c("fYEAR", tier_col, "model_name")) %>%
+      ggdist::median_hdci(cover_prop) %>%
+      select(fYEAR:.upper, model_name) %>%
+      mutate(fYEAR = as.numeric(as.character(fYEAR))) %>%
+      arrange(!!sym(tier_col), fYEAR) %>%
+      data.frame()
+  } else {
+    pred_tierIndex <- post_dist_df_all %>%
+      group_by_at(c("fYEAR", "draw", tier_col)) %>%
+      summarize(
+        reef_total_area = sum(reef_area),
+        cover = sum(weighted_pred, na.rm = TRUE),
+        cover_prop = cover / reef_total_area,
+        .groups = "drop"
+      ) %>%
+      group_by_at(c("fYEAR", tier_col)) %>%
+      ggdist::median_hdci(cover_prop) %>%
+      select(fYEAR:.upper) %>%
+      mutate(model_name = "FRK/INLA",
+      fYEAR = as.numeric(as.character(fYEAR))) %>%
+      arrange(!!sym(tier_col), fYEAR) %>%
+      data.frame()
+  }
+
+     #--- Save results into the AWS bucket
       write_csv(
         pred_tierIndex,
         file = paste0(AWS_OUTPUT_PATH, "output", tierIndex, ".csv"),
@@ -77,9 +102,15 @@ scale_up_pred <- function(whichModel) {
       )
       invisible(gc(full = TRUE))
       cli_alert_success("Modelled data compiled into outputs")
+    
+    #--- Save results
+    saveRDS(
+      pred_tierIndex,,
+      file = paste0(DATA_PATH, "modelled/", "output", tierIndex,".RData")
+    )
     }
 
-  # CASE 2: Other INLA cellmeans model types
+  # CASE 2: Other INLA cellmeans model types (codes not tested)
   } else {
     files <- list.files(
       path = paste0(DATA_PATH, "summarised"),

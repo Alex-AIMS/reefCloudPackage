@@ -26,11 +26,11 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       dplyr::mutate(across(Tier5, as.character))
 
     ## Join covariates
-    tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf) |>
+    tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf) |>
       dplyr::filter(!!sym(FOCAL_TIER) == TIER)
 
     ## Load covariate layers
-    full_cov_raw <- load_predictive_layers() |>
+    full_cov_raw <- reefCloudPackage::load_predictive_layers() |>
       dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) |>
       dplyr::rename(fYEAR = year) |>
       dplyr::filter(between(fYEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR)))
@@ -44,14 +44,14 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       dplyr::mutate(across(matches("^max_dhw.*"), ~ ifelse(.x >= out_dhw & As.Data == "No", NA, .x)))
 
     ## Select covariates
-    selected_covar <- select_covariates(HexPred_sf)
+    selected_covar <- reefCloudPackage::select_covariates(HexPred_sf)
 
     ## Scale covariates
     HexPred_sf <- HexPred_sf |>
       dplyr::mutate(across(matches("^severity.*|^max.*"), ~ as.numeric(scale(.))))
 
     ## Add reefid and fill missing years
-    covs.hexpred_tier_sf_v2_prep <- make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf)
+    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf)
 
     # Optional: Check missing reefid
     # missing_reefid <- covs.hexpred_tier_sf_v2_prep |>
@@ -69,7 +69,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       sf::st_as_sf(sf_column_name = "geometry")
 
     ## Remove obs outside covariate grid
-    data.grp.tier.ready <- rm_obs_outside(data.grp.tier, HexPred_reefid2)
+    data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)
 
     # Optional: Log removed observations
     # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
@@ -90,7 +90,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     }
 
     ## Prep FRK model inputs
-    obj_frk <- frk_prep(data.grp.tier.ready, HexPred_reefid2)
+    obj_frk <- reefCloudPackage::frk_prep(data.grp.tier.ready, HexPred_reefid2)
 
     ## Define model formula
     model_formula <- if (length(selected_covar) == 0) {
@@ -123,7 +123,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     #### Predict & summarise
     ##############################
 
-    pred <- predict(M, type = "mean")
+    pred <- FRK::predict(M, type = "mean", nsim = 1000)
 
     post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
       dplyr::mutate(fYEAR = obj_frk$ST_BAUs@data$fYEAR,

@@ -25,11 +25,11 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       dplyr::mutate(across(Tier5, as.character))
 
     #--- Join covariates
-    tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf) |>
+    tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf) |>
       dplyr::filter(!!sym(FOCAL_TIER) == TIER)
 
     #--- Load and filter predictive layers
-    full_cov_raw <- load_predictive_layers() |>
+    full_cov_raw <- reefCloudPackage::load_predictive_layers() |>
       dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) |>
       dplyr::rename(fYEAR = year) |>
       dplyr::filter(
@@ -50,7 +50,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
                            ~ ifelse(.x >= out_dhw & As.Data == "No", NA, .x)))
 
     #--- Select covariates
-    selected_covar <- select_covariates(HexPred_sf)
+    selected_covar <- reefCloudPackage::select_covariates(HexPred_sf)
 
     #--- Scale covariates
     HexPred_sf <- HexPred_sf |>
@@ -58,7 +58,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
                            ~ as.numeric(scale(.x))))
 
     #--- Create reefid
-    covs.hexpred_tier_sf_v2_prep <- make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf)
+    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf)
 
     #--- Merge reefid with covariates
     HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
@@ -73,7 +73,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       sf::st_as_sf(sf_column_name = "geometry")
 
     #--- Filter observations outside Tier5
-    data.grp.tier.ready <- rm_obs_outside(data.grp.tier, HexPred_reefid2)
+    data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)
     diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
 
     if (nrow(data.grp.tier.ready) == 0) {
@@ -109,10 +109,10 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     }
 
     model_formula_full <- as.formula(formula_string)
-    model_formula <- rm_factor(model_formula_full, data.sub)
+    model_formula <- reefCloudPackage::rm_factor(model_formula_full, data.sub)
 
     #--- Fit model
-    M <- inla(
+    M <- INLA::inla(
       model_formula,
       family = "binomial",
       Ntrials = TOTAL,
@@ -129,20 +129,32 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       next
     }
 
-    #--- Predictions at data locations
-    pred_summary <- M$summary.linear.predictor
+n_samples <- 1000
+samples <- INLA::inla.posterior.sample(n_samples, M)
 
-    post_dist_df <- data.frame(
-      fYEAR = data.sub$fYEAR,
-      Tier5 = data.sub$Tier5,
-      pred = plogis(pred_summary$mean)
-    ) |>
-      dplyr::mutate(
-        id_loc = dplyr::row_number(),
-        draw = "V1"
-      ) |>
-      dplyr::select(fYEAR, Tier5, id_loc, draw, pred) |>
-      dplyr::mutate(model_name = "INLA")
+# 2. Identify the predictor indices
+predictor_idx <- grep("^Predictor", rownames(samples[[1]]$latent))
+
+# 3. Extract predictor samples
+latent_samples <- sapply(samples, function(x) x$latent[predictor_idx])
+
+    #--- Predictions at data locations
+   # pred_summary <- M$summary.linear.predictor
+post_dist_df <- as.data.frame(latent_samples) |>
+  dplyr::mutate(
+    fYEAR = data.sub$fYEAR,
+    Tier5 = data.sub$Tier5,
+    id_loc = dplyr::row_number()
+  ) |>
+  tidyr::pivot_longer(
+    cols = -c(fYEAR, Tier5, id_loc),
+    names_to = "draw",
+    values_to = "pred"
+  ) |>
+  dplyr::mutate(
+    pred = plogis(pred),       
+    model_name = "INLA"
+  )
 
     #--- Summary predictions by Tier5
     tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)

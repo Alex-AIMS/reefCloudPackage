@@ -13,7 +13,7 @@ model_fitModelTier <- function() {
   # {
 
   # ---- Load input data tables for modelling ----
- load_data_for_model()
+ reefCloudPackage::load_data_for_model()
 
   # ---- Define target benthic group ----
   GROUP <- GROUPS[[2]]  # For now, modelling "hard corals" only
@@ -58,23 +58,30 @@ model_fitModelTier <- function() {
       FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
 
       # Filter focal tier based on data volume (≥3 sites, ≥2 years)
-      data.grp.enough <- filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
-      model_fitModelTier_type5_v2(data.grp.enough, tier.sf)
+      data.grp.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
+      reefCloudPackage::model_fitModelTier_type5_v2(data.grp.enough, tier.sf)
 
       # Filtered-out tiers (insufficient data) go to type6
-      data.grp.not.enough <- filter_focaltier(data.grp, FOCAL_TIER)$removed_tiers
-      model_fitModelTier_type6(data.grp.not.enough, tier.sf)
+      data.grp.not.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$removed_tiers
+      reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
 
       # Scale-up predictions for hybrid model
-      scale_up_pred("type6")
+      reefCloudPackage::scale_up_pred("type6")
+
+      # Attribute changes
+      reefCloudPackage::attribute_changes(FOCAL_TIER)
+
+      # Annual contrasts 
+      reefCloudPackage::annual.contrasts.lags() # not working yet
+
     }
   # } # End GROUP loop
 
   # status metadata
   # stage_ = 4,
-  # order_ = 13,
-  # name_ = "Model fitting complete; predictions saved to AWS bucket",
-  # item_ = "model_fit_save_pred"
+  # order_ = 15,
+  # name_ = "Model fitting complete; predictions, changes and contrasts saved to AWS bucket",
+  # item_ = "model_fit_save_all"
 
   # }
 }
