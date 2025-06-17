@@ -143,21 +143,24 @@ latent_samples <- sapply(samples, function(x) x$latent[predictor_idx])
 post_dist_df <- as.data.frame(latent_samples) |>
   dplyr::mutate(
     fYEAR = data.sub$fYEAR,
-    Tier5 = data.sub$Tier5,
-    id_loc = dplyr::row_number()
+    Tier5 = data.sub$Tier5
   ) |>
   tidyr::pivot_longer(
-    cols = -c(fYEAR, Tier5, id_loc),
+    cols = -c(fYEAR, Tier5), #, id_loc
     names_to = "draw",
     values_to = "pred"
   ) |>
+  group_by(fYEAR, Tier5, draw) |>
+  summarize(pred = mean(pred)) |>
   dplyr::mutate(
+    id_loc = dplyr::row_number(),
     pred = plogis(pred),       
     model_name = "INLA"
-  )
-
+  ) |>
+  dplyr::select(fYEAR, Tier5, id_loc, draw, pred, model_name)
+  
     #--- Summary predictions by Tier5
-    tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
+  tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
 
     pred_sum_sf <- post_dist_df |>
       dplyr::group_by(fYEAR, Tier5) |>

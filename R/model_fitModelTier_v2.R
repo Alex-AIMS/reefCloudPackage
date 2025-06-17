@@ -3,12 +3,12 @@
 #' Selects and fits model types 1 to 6 based on `MODEL_TYPE` and scales up the predictions.
 #'
 #' @examples
-#' model_fitModelTier()
+#' model_fitModelTier_v2()
 #'
 #' @author Julie Vercelloni
 #' 
 #' @export
-model_fitModelTier <- function() {
+model_fitModelTier_v2 <- function() {
   # status::status_try_catch(
   # {
 
@@ -16,8 +16,9 @@ model_fitModelTier <- function() {
  reefCloudPackage::load_data_for_model()
 
   # ---- Define target benthic group ----
-  GROUP <- GROUPS[[2]]  # For now, modelling "hard corals" only
+  # For now, modelling "hard corals" only
   # for (GROUP in GROUPS) {   # benthic groups
+  GROUP <- GROUPS[[2]] 
 
     # ---- Prepare data for modelling ----
     data.grp <- reefCloudPackage::prep_group_data_for_modelling(data, GROUP)
@@ -65,22 +66,16 @@ model_fitModelTier <- function() {
       data.grp.not.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$removed_tiers
       reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
 
-      # Scale-up predictions for hybrid model
+      # Scale-up predictions
       reefCloudPackage::scale_up_pred("type6")
 
       # Attribute changes
       reefCloudPackage::attribute_changes(FOCAL_TIER)
-
-      # Annual contrasts 
-      reefCloudPackage::annual.contrasts.lags() # not working yet
-
     }
-  # } # End GROUP loop
 
-  # status metadata
   # stage_ = 4,
-  # order_ = 15,
-  # name_ = "Model fitting complete; predictions, changes and contrasts saved to AWS bucket",
+  # order_ = 14,
+  # name_ = "Model fitting complete; predictions, changes attribution and contrasts saved to AWS bucket",
   # item_ = "model_fit_save_all"
 
   # }

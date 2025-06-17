@@ -2,26 +2,20 @@
 % Please edit documentation in R/make_contrasts.R
 \name{make_contrasts}
 \alias{make_contrasts}
-\title{Fit model at tier level}
+\title{Compile Tier-Level Fold Changes}
 \usage{
-make_contrasts()
+make_contrasts(pred_tierIndex, tier_col)
 }
 \arguments{
-\item{x}{A vector of values (e.g., years or time points).}
+\item{pred_tierIndex}{Data frame with posterior predictions including year, tier, and cover values.}
 
-\item{lags}{Integer or vector of integers indicating the lag steps between values for contrasts. Default is 1.}
+\item{tier_col}{Character string naming the tier column (e.g., "Tier4").}
 }
 \value{
-A matrix with rows corresponding to input values and columns to contrasts between lagged pairs.
+List of tibbles with fold changes and probabilities for each tier level.
 }
 \description{
-Constructs a matrix representing annual contrasts with specified lags for a vector of values.
-Each column corresponds to a contrast between year i and year i + lag.
-}
-\examples{
-years <- 2010:2015
-annual.contrasts.lags(years, lags = c(1,2))
-
+Computes year-on-year fold changes and directional probabilities from posterior draws by tier.
 }
 \author{
 Julie Vercelloni
