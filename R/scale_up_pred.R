@@ -56,6 +56,13 @@ scale_up_pred <- function(whichModel) {
         weighted_pred = pred * reef_area
       )
 
+    # if (any(map_int(post_dist_df_all, ~ sum(is.na(.x))) > 0)) {
+    #   msg <- "some tier5 missing from tiers.lookup were removed; model outputs saved to the wrong folder"
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Scaling-up predictions--", msg = msg)
+    # }
+
+    post_dist_df_all <- post_dist_df_all  %>% filter(if_all(everything(), ~ !is.na(.)))
+
 for (tierIndex in seq(as.numeric(BY_TIER) - 1, 2)) {
 
   tier_col <- paste0("Tier", tierIndex)

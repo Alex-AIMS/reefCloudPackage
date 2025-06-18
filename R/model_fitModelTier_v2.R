@@ -1,19 +1,16 @@
 #' @title Fit model at tier level
 #' @description Fits spatio-temporal models to data at a tier level for benthic groups.
-#' Selects and fits model types 1 to 6 based on `MODEL_TYPE` and scales up the predictions.
-#'
+#' Selects and fits model types 1 to 6 based on `MODEL_TYPE` and scales up the predictions.s
 #' @examples
 #' model_fitModelTier_v2()
-#'
 #' @author Julie Vercelloni
-#' 
 #' @export
 model_fitModelTier_v2 <- function() {
   # status::status_try_catch(
   # {
 
   # ---- Load input data tables for modelling ----
- reefCloudPackage::load_data_for_model()
+load_data_for_model() # reefCloudPackage::
 
   # ---- Define target benthic group ----
   # For now, modelling "hard corals" only
@@ -21,7 +18,7 @@ model_fitModelTier_v2 <- function() {
   GROUP <- GROUPS[[2]] 
 
     # ---- Prepare data for modelling ----
-    data.grp <- reefCloudPackage::prep_group_data_for_modelling(data, GROUP)
+    data.grp <- prep_group_data_for_modelling(data, GROUP) #reefCloudPackage::
 
     # ---- Model Type 1: Simple cell means ----
     if (MODEL_TYPE == 1) {
@@ -53,25 +50,25 @@ model_fitModelTier_v2 <- function() {
       reefCloudPackage::scale_up_pred("type5")
     }
 
-    # ---- Model Type 6: Hybrid model (auto switch between type5 and type2) ----
-    if (MODEL_TYPE == 6) {
-      # Define focal tier (e.g. Tier4)
-      FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
+    # # ---- Model Type 6: Hybrid model (auto switch between type5 and type2) ----
+     if (MODEL_TYPE == 6) {
+       # Define focal tier (e.g. Tier4)
+       FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
 
-      # Filter focal tier based on data volume (≥3 sites, ≥2 years)
-      data.grp.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
-      reefCloudPackage::model_fitModelTier_type5_v2(data.grp.enough, tier.sf)
+       # Filter focal tier based on data volume (≥3 sites, ≥2 years)
+       data.grp.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
+       reefCloudPackage::model_fitModelTier_type5_v2(data.grp.enough, tier.sf) 
 
-      # Filtered-out tiers (insufficient data) go to type6
-      data.grp.not.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$removed_tiers
-      reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
+       # Filtered-out tiers (insufficient data) 
+       data.grp.not.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$removed_tiers
+       reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
 
-      # Scale-up predictions
-      reefCloudPackage::scale_up_pred("type6")
+       # Scale-up predictions
+       reefCloudPackage::scale_up_pred("type6") 
 
-      # Attribute changes
-      reefCloudPackage::attribute_changes(FOCAL_TIER)
-    }
+       # Attribute changes - effect size of disturbances
+       reefCloudPackage::attribute_changes(FOCAL_TIER)
+     }
 
   # stage_ = 4,
   # order_ = 14,

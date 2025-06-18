@@ -17,10 +17,7 @@ make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf)
 A spatial `sf` object with Tier5 and reefid columns.
 }
 \description{
-Generate Reef ID Variable for Random Effects
-}
-\details{
-Joins covariates and reef layers to generate a `reefid` variable used as a spatial random effect.
+Make Reef ID
 }
 \examples{
 \dontrun{

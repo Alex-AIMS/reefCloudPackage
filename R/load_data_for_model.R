@@ -4,7 +4,9 @@
 #' This function checks for required `.RData` files in the processed data directory,
 #' sets up the list of target groups, and flags if covariate data is available.
 #'
-#' @return No return value. Loads data into the environment and optionally sets `COVARIATES = TRUE` if available.
+#' @param DATA_PATH Character. Path to the folder containing `processed/` and `primary/` data directories.
+#' @param RDATA_FILE Character. Name of the `.RData` file to load from the `processed/` directory.
+#' @return No return value. Loads data into the environment 
 #' @examples
 #' load_data_for_model()
 #' @export

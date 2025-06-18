@@ -6,8 +6,13 @@
 \usage{
 load_data_for_model()
 }
+\arguments{
+\item{DATA_PATH}{Character. Path to the folder containing `processed/` and `primary/` data directories.}
+
+\item{RDATA_FILE}{Character. Name of the `.RData` file to load from the `processed/` directory.}
+}
 \value{
-No return value. Loads data into the environment and optionally sets `COVARIATES = TRUE` if available.
+No return value. Loads data into the environment
 }
 \description{
 Loads benthic survey data and optionally identifies if covariates are available.

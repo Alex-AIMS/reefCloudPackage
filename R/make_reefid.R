@@ -1,12 +1,7 @@
-#' Generate Reef ID Variable for Random Effects
-#'
-#' Joins covariates and reef layers to generate a `reefid` variable used as a spatial random effect.
-#'
 #' @title Make Reef ID
 #' @param tier.sf.joined A spatial layer with tier information (e.g., from `join_covariates_to_tier_lookup()`).
 #' @param HexPred_sf Covariate shapefile for prediction.
 #' @param reef_layer.sf A reef polygon spatial layer.
-#'
 #' @return A spatial `sf` object with Tier5 and reefid columns.
 #' @examples
 #' \dontrun{
@@ -21,7 +16,6 @@ make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf) {
 
   covs.hexpred_tier_sf <- HexPred_sf |>
     dplyr::left_join(tier.sf.joined, by = c("Tier5" = "Tier5")) |>
-    dplyr::filter(.data[[FOCAL_TIER]] == TIER) |>
     dplyr::filter(fYEAR == min(fYEAR)) |>
     droplevels() |>
     sf::st_as_sf() |>
@@ -56,7 +50,7 @@ make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf) {
     suppressMessages() |>
     suppressWarnings()
 
-  sf::sf_use_s2(TRUE) |> suppressMessages()
+#  sf::sf_use_s2(TRUE) |> suppressMessages()
   # },
   # stage_ = 4,
   # order_ = 6,

@@ -8,11 +8,10 @@ model_fitModelTier_v2()
 }
 \description{
 Fits spatio-temporal models to data at a tier level for benthic groups.
-Selects and fits model types 1 to 6 based on `MODEL_TYPE` and scales up the predictions.
+Selects and fits model types 1 to 6 based on `MODEL_TYPE` and scales up the predictions.s
 }
 \examples{
 model_fitModelTier_v2()
-
 }
 \author{
 Julie Vercelloni

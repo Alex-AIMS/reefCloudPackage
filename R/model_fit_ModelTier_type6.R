@@ -6,6 +6,8 @@
 #' @author Julie Vercelloni
 #' @export
 model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
+  # status::status_try_catch(
+  # {
 
   # Define spatial scale
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
@@ -52,13 +54,15 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     #--- Select covariates
     selected_covar <- reefCloudPackage::select_covariates(HexPred_sf)
 
-    #--- Scale covariates
+    ## Scale covariates
     HexPred_sf <- HexPred_sf |>
-      dplyr::mutate(across(matches("^severity.*|^max.*"),
-                           ~ as.numeric(scale(.x))))
+      dplyr::mutate(across(
+       matches("^severity.*|^max.*"),
+      ~ as.numeric((. - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE))
+     ))
 
     #--- Create reefid
-    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf)
+    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf) 
 
     #--- Merge reefid with covariates
     HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
@@ -187,4 +191,10 @@ post_dist_df <- as.data.frame(latent_samples) |>
       file = paste0(DATA_PATH, "modelled/", "INLA_", FOCAL_TIER, "_", TIER, ".RData")
     )
   }
+  # },
+  # stage_ = 4,
+  # order_ = 11,
+  # name_ = "Fit INLA models",
+  # item_ = "INLA_fit"
+  # )  
 }

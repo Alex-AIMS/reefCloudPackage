@@ -38,6 +38,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     ## Apply quality control thresholds
     out_cycl <- quantile(full_cov_raw$max_cyc, probs = 0.975)
     out_dhw  <- quantile(full_cov_raw$max_dhw, probs = 0.975)
+    
     HexPred_sf <- full_cov_raw |>
       dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
       dplyr::mutate(across(matches("^max_cyc.*"), ~ ifelse(.x >= out_cycl & As.Data == "No", NA, .x))) |>
@@ -48,16 +49,19 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
 
     ## Scale covariates
     HexPred_sf <- HexPred_sf |>
-      dplyr::mutate(across(matches("^severity.*|^max.*"), ~ as.numeric(scale(.))))
+      dplyr::mutate(across(
+       matches("^severity.*|^max.*"),
+      ~ as.numeric((. - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE))
+     ))
 
     ## Add reefid and fill missing years
-    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf)
-
-    # Optional: Check missing reefid
+    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf) 
+ 
+ # Optional: Check missing reefid
     # missing_reefid <- covs.hexpred_tier_sf_v2_prep |>
     #   sf::st_drop_geometry() |> purrr::map_df(~sum(is.na(.)))
-
-    HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
+ 
+   HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
       dplyr::group_by(Tier5) |>
       dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
       ungroup()
@@ -69,8 +73,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       sf::st_as_sf(sf_column_name = "geometry")
 
     ## Remove obs outside covariate grid
-    data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)
-
+    data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)    
     # Optional: Log removed observations
     # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
     # if (nrow(diff_db) > 0) {
@@ -162,4 +165,5 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
   # name_ = "Fit FRK models",
   # item_ = "FRK_fit"
   # )
+
 }

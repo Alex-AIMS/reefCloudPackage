@@ -6,8 +6,8 @@
 #' @examples prep_group_data_for_modelling(data, GROUP)
 #' @export
 prep_group_data_for_modelling <- function(data, GROUP) {
-  status::status_try_catch(
-  {
+ # status::status_try_catch(
+ # {
     ## ---- data_sub
     data.grp <- data %>%
       filter(fGROUP == GROUP) %>%
@@ -23,11 +23,11 @@ prep_group_data_for_modelling <- function(data, GROUP) {
       arrange(Tier4, Tier5, Site, Transect, desc(as.numeric(as.character(fYEAR)))) %>%
       mutate(fYEAR = factor(fYEAR, levels=unique(fYEAR)))
     ## ----end
-  },
-  stage_ = 4,
-  order_ = 2,
-  name_ = "Prepare group data for modelling",
-  item_ = "prep_group_data_for_modelling"
-  )
+  #},
+  #stage_ = 4,
+  #order_ = 2,
+  #name_ = "Prepare group data for modelling",
+  #item_ = "prep_group_data_for_modelling"
+  #)
   return(data.grp)
 }
