@@ -2,24 +2,28 @@
 % Please edit documentation in R/get_geoserver_data.R
 \name{get_geoserver_data}
 \alias{get_geoserver_data}
-\title{Get data from geoserver}
+\title{Get Data from Geoserver}
 \usage{
-get_geoserver_data(Tier = 4, cov_name = NULL)
+get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = NULL)
 }
 \arguments{
-\item{Tier}{- an integer indicating the tier of the data to be retrieved}
+\item{Tier}{An integer indicating the tier of the data to be retrieved.}
 
-\item{cov_name}{- a string indicating the name of the coverage to be retrieved}
+\item{cov_name}{A string indicating the name of the coverage to be retrieved.}
 }
 \value{
-a spatial data frame containing the data from the geoserver
+A spatial data frame containing the filtered data from the geoserver.
 }
 \description{
-Get data from geoserver
+Downloads and filters spatial data from the geoserver for a specified tier and coverage name.
 }
 \details{
-This function gets data from the geoserver
+Requires BY_TIER, DATA_PATH, and geo_info to be available in the environment.
+}
+\examples{
+get_geoserver_info()
+cov_data <- get_geoserver_data(Tier = 4, cov_name = "degrees_heating_weeks_tier")
 }
 \author{
-Murray
+Murray Logan
 }

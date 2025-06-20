@@ -2,15 +2,18 @@
 % Please edit documentation in R/get_geoserver_info.R
 \name{get_geoserver_info}
 \alias{get_geoserver_info}
-\title{get geoserver info}
+\title{Get Geoserver Info}
 \usage{
 get_geoserver_info()
 }
 \description{
-Retrieves metadata from the geoserver
+Retrieves metadata from the geoserver. 
+This function loads available reefCloud layers and geoserver URL into the global environment.
 }
-\details{
-Get data from geoserver
+\examples{
+get_geoserver_info()
+# This will load `geo_info` in the global environment 
+# with `rc_lyrs` (available layers) and `url` (parsed URL).
 }
 \author{
 Murray Logan
