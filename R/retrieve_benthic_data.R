@@ -1,10 +1,11 @@
-##' Retrieve benthic data from source
-##'
-##' Retrieve the benthic data from the source specified by `AWS_PATH`
-##' and `FILENAME` and save it to the `DATA_PATH` directory.
-##' @title Retrieve benthic data
-##' @return NULL
-##' @author Murray
+#' @title Retrieve benthic data
+#' @description Retrieve the benthic data from the source specified by `AWS_PATH` and `FILENAME`, and save it to the `DATA_PATH` directory
+#' @return NULL (used for side effects: copying or downloading files)
+#' @examples
+#' retrieve_benthic_data()
+#' @author Murray Logan
+#' @export
+
 retrieve_benthic_data <- function() {
   status::status_try_catch(
   {

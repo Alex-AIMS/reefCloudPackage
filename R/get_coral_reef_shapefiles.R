@@ -1,9 +1,11 @@
-##' Get coral reef shapefiles
-##'
-##' Get coral reef shapefiles
-##' @title Get coral reef shapefiles 
-##' @return NULL 
-##' @author Murray
+#' @title Get coral reef shapefiles
+#' @description Unzips and loads the global coral reef shapefiles from the reefCloud package, saves them locally, and removes temporary files
+#' @return NULL (saves shapefile as reef_layer.sf.RData)
+#' @examples
+#' get_coral_reef_shape_files()
+#' @author Murray Logan
+#' @export
+
 get_coral_reef_shape_files <- function() {
   status::status_try_catch(
   {

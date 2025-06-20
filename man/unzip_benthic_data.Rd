@@ -6,12 +6,15 @@
 \usage{
 unzip_benthic_data()
 }
-\description{
-Unzip benthic data
+\value{
+NULL (used for side effects: unzipping files)
 }
-\details{
-Unzips the benthic data file to the primary data directory.
+\description{
+Unzips the benthic data file to the primary data directory using system unzip
+}
+\examples{
+unzip_benthic_data()
 }
 \author{
-Murray
+Murray Logan
 }

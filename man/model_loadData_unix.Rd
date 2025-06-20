@@ -2,19 +2,28 @@
 % Please edit documentation in R/model_loadData_unix.R
 \name{model_loadData_unix}
 \alias{model_loadData_unix}
-\title{Load data}
+\title{Load Data from S3 or Local Sources}
 \usage{
 model_loadData_unix()
 }
+\arguments{
+\item{None}{This function uses global settings and paths.}
+}
+\value{
+NULL All datasets are saved to disk; nothing is returned.
+}
 \description{
-This script will copy all the data sources from the bucket provided and place in <DATA_PATH>/primary.\cr
-When run on the dev server (HPC) DATA_FROM will be LOCAL\cr
-When run on the prod server (AWS) DATA_FROM will be S3\cr
-There should be three data collections in <AWS_PATH>/raw:\cr
-- benthic data (reefs_data.csv|zip)\cr
-- spatial tiers data (tiers[2-5].shp)\cr
-- covariates data (?)
+Copies all required data sources from the bucket or local path into `<DATA_PATH>/primary`.\cr
+- On the dev server (HPC), `DATA_FROM` must be `"LOCAL"`.\cr
+- On the prod server (AWS), `DATA_FROM` must be `"S3"`.\cr
+Required data collections under `<AWS_PATH>/raw` include:\cr
+• Benthic data (`reefs_data.csv` or `.zip`)\cr
+• Spatial tiers data (`tiers[2-5].shp`)\cr
+• Covariates data (format TBD)
 }
 \examples{
 model_loadData_unix()
+}
+\author{
+Murray Logan
 }

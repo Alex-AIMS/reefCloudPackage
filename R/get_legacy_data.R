@@ -1,9 +1,11 @@
-##' Get legacy data
-##'
-##' Unzip, retrieve and read legacy benthic data
-##' @title Get legacy data 
-##' @return NULL 
-##' @author Murray
+#' @title Get legacy data
+#' @description Unzip, retrieve, read, and save legacy benthic data for analysis and reporting
+#' @return NULL (used for side effects: file copy, unzip, read, and save)
+#' @examples
+#' get_legacy_data()
+#' @author Murray
+#' @export
+
 get_legacy_data <- function() {
   status::status_try_catch(
   {
@@ -11,9 +13,6 @@ get_legacy_data <- function() {
     if (DATA_FROM == "LOCAL")
       system(paste0("cp ", AWS_PATH, "raw/", LEGACY_FILENAME, ".zip", " ",
         DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"))
-    ## if (INPUT_FORMAT == "zip")
-    ##   unzip(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"),
-    ##         overwrite = TRUE, junkpaths = TRUE, exdir = paste0(DATA_PATH, "primary/"))
     if (INPUT_FORMAT == "zip")
       system(paste0('unzip -o -j ', DATA_PATH, 'primary/', LEGACY_FILENAME, '.zip -d ', DATA_PATH, 'primary/'))
     legacy_data <- read_csv(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".csv"),
@@ -31,7 +30,6 @@ get_legacy_data <- function() {
 
     if (DEBUG_MODE) reefCloudPackage::change_status(stage = paste0("STAGE", CURRENT_STAGE),
       item = "Legacy data",
-      ## label = "Legacy data",
       status = "success")
   },
   stage_ = 2,

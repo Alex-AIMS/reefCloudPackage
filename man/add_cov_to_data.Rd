@@ -7,14 +7,14 @@
 add_cov_to_data(data, cov, cov_name)
 }
 \arguments{
-\item{data}{data on which model is fitted}
+\item{data}{Data on which model is fitted}
 
-\item{cov}{refers to the extracted disturbance layer corresponding to the monitored years}
+\item{cov}{Extracted disturbance layer corresponding to the monitored years}
 
-\item{cov_name}{is the disturbance layer name}
+\item{cov_name}{Name of the disturbance layer}
 }
 \value{
-data with adjusted disturbance values
+Data with adjusted disturbance values
 }
 \description{
 Process spatial layers including time lags and adjusting values depending on survey dates

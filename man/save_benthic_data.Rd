@@ -6,11 +6,17 @@
 \usage{
 save_benthic_data(data)
 }
-\description{
-Save benthic data
+\arguments{
+\item{data}{A data frame or list to be saved}
 }
-\details{
-Save benthic data to RData file
+\value{
+NULL (used for side effects: writing files and updating state)
+}
+\description{
+Save benthic data to an RData file in the primary data directory. Optionally updates the analysis stage.
+}
+\examples{
+save_benthic_data(benthic_df)
 }
 \author{
 Murray

@@ -6,12 +6,15 @@
 \usage{
 get_tiers()
 }
-\description{
-Get tiers
+\value{
+NULL (saves tier spatial data for tiers 2 to 5)
 }
-\details{
-This function retrieves the tiers from the geoserver and saves them as spatial data
+\description{
+Retrieve tier spatial layers from the geoserver or AWS, save locally as `.RData`, and register for reporting
+}
+\examples{
+get_tiers()
 }
 \author{
-Murray
+Murray Logan
 }

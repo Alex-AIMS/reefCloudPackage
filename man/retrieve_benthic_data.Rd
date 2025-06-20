@@ -6,13 +6,15 @@
 \usage{
 retrieve_benthic_data()
 }
-\description{
-Retrieve benthic data from source
+\value{
+NULL (used for side effects: copying or downloading files)
 }
-\details{
-Retrieve the benthic data from the source specified by `AWS_PATH`
-and `FILENAME` and save it to the `DATA_PATH` directory.
+\description{
+Retrieve the benthic data from the source specified by `AWS_PATH` and `FILENAME`, and save it to the `DATA_PATH` directory
+}
+\examples{
+retrieve_benthic_data()
 }
 \author{
-Murray
+Murray Logan
 }

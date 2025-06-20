@@ -7,12 +7,15 @@
 #' - spatial tiers data (tiers[2-5].shp)\cr
 #' - covariates data (?)
 #' @examples model_loadData()
+#' @author Murray Logan
 #' @export
 model_loadData <- function(){
 
   if(.Platform$OS.type == "unix") {
     reefCloudPackage::model_loadData_unix()
   } else if (.Platform$OS.type == "windows"){
-    reefCloudPackage::model_loadData_windows()
+    #msg <- paste("Pipeline is not supported on Windows. Execution stopped.")
+    #reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model load data--", msg = msg)
+    #reefCloudPackage::model_loadData_windows()
   }
 }

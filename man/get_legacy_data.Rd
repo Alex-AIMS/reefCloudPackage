@@ -6,11 +6,14 @@
 \usage{
 get_legacy_data()
 }
-\description{
-Get legacy data
+\value{
+NULL (used for side effects: file copy, unzip, read, and save)
 }
-\details{
-Unzip, retrieve and read legacy benthic data
+\description{
+Unzip, retrieve, read, and save legacy benthic data for analysis and reporting
+}
+\examples{
+get_legacy_data()
 }
 \author{
 Murray

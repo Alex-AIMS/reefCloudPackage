@@ -6,12 +6,15 @@
 \usage{
 get_coral_reef_shape_files()
 }
-\description{
-Get coral reef shapefiles
+\value{
+NULL (saves shapefile as reef_layer.sf.RData)
 }
-\details{
-Get coral reef shapefiles
+\description{
+Unzips and loads the global coral reef shapefiles from the reefCloud package, saves them locally, and removes temporary files
+}
+\examples{
+get_coral_reef_shape_files()
 }
 \author{
-Murray
+Murray Logan
 }

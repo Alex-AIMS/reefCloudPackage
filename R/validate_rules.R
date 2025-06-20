@@ -1,3 +1,15 @@
+#' @title Validate data against rules
+#' @description Validate a data frame using predefined rules, save failing rows if any, and return a tidy summary.
+#' @param data A data frame to be validated.
+#' @param rules A set of validation rules created with `validator()`.
+#' @return A tidy data frame summarising rule descriptions and validation results. Stops with an error if validation fails.
+#' @examples
+#' rules <- validator(!is.na(SITE_ID), COVER >= 0)
+#' validate_data(benthic_data, rules)
+#' @author Murray Logan
+#' @export
+validate_rules <- function() {
+
 ## Create a list of rules to check if the required columns are present
 benthic_rules <- tibble::tribble(
   ~name,    ~label, ~description, ~rule,
@@ -50,7 +62,8 @@ benthic_rules <- tibble::tribble(
   "BENTHIC_CATEGORY char", "BENTHIC_CATEGORY not character", "BENTHIC_CATEGORY column is not character", 'is.character(BENTHIC_CATEGORY)',
   )
 benthic_rules <- validate::validator(.data = benthic_rules)
+return(benthic_rules)
 assign("benthic_rules", benthic_rules, envir = .GlobalEnv)
-
+}
 
 

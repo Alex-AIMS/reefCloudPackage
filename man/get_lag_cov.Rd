@@ -2,26 +2,27 @@
 % Please edit documentation in R/get_lag_cov.R
 \name{get_lag_cov}
 \alias{get_lag_cov}
-\title{get_lag_cov}
+\title{Get lagged disturbance value}
 \usage{
 get_lag_cov(yr, cov, tier5, .x)
 }
 \arguments{
-\item{yr}{is the adjusted year of the ecological survey}
+\item{yr}{Adjusted year of the ecological survey}
 
-\item{cov}{refers to the extracted disturbance layer corresponding to the monitored years}
+\item{cov}{Extracted disturbance layer corresponding to the monitored years}
 
-\item{tier5}{is the spatial unit}
+\item{tier5}{Spatial unit identifier}
 
-\item{.x}{is the col from the disturbance data}
-
-\item{cov_name}{is the disturbance layer name}
+\item{.x}{Column name from the disturbance data (e.g. severity or max variable)}
+}
+\value{
+Numeric value of the lagged disturbance, or 0 if missing
 }
 \description{
-Filter disturbance values to extract lags
+Filter disturbance values to extract lag from a previous year
 }
-\details{
-Extract values of disturbance at previous time
+\examples{
+get_lag_cov(yr = 2020, cov = cov_dhw, tier5 = 101, .x = "severity_dhw")
 }
 \author{
 Julie Vercelloni

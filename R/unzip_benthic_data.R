@@ -1,9 +1,11 @@
-##' Unzip benthic data
-##'
-##' Unzips the benthic data file to the primary data directory.
-##' @title Unzip benthic data 
-##' @return NULL 
-##' @author Murray
+#' @title Unzip benthic data
+#' @description Unzips the benthic data file to the primary data directory using system unzip
+#' @return NULL (used for side effects: unzipping files)
+#' @examples
+#' unzip_benthic_data()
+#' @author Murray Logan
+#' @export
+
 unzip_benthic_data <- function() {
   status::status_try_catch(
   {

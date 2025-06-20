@@ -18,3 +18,6 @@ There should be three data collections in <AWS_PATH>/raw:\cr
 \examples{
 model_loadData()
 }
+\author{
+Murray Logan
+}

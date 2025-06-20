@@ -10,11 +10,11 @@ import_benthic_data()
 A data frame with the benthic data
 }
 \description{
-Import benthic data
+Import benthic data from a CSV file located in the primary data directory
 }
-\details{
-Import benthic data from a CSV file
+\examples{
+benthic_df <- import_benthic_data()
 }
 \author{
-Murray
+Murray Logan
 }
