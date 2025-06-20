@@ -9,6 +9,7 @@
 #' @examples
 #' get_geoserver_info()
 #' cov_data <- get_geoserver_data(Tier = 4, cov_name = "degrees_heating_weeks_tier")
+#' @export
 get_geoserver_data <- function(Tier = as.numeric(BY_TIER) - 1, cov_name = NULL) {
   status::status_try_catch(
   {
