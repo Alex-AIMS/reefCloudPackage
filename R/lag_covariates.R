@@ -1,12 +1,14 @@
-##' Compute lag values
-##' 
-##' @title lag covariates 
-##' @param full_cov_lookup is the full time series of the disturbance
-##' @param cov refers to the extracted disturbance layer corresponding to the monitored years
-##' @param year_range corresponds to the range of monitoring years 
-##' @param cov_name is the disturbance layer name
-##' @author Julie Vercelloni
-##' @export
+#' @title Lag covariates
+#' @description Compute lag values from the full time series of a disturbance layer
+#' @param full_cov_lookup Full time series of the disturbance
+#' @param cov Extracted disturbance layer corresponding to the monitored years
+#' @param year_range Range of monitoring years
+#' @param cov_name Name of the disturbance layer
+#' @return A data frame with lagged covariate values
+#' @examples
+#' lag_covariates(cov = cov_dhw, year_range = 2010:2022, full_cov_lookup = full_dhw, cov_name = "dhw")
+#' @author Julie Vercelloni
+#' @export
 
 lag_covariates <- function(cov, year_range, full_cov_lookup, cov_name) {
   cov %>%

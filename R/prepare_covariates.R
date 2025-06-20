@@ -22,7 +22,7 @@ prepare_covariates <- function(data) {
         cov <- get(load(file = f))
 
         ## join to benthic data
-        data <- data %>% add_cov_to_data(cov, cov_name)
+        data <- data %>% add_cov_to_data(cov, cov_name) #reefCloudPackage::
 
         ## fill in the missing years for each Tier5 in the covariates
         year_range <- data %>% pull(REPORT_YEAR) %>% range()
@@ -30,7 +30,7 @@ prepare_covariates <- function(data) {
           crossing(Tier5 = unique(tier.sf$Tier5)) %>%
           arrange(Tier5)
         cov_list[[cov_name]] <-
-          cov %>% lag_covariates(year_range, full_cov_lookup, cov_name)
+          cov %>% lag_covariates(year_range, full_cov_lookup, cov_name) #reefCloudPackage::
       }
       full_cov <- cov_list[[1]] %>%
         dplyr::select(Tier5, year) %>%
@@ -42,7 +42,7 @@ prepare_covariates <- function(data) {
       assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))
       save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE))
 
-      covs.hexpred_tier_sf_v2_prep <- extract_reef_id_tier(full_cov, tier.sf)
+      covs.hexpred_tier_sf_v2_prep <- extract_reef_id_tier(full_cov, tier.sf) #reefCloudPackage::
       
       
     }
