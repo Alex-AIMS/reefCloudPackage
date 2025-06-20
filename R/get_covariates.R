@@ -18,11 +18,12 @@ get_covariates <- function() {
   if (exists("cov_dhw") & !is.null(cov_dhw)) {
     cov_dhw <- st_simplify(cov_dhw, dTolerance = 0.001) |>
       suppressMessages() |>
-      suppressWarnings()
-    cov_dhw <- tier.sf %>% st_intersection(cov_dhw) |>
+      suppressWarnings() 
+    cov_dhw <- st_make_valid(tier.sf) %>% st_intersection(st_make_valid(cov_dhw)) |>
       suppressMessages() |>
       suppressWarnings()
     cov_dhw <- cov_dhw %>%
+      dplyr::rename(Tier5 = tier_id) %>%
       st_drop_geometry() %>%
       group_by(Tier5, year) %>%
       summarise(
@@ -45,10 +46,11 @@ get_covariates <- function() {
     cov_cyc <- st_simplify(cov_cyc, dTolerance = 0.001) |>
       suppressMessages() |>
       suppressWarnings()
-    cov_cyc <- tier.sf %>% st_intersection(cov_cyc) |>
+    cov_cyc <- st_make_valid(tier.sf) %>% st_intersection(st_make_valid(cov_cyc)) |>
       suppressMessages() |>
       suppressWarnings()
     cov_cyc <- cov_cyc %>%
+      dplyr::rename(Tier5 = tier_id) %>%
       st_drop_geometry() %>%
       group_by(Tier5, end_year) %>%
       summarise(
