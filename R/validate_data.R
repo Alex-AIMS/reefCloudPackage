@@ -11,7 +11,10 @@
 validate_data <- function(data, rules) {
   result <- validate::confront(data, rules)
   invalid_rows <- violating_rows(result)
-  val <- tidy_validation(result, rules)
+  val <-   summary(result) |>
+    mutate(description = description(rules)) |>
+    dplyr::select(description, everything(), -name, -expression)
+    #tidy_validation(result, rules)
   if (any(val$fails)) {
     saveRDS(invalid_rows,
       file = paste0(AWS_OUTPUT_PATH, "invalid_rows.rds")

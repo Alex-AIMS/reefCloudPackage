@@ -6,6 +6,7 @@
 #' @examples
 #' get_geoserver_info()
 #' get_covariates()
+#' @export
 get_covariates <- function() {
   COVARIATES <<- NULL
   load(file=paste0(DATA_PATH,'primary/tier', as.numeric(BY_TIER) - 1, '.sf.RData'))
