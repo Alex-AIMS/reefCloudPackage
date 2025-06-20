@@ -8,6 +8,7 @@
 #' get_covariates()
 get_covariates <- function() {
   COVARIATES <<- NULL
+  load(file=paste0(DATA_PATH,'primary/tier', Tier, '.sf.RData'))
   
   ## --- Degree Heating Weeks ---
   # get the geoserver info
