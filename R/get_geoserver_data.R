@@ -13,7 +13,7 @@
 get_geoserver_data <- function(Tier = as.numeric(BY_TIER) - 1, cov_name = NULL) {
   status::status_try_catch(
   {
-    load(file=paste0(DATA_PATH,'primary/tier', Tier, '.sf.RData'))
+    load(file=paste0(DATA_PATH,'primary/tier', as.numeric(BY_TIER) - 1, '.sf.RData'))
     
     wch <- str_which(geo_info$rc_lyrs, cov_name)
     
