@@ -29,7 +29,7 @@ scale_up_pred <- function(whichModel) {
     if (length(files) == 0) {
     #   msg <- paste("No model outputs for the region")
     #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model predictions--", msg = msg)
-     next
+    stop("No model outputs found")
     }
 
 
@@ -84,7 +84,7 @@ scale_up_pred <- function(whichModel) {
     if (nrow(post_dist_df_tier5) == 0) {
     #   msg <- paste("No model outputs for the region")
     #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model predictions--", msg = msg)
-     next
+    stop("No model outputs found")
     }
 
     for (tierIndex in seq(as.numeric(BY_TIER), 2)) {

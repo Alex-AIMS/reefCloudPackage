@@ -27,7 +27,7 @@ attribute_changes <- function() {
   if (length(files) == 0) {
     #   msg <- paste("No model outputs for the region")
     #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Attribute changes--", msg = msg)
-     next
+   stop("No model outputs found")
     }
 
   model_list <- list()
@@ -123,7 +123,7 @@ attribute_changes <- function() {
     if (nrow(coef_table) == 0) {
     #   msg <- paste("No model outputs for the region")
     #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Attribute changes--", msg = msg)
-     next
+    stop("No model outputs found")
     }
 
   coef_table <- coef_table %>%
