@@ -53,9 +53,9 @@ make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf) {
 #  sf::sf_use_s2(TRUE) |> suppressMessages()
   # },
   # stage_ = 4,
-  # order_ = 6,
+  # order_ = 7,
   # name_ = "Make reef id",
-  # item_ = "Make reef id"
+  # item_ = "make_reef_id"
   # )
   return(covs.hexpred_tier_sf_v2_prep)
 }

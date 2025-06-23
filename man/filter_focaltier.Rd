@@ -4,7 +4,7 @@
 \alias{filter_focaltier}
 \title{Filter Focal Tiers}
 \usage{
-filter_focaltier(data.grp, FOCAL_TIER)
+filter_focaltier(data.grp, FOCAL_TIER, n.spat, n.temp)
 }
 \arguments{
 \item{data.grp}{A data frame containing survey data to be filtered.}

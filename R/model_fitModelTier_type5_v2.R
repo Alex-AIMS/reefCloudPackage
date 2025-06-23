@@ -166,7 +166,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
   }
   # },
   # stage_ = 4,
-  # order_ = 7,
+  # order_ = 10,
   # name_ = "Fit FRK models",
   # item_ = "FRK_fit"
   # )

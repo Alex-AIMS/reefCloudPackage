@@ -31,8 +31,8 @@ data.sub <- left_join(data.grp.tier.ready, HexPred_reefid2) %>%
 return(list(data.sub = data.sub))
   # },
   # stage_ = 4,
-  # order_ = 10,
+  # order_ = 11,
   # name_ = "Prep INLA objects",
-  # item_ = "Prep INLA objects"
+  # item_ = "prep_INLA_objects"
   # )
 }

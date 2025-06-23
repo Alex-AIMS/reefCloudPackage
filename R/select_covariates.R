@@ -37,9 +37,9 @@ select_covariates <- function(x) {
     dplyr::pull(column)
   # },
   # stage_ = 4,
-  # order_ = 5,
+  # order_ = 6,
   # name_ = "Select covariates",
-  # item_ = "Select covariates"
+  # item_ = "select_covariates"
   # )
   return(filtered_data)
 }

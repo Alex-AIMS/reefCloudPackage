@@ -45,9 +45,9 @@ rm_obs_outside <- function(data.grp.tier, HexPred_reefid2) {
     sf::st_drop_geometry()
   #   },
   #   stage_ = 4,
-  #   order_ = 7,
+  #   order_ = 8,
   #   name_ = "Remove obs outside tier5 cells",
-  #   item_ = "rm obs outside tier5 cells"
+  #   item_ = "rm_obs_outside_tier5_cells"
   # )
   
   return(data.grp.tier.filtered)

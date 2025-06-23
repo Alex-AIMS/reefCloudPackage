@@ -155,9 +155,9 @@ attribute_changes <- function() {
   invisible(coef_table)
   # status metadata
   # stage_ = 4,
-  # order_ = 13,
+  # order_ = 14,
   # name_ = "Attribution of changes complete; coef table saved to AWS bucket",
-  # item_ = "attribute_save_changes"
+  # item_ = "covariate_effects"
 
   # }
 }

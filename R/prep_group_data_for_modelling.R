@@ -24,8 +24,8 @@ prep_group_data_for_modelling <- function(data, GROUP) {
   #},
   #stage_ = 4,
   #order_ = 2,
-  #name_ = "Prepare group data for modelling",
-  #item_ = "prep_group_data_for_modelling"
+  #name_ = "Filter for benthic group",
+  #item_ = "filter_for_benthic_group"
   #)
   return(data.grp)
 }

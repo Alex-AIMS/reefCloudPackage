@@ -53,9 +53,9 @@ filter_focaltier <- function(data.grp, FOCAL_TIER, n.spat, n.temp) {
     dplyr::filter(!!sym(FOCAL_TIER) %in% removed_tiers)
   # },
   # stage_ = 4,
-  # order_ = 2,
+  # order_ = 3,
   # name_ = "Filter locations without enough spatio-temporal replicates",
-  # item_ = "Filter locations"
+  # item_ = "filter_locations"
   # )
   return(list(filtered_data = data.grp.filtered, removed_tiers = data.grp.removed))
 }
