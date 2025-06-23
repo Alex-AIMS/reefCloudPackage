@@ -14,7 +14,8 @@ validate_data <- function(data, rules) {
   val <-   summary(result) |>
     tibble::as_tibble()|>
     dplyr::mutate(description = description(rules)) |>
-    dplyr::select(description, everything(), -name, -expression)
+    dplyr::select(description, everything(), -name, -expression) |>
+    data.frame()
   if (any(val$fails)) {
     saveRDS(invalid_rows,
       file = paste0(AWS_OUTPUT_PATH, "invalid_rows.rds")
