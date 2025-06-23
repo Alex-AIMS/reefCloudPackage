@@ -25,7 +25,11 @@ rank_checks <- function(data.grp.tier.ready, HexPred_reefid2, selected_covar) {
     dplyr::left_join(HexPred_reefid2 %>% dplyr::mutate(fYEAR = as.factor(fYEAR)), 
                      by = c("fYEAR", "Tier5"))
 
+  if (length(selected_covar) > 0){
   formula_no_random <- paste("COUNT ~ 1 +", paste(selected_covar, collapse = " + "))
+  } else{
+  formula_no_random <- "COUNT ~ 1"
+  }
   X_O <- model.matrix(as.formula(formula_no_random), data = data_with_cov)
 
   # Initial full-rank check

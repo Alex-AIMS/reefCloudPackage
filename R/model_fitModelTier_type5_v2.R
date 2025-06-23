@@ -104,17 +104,17 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       as.formula(paste("COUNT ~ 1 + (1 | reefid) +", paste(selected_covar, collapse = " + ")))
     }
 
-    ## Test for rank deficiencies 
-    result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
+    # # ## Test for rank deficiencies 
+    # result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
 
-    if (result_rank$status == "fail"){
-      # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
-      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg )
-    next
-    }
+    #  if (result_rank$status == "fail"){
+    #    # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
+    #    # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg )
+    #  next
+    #  }
 
-    ## Update formula 
-    model_formula <- as.formula(result_rank$formula)
+    # ## Update formula 
+    # model_formula <- as.formula(result_rank$formula)
 
     ## Fit FRK model
     M <- FRK(

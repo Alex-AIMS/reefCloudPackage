@@ -129,17 +129,17 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
 
 
     ## Test for rank deficiencies 
-    result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
+    # result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
 
-    if (result_rank$status == "fail"){
-      # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
-      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg )
-    next
-    }
+    # if (result_rank$status == "fail"){
+    #   # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
+    #   # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg )
+    # next
+    # }
 
-    ## Update formula 
+    # ## Update formula 
 
-    model_formula <- as.formula(result_rank$formula)
+    # model_formula <- as.formula(result_rank$formula)
 
     #--- Fit model
     M <- INLA::inla(
