@@ -2,19 +2,24 @@
 % Please edit documentation in R/make_tiers_lookup.R
 \name{make_tiers_lookup}
 \alias{make_tiers_lookup}
-\title{Function}
+\title{Make Tiers Lookup}
 \usage{
 make_tiers_lookup()
 }
-\arguments{
-\item{parameters}{description}
-}
 \value{
-returned arguments description
+No return value. Creates and saves:
+\itemize{
+  \item \code{tiers.sf.RData} — an `sf` object of all tier joins.
+  \item \code{tiers.lookup.RData} — a lookup table between tiers.
+}
 }
 \description{
-Description
+Joins all tier spatial files (`tier2`–`tier5`) into a single `sf` object and creates a lookup table between the tiers. Saves the results as `tiers.sf.RData` and `tiers.lookup.RData`.
 }
 \examples{
-examples 
+make_tiers_lookup()
+# This saves processed tiers and lookup data into the `DATA_PATH`.
+}
+\author{
+Murray Logan
 }

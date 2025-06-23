@@ -1,20 +1,15 @@
-##' Assign spatial data
-##'
-##' This function assigns spatial domains to the benthic data. It does
-##' so by first summarising the data at the site level and then before
-##' assigning spatial domains to the data (based on the tiers sf
-##' objects). Finally, these spatial inforation are joined onto the
-##' benthic data
-##' @title Assign spatial data
-##' @param data - a data frame containing the benthic data that
-##'   includes latidude/longitude
-##' @return dataframe - containing the data with tier classifications
-##' @author Murray
+#' @title Assign Spatial Data
+#' @description Assigns spatial domain (tiers) to the benthic data. First, it summarises data at the site level, then assigns spatial domains using tier shapefiles, and finally joins the spatial info back to the full dataset.
+#' @param data A data frame containing benthic data including latitude and longitude.
+#' @return A data frame with spatial tier classifications assigned.
+#' @examples
+#' data_with_spatial <- assign_spatial_data(benthic_data)
+#' head(data_with_spatial)
+#' @author Murray Logan
+#' @export
 assign_spatial_data <- function(data) {
   status::status_try_catch(
   {
-    ## reefCloudPackage::ReefCloud_tryCatch({
-    ## load(file=paste0(DATA_PATH,'primary/',RDATA_FILE))
     ## This only needs to be done at the site level
     data.site <- data %>%
       group_by(P_CODE, REEF, SITE_NO) %>%
@@ -35,18 +30,9 @@ assign_spatial_data <- function(data) {
     data <- data %>%
       left_join(data.site) %>%
       suppressMessages()
-    ## Tests ==============================================
-    ## data %>% filter(is.na(GROUP_DESC)) %>% head
-    ## ====================================================
+
     data <- data %>% filter(!is.na(GROUP_DESC))  # this is necessary to counteract spurious joins to tiers
     if (!DEBUG_MODE) cli_alert_success("Spatial domains successfully applied to the benthic data")
-    ## },
-    ## logFile=LOG_FILE,
-    ## Category='--Processing routines--',
-    ## msg='Assign spatial domains',
-    ## return=NULL,
-    ## stage = paste0("STAGE", CURRENT_STAGE),
-    ## item = "Processing tiers")
   },
   stage_ = 3,
   order_ = 4,

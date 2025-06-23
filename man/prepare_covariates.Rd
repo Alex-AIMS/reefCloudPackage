@@ -2,19 +2,25 @@
 % Please edit documentation in R/prepare_covariates.R
 \name{prepare_covariates}
 \alias{prepare_covariates}
-\title{Prepare covariates}
+\title{Prepare Covariates}
 \usage{
 prepare_covariates(data)
 }
 \arguments{
-\item{data}{- the benthic data}
+\item{data}{The benthic data frame used to align and join covariates.}
+}
+\value{
+NULL. Saves processed covariate data to disk and modifies global state.
 }
 \description{
-Prepare covariates
+Loads, processes, and joins covariate data to the benthic dataset. Also fills missing years and saves combined covariate layers for Tier 5 spatial units.
 }
-\details{
-Prepare covariates and join to the benthic data
+\examples{
+\dontrun{
+load("benthic_data.RData")
+prepare_covariates(benthic_data)
+}
 }
 \author{
-Murray
+Murray Logan
 }

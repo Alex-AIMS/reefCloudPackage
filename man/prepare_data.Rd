@@ -2,22 +2,25 @@
 % Please edit documentation in R/prepare_data.R
 \name{prepare_data}
 \alias{prepare_data}
-\title{Prepare data for analyses}
+\title{Prepare Data for Analyses}
 \usage{
 prepare_data(data)
 }
 \arguments{
-\item{data}{- a data frame containing the benthic data}
+\item{data}{A data frame containing the benthic data with required fields (e.g., REPORT_YEAR, GROUP_DESC, SITE_DEPTH, etc.).}
 }
 \value{
-dataframe
+A cleaned and formatted `data.frame` ready for analysis and reporting.
 }
 \description{
-Prepare data for analyses
+Processes and summarizes benthic monitoring data, including grouping, aggregation, and formatting required for downstream analysis. Saves both `.RData` and `.csv` outputs.
 }
-\details{
-Prepare data for analyses
+\examples{
+\dontrun{
+load("raw_benthic_data.RData")
+processed_data <- prepare_data(benthic_data)
+}
 }
 \author{
-Murray
+Murray Logan
 }

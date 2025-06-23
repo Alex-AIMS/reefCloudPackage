@@ -2,27 +2,23 @@
 % Please edit documentation in R/assign_spatial_data.R
 \name{assign_spatial_data}
 \alias{assign_spatial_data}
-\title{Assign spatial data}
+\title{Assign Spatial Data}
 \usage{
 assign_spatial_data(data)
 }
 \arguments{
-\item{data}{- a data frame containing the benthic data that
-includes latidude/longitude}
+\item{data}{A data frame containing benthic data including latitude and longitude.}
 }
 \value{
-dataframe - containing the data with tier classifications
+A data frame with spatial tier classifications assigned.
 }
 \description{
-Assign spatial data
+Assigns spatial domain (tiers) to the benthic data. First, it summarises data at the site level, then assigns spatial domains using tier shapefiles, and finally joins the spatial info back to the full dataset.
 }
-\details{
-This function assigns spatial domains to the benthic data. It does
-so by first summarising the data at the site level and then before
-assigning spatial domains to the data (based on the tiers sf
-objects). Finally, these spatial inforation are joined onto the
-benthic data
+\examples{
+data_with_spatial <- assign_spatial_data(benthic_data)
+head(data_with_spatial)
 }
 \author{
-Murray
+Murray Logan
 }

@@ -4,10 +4,7 @@
 \alias{attribute_changes}
 \title{Attribute Changes by Model Type}
 \usage{
-attribute_changes(FOCAL_TIER)
-}
-\arguments{
-\item{FOCAL_TIER}{A string indicating the column name for Tier grouping (e.g., "Tier4").}
+attribute_changes()
 }
 \value{
 A CSV file is written to AWS_OUTPUT_PATH and a tibble of combined estimates is returned (invisibly).
@@ -15,4 +12,10 @@ A CSV file is written to AWS_OUTPUT_PATH and a tibble of combined estimates is r
 \description{
 Compiles coefficient estimates from FRK and INLA models by Tier level,
 extracting uncertainty measures and formatting results into a common structure.
+}
+\examples{
+attribute_changes("Tier4")
+}
+\author{
+Julie Vercelloni
 }

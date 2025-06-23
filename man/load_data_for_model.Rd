@@ -12,13 +12,29 @@ load_data_for_model()
 \item{RDATA_FILE}{Character. Name of the `.RData` file to load from the `processed/` directory.}
 }
 \value{
-No return value. Loads data into the environment
+No return value. Loads data into the environment.
 }
 \description{
 Loads benthic survey data and optionally identifies if covariates are available.
 This function checks for required `.RData` files in the processed data directory,
 sets up the list of target groups, and flags if covariate data is available.
 }
+\details{
+The following objects are loaded or created in the global environment:
+\itemize{
+  \item Dataset from \code{RDATA_FILE} (typically a list of survey or model-ready data).
+  \item \code{GROUPS} – vector of benthic target groups.
+  \item \code{RDATA_COV_FILE} – name of the associated file with covariates (if it exists).
+  \item \code{COVARIATES} – logical flag indicating if covariate file is available.
+  \item \code{tiers.lookup} – lookup table for tier hierarchy.
+  \item \code{tier5.sf} – spatial features for Tier5 level.
+  \item \code{FOCAL_TIER} – character string indicating the modelling tier level (e.g., "Tier4").
+  \item \code{reef_layer.sf} – spatial reef layer object.
+}
+}
 \examples{
 load_data_for_model()
+}
+\author{
+Julie Vercelloni
 }

@@ -24,7 +24,7 @@ get_covariates <- function() {
       suppressMessages() |>
       suppressWarnings()
     cov_dhw <- cov_dhw %>%
-    #  dplyr::rename(Tier5 = tier_id) %>%
+      dplyr::rename(Tier5 = tier_id) %>%
       dplyr::mutate(Tier5 = as.factor(Tier5)) %>%
       st_drop_geometry() %>%
       group_by(Tier5, year) %>%
@@ -52,7 +52,7 @@ get_covariates <- function() {
       suppressMessages() |>
       suppressWarnings()
     cov_cyc <- cov_cyc %>%
-    #  dplyr::rename(Tier5 = tier_id) %>%
+      dplyr::rename(Tier5 = tier_id) %>%
       dplyr::mutate(Tier5 = as.factor(Tier5)) %>%
       st_drop_geometry() %>%
       group_by(Tier5, end_year) %>%

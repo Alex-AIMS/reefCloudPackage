@@ -1,23 +1,14 @@
-
-#######################################################################
-## The following function joins each of the tiers together and then  ##
-## creates a lookup between the tiers.                               ##
-##                                                                   ##
-## This function purely has side effects.  It creates and saves the  ##
-## following:                                                        ##
-##   - tiers.sf.RData:     an sf object representing the join of all ##
-##     tiers                                                         ##
-##   - tiers.lookup.RData: a data.frame lookup between all tiers     ##
-## Arguments:                                                        ##
-##                                                                   ##
-## Returns:                                                          ##
-##                                                                   ##
-#######################################################################
-#' @title Function 
-#' @description Description 
-#' @param parameters description
-#' @return returned arguments description
-#' @examples examples 
+#' @title Make Tiers Lookup
+#' @description Joins all tier spatial files (`tier2`–`tier5`) into a single `sf` object and creates a lookup table between the tiers. Saves the results as `tiers.sf.RData` and `tiers.lookup.RData`.
+#' @return No return value. Creates and saves:
+#' \itemize{
+#'   \item \code{tiers.sf.RData} — an `sf` object of all tier joins.
+#'   \item \code{tiers.lookup.RData} — a lookup table between tiers.
+#' }
+#' @examples
+#' make_tiers_lookup()
+#' # This saves processed tiers and lookup data into the `DATA_PATH`.
+#' @author Murray Logan
 #' @export
 make_tiers_lookup <- function() {
   status::status_try_catch(
@@ -35,7 +26,6 @@ make_tiers_lookup <- function() {
             sf::st_join(tier.sf %>% dplyr::select(-one_of('tier', 'tier_id', 'tir_src', 'WKT')), join = st_nearest_feature) %>%
         suppressMessages() %>%
         suppressWarnings()
-
     }
     save(tiers.sf, file=paste0(DATA_PATH, 'processed/tiers.sf.RData'))
     tiers.lookup <-
@@ -44,7 +34,6 @@ make_tiers_lookup <- function() {
         dplyr::distinct() %>%
         suppressMessages() %>%
         suppressWarnings()
-
     save(tiers.lookup, file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
   },
   stage_ = 3,

@@ -2,20 +2,20 @@
 % Please edit documentation in R/get_data_and_legacy_for_processing.R
 \name{get_data_and_legacy_for_processing}
 \alias{get_data_and_legacy_for_processing}
-\title{Get data and legacy data for processing}
+\title{Get Data and Legacy Data for Processing}
 \usage{
 get_data_and_legacy_for_processing()
 }
 \value{
-dataframe with data and legacy data
+A dataframe containing combined data and legacy data.
 }
 \description{
-Get data and legacy data for processing
+Loads the data and legacy data for processing and combines them into a single data frame.
 }
-\details{
-This function loads the data and legacy data for processing
-and combines them into a single data frame.
+\examples{
+data <- get_data_and_legacy_for_processing()
+head(data)
 }
 \author{
-Murray
+Murray Logan
 }

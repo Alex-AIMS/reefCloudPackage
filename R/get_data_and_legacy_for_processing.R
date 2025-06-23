@@ -1,10 +1,11 @@
-##' Get data and legacy data for processing
-##'
-##' This function loads the data and legacy data for processing
-##' and combines them into a single data frame.
-##' @title Get data and legacy data for processing 
-##' @return dataframe with data and legacy data 
-##' @author Murray
+#' @title Get Data and Legacy Data for Processing
+#' @description Loads the data and legacy data for processing and combines them into a single data frame.
+#' @return A dataframe containing combined data and legacy data.
+#' @examples
+#' data <- get_data_and_legacy_for_processing()
+#' head(data)
+#' @author Murray Logan
+#' @export
 get_data_and_legacy_for_processing <- function() {
   status::status_try_catch(
   {

@@ -1,10 +1,14 @@
-##' Prepare covariates
-##'
-##' Prepare covariates and join to the benthic data
-##' @title Prepare covariates 
-##' @param data - the benthic data
-##' @return NULL 
-##' @author Murray
+#' @title Prepare Covariates
+#' @description Loads, processes, and joins covariate data to the benthic dataset. Also fills missing years and saves combined covariate layers for Tier 5 spatial units.
+#' @param data The benthic data frame used to align and join covariates.
+#' @return NULL. Saves processed covariate data to disk and modifies global state.
+#' @examples
+#' \dontrun{
+#' load("benthic_data.RData")
+#' prepare_covariates(benthic_data)
+#' }
+#' @author Murray Logan
+#' @export
 prepare_covariates <- function(data) {
   status::status_try_catch(
   {
@@ -37,9 +41,7 @@ prepare_covariates <- function(data) {
        })
       save(full_cov, file=paste0(DATA_PATH, "processed/", "covariates_full_tier5.RData"))
       assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))
-      save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE))
-
-   #   covs.hexpred_tier_sf_v2_prep <- extract_reef_id_tier(full_cov, tier.sf) #reefCloudPackage::         
+      save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE)) 
     }
   },
   stage_ = 3,
@@ -47,5 +49,4 @@ prepare_covariates <- function(data) {
   name_ = "Prepare covariates",
   item_ = "prepare_covariates"
   )
-
 }
