@@ -57,7 +57,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     ## Add reefid and fill missing years
     covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf) 
  
- # Optional: Check missing reefid
+    # Optional: Check missing reefid
     # missing_reefid <- covs.hexpred_tier_sf_v2_prep |>
     #   sf::st_drop_geometry() |> purrr::map_df(~sum(is.na(.)))
  
@@ -74,21 +74,14 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
 
     ## Remove obs outside covariate grid
     data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)    
-    # Optional: Log removed observations
-    # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
-    # if (nrow(diff_db) > 0) {
-    #   msg <- paste(nrow(diff_db), "observations removed for", FOCAL_TIER, ":", TIER)
-    #   reefCloudPackage::log("WARNING", logFile = LOG_FILE, "--Fitting model FRK--", msg = msg)
-    # }
 
-     if (nrow(data.grp.tier.ready) == 0) {
-  #    msg <- paste("All data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
-  #    reefCloudPackage::log(
-  #  "ERROR",
-  #  logFile = LOG_FILE,
-  #  "--Fitting INLA model--",
-  #  msg = msg
-  #  )
+    ## Log removed observations and stop if more than 30% of observations are outside tier5 cells 
+
+    diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
+    # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
+     if (diff_perc > 30) {
+    #   msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg)
      next
     }
 
@@ -101,6 +94,18 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     } else {
       as.formula(paste("COUNT ~ 1 + (1 | reefid) +", paste(selected_covar, collapse = " + ")))
     }
+
+    ## Test for rank deficiencies 
+    result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
+
+    if (result_rank$status == "fail"){
+      # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
+      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg )
+    next
+    }
+
+    ## Update formula 
+    model_formula <- as.formula(result_rank$formula)
 
     ## Fit FRK model
     M <- FRK(
@@ -118,7 +123,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     ## Handle failed model
     if (length(M) == 0) {
   #    msg <- paste("Model failed to fit for", FOCAL_TIER, ":", TIER)
-  #    reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting model FRK--", msg = msg)
+  #    reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg)
       next
     }
 

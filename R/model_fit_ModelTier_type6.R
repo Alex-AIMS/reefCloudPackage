@@ -78,12 +78,15 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
 
     #--- Filter observations outside Tier5
     data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)
-    diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
+   
+    ## Log removed observations and stop if more than 30% of observations are outside tier5 cells 
 
-    if (nrow(data.grp.tier.ready) == 0) {
-      # msg <- paste("All data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
-      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg)
-      next
+    diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
+    # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
+     if (diff_perc > 30) {
+    #   msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg)
+     next
     }
 
     #--- Prepare model objects
@@ -115,6 +118,20 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     model_formula_full <- as.formula(formula_string)
     model_formula <- reefCloudPackage::rm_factor(model_formula_full, data.sub)
 
+
+    ## Test for rank deficiencies 
+    result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
+
+    if (result_rank$status == "fail"){
+      # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
+      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg )
+    next
+    }
+
+    ## Update formula 
+
+    model_formula <- as.formula(result_rank$formula)
+
     #--- Fit model
     M <- INLA::inla(
       model_formula,
@@ -129,7 +146,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     # Handle failed model
     if (length(M) == 0) {
       # msg <- paste("Model failed to fit for", FOCAL_TIER, ":", TIER)
-      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting model INLA--", msg = msg)
+      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg)
       next
     }
 
