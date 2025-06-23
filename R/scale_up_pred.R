@@ -24,6 +24,15 @@ scale_up_pred <- function(whichModel) {
       full.names = TRUE
     )
     files <- files[!grepl('TIER', files, perl = TRUE)]
+
+    # Stop if files don't exist 
+    if (length(files) == 0) {
+    #   msg <- paste("No model outputs for the region")
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model predictions--", msg = msg)
+     next
+    }
+
+
     data.list <- vector('list', length(files))
     post_dist_df_list <- list()
 
@@ -70,6 +79,13 @@ scale_up_pred <- function(whichModel) {
     # Remove NAs (model saved in wrong folder)
     post_dist_df_tier5 <- post_dist_df_tier5 %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
     post_dist_df_all <- post_dist_df_all %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
+   
+    # Stop if empty
+    if (nrow(post_dist_df_tier5) == 0) {
+    #   msg <- paste("No model outputs for the region")
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model predictions--", msg = msg)
+     next
+    }
 
     for (tierIndex in seq(as.numeric(BY_TIER), 2)) {
 

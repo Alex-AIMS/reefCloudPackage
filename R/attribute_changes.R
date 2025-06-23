@@ -23,6 +23,13 @@ attribute_changes <- function() {
   )
   files <- files[!grepl('TIER', files, perl = TRUE)]
   
+  # Stop if files don't exist 
+  if (length(files) == 0) {
+    #   msg <- paste("No model outputs for the region")
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Attribute changes--", msg = msg)
+     next
+    }
+
   model_list <- list()
   for (i in seq_along(files)) {
     obj <- readRDS(files[i])
@@ -110,7 +117,16 @@ attribute_changes <- function() {
 
   # Remove NAs (model saved in wrong folder) and rename
   coef_table <- coef_table %>% 
-    dplyr::filter(if_all(everything(), ~ !is.na(.))) %>%
+    dplyr::filter(if_all(everything(), ~ !is.na(.))) 
+
+  # Stop if empty
+    if (nrow(coef_table) == 0) {
+    #   msg <- paste("No model outputs for the region")
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Attribute changes--", msg = msg)
+     next
+    }
+
+  coef_table <- coef_table %>%
     dplyr::mutate(term = case_when(
       stringr::str_detect(term, "^fYEAR\\d{4}$") ~ str_replace(term, "^fYEAR(\\d{4})$", "Year \\1"),
       term == "Intercept"      ~ "Intercept",
