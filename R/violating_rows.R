@@ -9,7 +9,7 @@
 #' @author Murray Logan
 #' @export
 violating_rows <- function(result) {
-  s <- summary(result)
+  s <- validate::summary(result)
   wch <- which(s["items"] > 1 & s["fails"] > 1) 
   if (length(wch) == 0) {
     return(NULL)
