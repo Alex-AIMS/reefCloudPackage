@@ -1,12 +1,12 @@
 #' Scale Up Predictions from Model Outputs
 #'
-#' This function reads model outputs (either type5 or other specified models), processes them
+#' This function reads model outputs (either type6 or other specified models), processes them
 #' to scale up predictions across different tiers, extract covariate effect sizes, compute annual contrasts and saves the summarised results.
 #'
-#' @param whichModel Character string indicating the model type (e.g., "type5").
+#' @param whichModel Character string indicating the model type (e.g., "type6").
 #' @return This function has no return value. It writes summarised prediction CSV files to AWS path.
 #' @examples
-#' scale_up_pred("type5")
+#' scale_up_pred("type6")
 #' @export
 scale_up_pred <- function(whichModel) {
 
@@ -29,16 +29,16 @@ scale_up_pred <- function(whichModel) {
 
     for (i in seq_along(data.list)) {
       GROUP <- "HARD CORAL"
-      tier <- str_extract(files[i], "(?<=_)(\\d+)(?=.RData)")
+      tier <- stringr::str_extract(files[i], "(?<=_)(\\d+)(?=.RData)")
       obj <- readRDS(files[i])
       post_dist_df_list[[i]] <- obj$post_dist_df
     }
 
     post_dist_df_list <- post_dist_df_list |> 
-      keep(~ "model_name" %in% names(.x))
+      purrr::keep(~ "model_name" %in% names(.x))
 
     post_dist_df_list <- map(post_dist_df_list, ~ .x |>
-      mutate(
+      dplyr::mutate(
         fYEAR = as.factor(fYEAR),
         Tier5 = as.factor(Tier5),
         id_loc = as.integer(id_loc),
@@ -50,20 +50,26 @@ scale_up_pred <- function(whichModel) {
     )
 
     # List for Tier 5 (not weight)
-    post_dist_df_tier5 <- bind_rows(post_dist_df_list) %>%
-      left_join(tiers.lookup)
+    post_dist_df_tier5 <- dplyr::bind_rows(post_dist_df_list) %>%
+      dplyr::left_join(tiers.lookup)
 
     # Weight predictions for Tier4, 3, 2
-    post_dist_df_all <- bind_rows(post_dist_df_list) %>%
-      left_join(tiers.lookup) %>%
-      mutate(
+    post_dist_df_all <- dplyr::bind_rows(post_dist_df_list) %>%
+      dplyr::left_join(tiers.lookup) %>%
+      dplyr::mutate(
         reef_area = reef_area / 1000000,
         weighted_pred = pred * reef_area
       )
+    
+    # Log warning 
+    #if (anyNA(post_dist_df_tier5) || anyNA(post_dist_df_all)) {
+     #msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
+     #reefCloudPackage::log("WARNING", logFile = LOG_FILE, "--Model predictions--", msg = msg)
+    # }
 
-    # post_dist_df_all <- post_dist_df_all[complete.cases(post_dist_df_all), ]
-    post_dist_df_tier5 <- post_dist_df_tier5 %>% filter(if_all(everything(), ~ !is.na(.)))
-    post_dist_df_all <- post_dist_df_all %>% filter(if_all(everything(), ~ !is.na(.)))
+    # Remove NAs (model saved in wrong folder)
+    post_dist_df_tier5 <- post_dist_df_tier5 %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
+    post_dist_df_all <- post_dist_df_all %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
 
     for (tierIndex in seq(as.numeric(BY_TIER), 2)) {
 
@@ -72,8 +78,8 @@ scale_up_pred <- function(whichModel) {
       if (tier_col == "Tier5") {
 
         pred_tierIndex <- post_dist_df_tier5 %>%
-          group_by_at(c("fYEAR", "draw", tier_col, "model_name")) %>%
-          summarize(
+          dplyr::group_by(across(fYEAR, draw, tier_col, model_name)) %>%
+          dplyr::summarize(
             cover_prop = pred,
             .groups = "drop"
           ) %>%
@@ -82,8 +88,8 @@ scale_up_pred <- function(whichModel) {
       } else if (tier_col == "Tier4") {
 
         pred_tierIndex <- post_dist_df_all %>%
-          group_by_at(c("fYEAR", "draw", tier_col, "model_name")) %>%
-          summarize(
+          dplyr::group_by(across(fYEAR, draw, tier_col, model_name)) %>%
+          dplyr::summarize(
             reef_total_area = sum(reef_area),
             cover = sum(weighted_pred, na.rm = TRUE),
             cover_prop = cover / reef_total_area,
@@ -92,7 +98,7 @@ scale_up_pred <- function(whichModel) {
           dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
 
         # Convert predictions to fold change year-by-year  
-        predictions <- make_contrasts(pred_tierIndex, tier_col)
+        predictions <- reefCloudPackage::make_contrasts(pred_tierIndex, tier_col)
 
         # Create the final table
         pred_tierIndex <- dplyr::bind_rows(predictions) |>
@@ -109,8 +115,8 @@ scale_up_pred <- function(whichModel) {
       } else {
         pred_tierIndex <- post_dist_df_all |>
           dplyr::mutate(model_name = "FRK/INLA") |>
-          group_by_at(c("fYEAR", "draw", tier_col, "model_name")) |>
-          summarize(
+          dplyr::group_by(across("fYEAR", "draw", tier_col, "model_name")) |>
+          dplyr::summarize(
             reef_total_area = sum(reef_area),
             cover = sum(weighted_pred, na.rm = TRUE),
             cover_prop = cover / reef_total_area,
@@ -135,7 +141,7 @@ scale_up_pred <- function(whichModel) {
       }
 
       #--- Save results into the AWS bucket
-      write_csv(
+      readr::write_csv(
         pred_tierIndex,
         file = paste0(AWS_OUTPUT_PATH, "output", tierIndex, ".csv"),
         quote = "none"

@@ -3,12 +3,25 @@
 #' Loads benthic survey data and optionally identifies if covariates are available.
 #' This function checks for required `.RData` files in the processed data directory,
 #' sets up the list of target groups, and flags if covariate data is available.
+#' 
+#' The following objects are loaded or created in the global environment:
+#' \itemize{
+#'   \item Dataset from \code{RDATA_FILE} (typically a list of survey or model-ready data).
+#'   \item \code{GROUPS} – vector of benthic target groups.
+#'   \item \code{RDATA_COV_FILE} – name of the associated file with covariates (if it exists).
+#'   \item \code{COVARIATES} – logical flag indicating if covariate file is available.
+#'   \item \code{tiers.lookup} – lookup table for tier hierarchy.
+#'   \item \code{tier5.sf} – spatial features for Tier5 level.
+#'   \item \code{FOCAL_TIER} – character string indicating the modelling tier level (e.g., "Tier4").
+#'   \item \code{reef_layer.sf} – spatial reef layer object.
+#' }
 #'
 #' @param DATA_PATH Character. Path to the folder containing `processed/` and `primary/` data directories.
 #' @param RDATA_FILE Character. Name of the `.RData` file to load from the `processed/` directory.
-#' @return No return value. Loads data into the environment 
+#' @return No return value. Loads data into the environment.
 #' @examples
 #' load_data_for_model()
+#' @author Julie Vercelloni
 #' @export
 load_data_for_model <- function() {
   # status::status_try_catch(
@@ -39,7 +52,7 @@ load_data_for_model <- function() {
   load(file.path(DATA_PATH, "primary", "tier5.sf.RData"), envir = .GlobalEnv)
 
   # Define focal tier
-  assign("FOCAL_TIER", paste0("Tier", BY_TIER), envir = .GlobalEnv)
+  assign("FOCAL_TIER", paste0('Tier', as.numeric(BY_TIER) - 1), envir = .GlobalEnv)
 
   # Import reef layer 
   load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'), envir = .GlobalEnv)

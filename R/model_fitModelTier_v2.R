@@ -10,7 +10,7 @@ model_fitModelTier_v2 <- function() {
   # {
 
   # ---- Load input data tables for modelling ----
-load_data_for_model() # reefCloudPackage::
+  reefCloudPackage::load_data_for_model()  
 
   # ---- Define target benthic group ----
   # For now, modelling "hard corals" only
@@ -18,7 +18,7 @@ load_data_for_model() # reefCloudPackage::
   GROUP <- GROUPS[[2]] 
 
     # ---- Prepare data for modelling ----
-    data.grp <- prep_group_data_for_modelling(data, GROUP) #reefCloudPackage::
+    data.grp <- reefCloudPackage::prep_group_data_for_modelling(data, GROUP) 
 
     # ---- Model Type 1: Simple cell means ----
     if (MODEL_TYPE == 1) {
@@ -53,7 +53,7 @@ load_data_for_model() # reefCloudPackage::
     # # ---- Model Type 6: Hybrid model (auto switch between type5 and type2) ----
      if (MODEL_TYPE == 6) {
        # Define focal tier (e.g. Tier4)
-       FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
+       #FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
 
        # Filter focal tier based on data volume (≥3 sites, ≥2 years)
        data.grp.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
@@ -67,7 +67,7 @@ load_data_for_model() # reefCloudPackage::
        reefCloudPackage::scale_up_pred("type6") 
 
        # Attribute changes - effect size of disturbances
-       reefCloudPackage::attribute_changes(FOCAL_TIER)
+       reefCloudPackage::attribute_changes()
      }
 
   # stage_ = 4,
