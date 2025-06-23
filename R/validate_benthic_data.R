@@ -11,7 +11,7 @@
 validate_benthic_data <- function(data, rules) {
   status::status_try_catch(
   {
-    validate_data(data, rules)
+    reefCloudPackage::validate_data(data, rules)
   },
   stage_ = 2,
   order_ = 4,

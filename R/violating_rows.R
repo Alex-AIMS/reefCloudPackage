@@ -10,10 +10,10 @@
 #' @export
 violating_rows <- function(result) {
   s <- summary(result)
-  wch <- which(s$items > 1 & s$fails > 1)
+  wch <- which(s["items"] > 1 & s["fails"] > 1) 
   if (length(wch) == 0) {
     return(NULL)
   } else {
-    return(violating(data, result[wch]))
+    return(validate::violating(data, result[wch]))
   }
 }
