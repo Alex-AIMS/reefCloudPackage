@@ -12,26 +12,26 @@ assign_spatial_data <- function(data) {
   {
     ## This only needs to be done at the site level
     data.site <- data %>%
-      group_by(P_CODE, REEF, SITE_NO) %>%
-      summarise(
+      dplyr::group_by(P_CODE, REEF, SITE_NO) %>%
+      dplyr::summarise(
         LATITUDE = mean(LATITUDE),
         LONGITUDE = mean(LONGITUDE))
     sf_use_s2(FALSE)
     data.site <-
       data.site %>%
-      assignSpatialDomain_tier(tier = 2) %>%
-      assignSpatialDomain_tier(tier = 3) %>%
-      assignSpatialDomain_tier(tier = 4) %>%
-      assignSpatialDomain_tier(tier = 5) %>%
+      reefCloudPackage::assignSpatialDomain_tier(tier = 2) %>%
+      reefCloudPackage::assignSpatialDomain_tier(tier = 3) %>%
+      reefCloudPackage::assignSpatialDomain_tier(tier = 4) %>%
+      reefCloudPackage::assignSpatialDomain_tier(tier = 5) %>%
       dplyr::select(-LONGITUDE, -LATITUDE) %>%
-      distinct() %>%
+      dplyr::distinct() %>%
       suppressMessages() %>%
       suppressWarnings()
     data <- data %>%
-      left_join(data.site) %>%
+      dplyr::left_join(data.site) %>%
       suppressMessages()
 
-    data <- data %>% filter(!is.na(GROUP_DESC))  # this is necessary to counteract spurious joins to tiers
+    data <- data %>% dplyr::filter(!is.na(GROUP_DESC))  # this is necessary to counteract spurious joins to tiers
     if (!DEBUG_MODE) cli_alert_success("Spatial domains successfully applied to the benthic data")
   },
   stage_ = 3,

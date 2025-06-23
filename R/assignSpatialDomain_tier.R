@@ -6,26 +6,23 @@
 #' @export
 assignSpatialDomain_tier <- function(dat, tier, andNearest=TRUE) {
   load(paste0(DATA_PATH, 'primary/tier', tier, '.sf.RData'))
-  ## nm <- sym(paste0('Tier',tier))
-  ## old_nm <- ifelse(tier<5, sym("name"), sym("Group_1"))
   dat <- dat %>%
-      st_as_sf(coords = c("LONGITUDE", "LATITUDE"),
+      sf::st_as_sf(coords = c("LONGITUDE", "LATITUDE"),
                crs = st_crs(tier.sf)) %>%
-      st_join(tier.sf %>%
+      sf::st_join(tier.sf %>%
               dplyr::select(!!sym(paste0('Tier',tier))),
               join = st_intersects) %>%
-      distinct() %>%
-              ## dplyr::select(!!nm := !!old_nm)) %>%
+      dplyr::distinct() %>%
       cbind(LONGITUDE = st_coordinates(.)[,1],
             LATITUDE = st_coordinates(.)[,2])
   ## if there are any that did not match, consider matching to the mearest feature
   if(andNearest==TRUE & any(is.na(dat[,paste0('Tier',tier)]))) {
       a <- dat %>% filter(is.na(.data[[paste0("Tier", tier)]])) %>%
           dplyr::select(-.data[[paste0("Tier", tier)]]) %>%
-          st_join(tier.sf %>%
+          sf::st_join(tier.sf %>%
                   dplyr::select(!!sym(paste0('Tier',tier))),
                   join = st_nearest_feature) %>%
-          distinct() %>%
+          dplyr::distinct() %>%
           suppressMessages() %>%
           suppressWarnings()
       ## update the original dat according to the new a
@@ -36,10 +33,10 @@ assignSpatialDomain_tier <- function(dat, tier, andNearest=TRUE) {
                          st_drop_geometry(a),
                          by=c("P_CODE", "REEF", "SITE_NO"))
       dat <- dat_no_geom %>%
-        st_as_sf(coords = c("LONGITUDE", "LATITUDE"), remove = FALSE, crs = st_crs(dat))
+        sf::st_as_sf(coords = c("LONGITUDE", "LATITUDE"), remove = FALSE, crs = st_crs(dat))
   }
   dat %>%
-    st_drop_geometry() %>%
+    sf::st_drop_geometry() %>%
     suppressMessages() %>%
     suppressWarnings()
 }

@@ -14,6 +14,8 @@ attribute_changes <- function() {
   # ---- Load input data tables for modelling ----
   reefCloudPackage::load_data_for_model()
 
+  FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
+  
   files <- list.files(
     path = paste0(DATA_PATH, "modelled"),
     pattern = "FRK|INLA", 

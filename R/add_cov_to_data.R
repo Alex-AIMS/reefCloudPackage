@@ -11,26 +11,26 @@
 add_cov_to_data <- function(data, cov, cov_name) {
   data %>%  
   #  mutate(Tier5 = as.numeric(as.character(Tier5))) %>%
-    left_join(cov, by = c("Tier5" = "Tier5",
+    dplyr::left_join(cov, by = c("Tier5" = "Tier5",
                           "REPORT_YEAR" = "year")) %>%
     ## replace NA's for severity_* and max_*
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
+    dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
                   ~ replace_na(.x, replace = 0))) %>% 
     ## arrange according to REEF, SITE_NO, TRANSECT_NO, fDEPTH, fYEAR
-    group_by(REEF, SITE_NO, TRANSECT_NO, fDEPTH, fGROUP) %>% 
-    arrange(fYEAR) %>% 
+    dplyr::group_by(REEF, SITE_NO, TRANSECT_NO, fDEPTH, fGROUP) %>% 
+    dplyr::arrange(fYEAR) %>% 
     ## determine whether end_date is after date, then use previous row
-    rowwise() %>% 
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
+    dplyr::rowwise() %>% 
+    dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
                   list(~adjust_cov_for_after_surveys(DATE, end_date, cov, Tier5, cur_column())),
                   .names = "{.col}")) %>% 
     ## add lags
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
+    dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
                   list(lag1 =  ~ get_lag_cov(REPORT_YEAR-1, cov, Tier5, cur_column())),
                   .names = "{.col}.{.fn}")) %>% 
-    mutate(across(paste0(c("severity_", "max_"), cov_name),
+    dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
                   list(lag2 =  ~ get_lag_cov(REPORT_YEAR-2, cov, Tier5, cur_column())),
                   .names = "{.col}.{.fn}")) %>% 
     dplyr::select(-end_date) %>% 
-    ungroup()
+    dplyr::ungroup()
 }

@@ -22,7 +22,7 @@
 #' model_formula <- y ~ factor1 + factor2 + numeric1 + f(factor2, model = 'iid')
 #' rm_factor(model_formula, data.sub)
 #' }
-#'
+#' @author Murray Logan
 #' @export
 rm_factor <- function(model_formula, data.sub) {
   term.labels <- attr(terms(model_formula), "term.labels")

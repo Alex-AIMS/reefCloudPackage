@@ -18,7 +18,7 @@ get_coral_reef_shape_files <- function() {
         DATA_PATH, "primary/"
       ), ignore.stdout = TRUE)
 
-      reef_layer.sf <- read_sf(paste0(
+      reef_layer.sf <- sf::read_sf(paste0(
         DATA_PATH,
         "/primary/reef_500_poly.shp"
       ))

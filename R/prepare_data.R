@@ -13,7 +13,7 @@ prepare_data <- function(data) {
   status::status_try_catch(
   {
     data %>%
-      mutate(
+      dplyr::mutate(
         P_CODE = factor(P_CODE),
         ID = factor(ID),
         fYEAR = factor(REPORT_YEAR),
@@ -22,21 +22,21 @@ prepare_data <- function(data) {
         across(c(SITE_NO, TRANSECT_NO, fYEAR, fDEPTH), function(x) factor(as.character(x))),
         DATE = as.Date(SURVEY_DATE, format = '%Y-%m-%d %h:%m:%s'),
         fGROUP = factor(GROUP_DESC)) %>%
-      group_by(P_CODE, REEF, SITE_NO, TRANSECT_NO,
+      dplyr::group_by(P_CODE, REEF, SITE_NO, TRANSECT_NO,
         DATA_TYPE,
         LATITUDE, LONGITUDE,
         across(matches("^Tier[2345]$")),
         REPORT_YEAR, DATE, fYEAR, fDEPTH, REEF_ZONE,
         fGROUP, GROUP_DESC) %>%
-      summarise(COUNT = n(),
+      dplyr::summarise(COUNT = n(),
         COVER = mean(COVER)/100) %>%
-      ungroup(fGROUP, GROUP_DESC) %>%
-      mutate(TOTAL=sum(COUNT),
+      dplyr::ungroup(fGROUP, GROUP_DESC) %>%
+      dplyr::mutate(TOTAL=sum(COUNT),
         PERC_COVER=COUNT/TOTAL,
         ZONE_DEPTH=interaction(REEF_ZONE, fDEPTH)) %>%
-      ungroup() %>%
-      filter(!is.na(REPORT_YEAR)) %>% droplevels() %>%
-      mutate(COUNT = ifelse(!is.na(COVER), NA, COUNT),
+      dplyr::ungroup() %>%
+      dplyr::filter(!is.na(REPORT_YEAR)) %>% droplevels() %>%
+      dplyr::mutate(COUNT = ifelse(!is.na(COVER), NA, COUNT),
         TOTAL = ifelse(!is.na(COVER), NA, TOTAL),
         PERC_COVER = ifelse(!is.na(COVER), NA, PERC_COVER)) %>%
       suppressMessages() %>%

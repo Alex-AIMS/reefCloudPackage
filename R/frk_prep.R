@@ -22,13 +22,13 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
       lon_idx <- which(names(data.grp.tier) == "LONGITUDE")
       lat_idx <- which(names(data.grp.tier) == "LATITUDE")
       
-      STObj <- stConstruct(x = data.grp.tier,
+      STObj <- FRK::stConstruct(x = data.grp.tier,
                            space = c(lon_idx, lat_idx),
                            time = "Year",
                            interval = TRUE)
       
       # Convert HexPred_reefid2 to sp object for BAU construction
-      HexPred_sp <- as_Spatial(HexPred_reefid2)
+      HexPred_sp <- sp::as_Spatial(HexPred_reefid2)
       nHEX <- nrow(subset(HexPred_sp, fYEAR == min(HexPred_sp@data$fYEAR)))
       nYEAR <- length(unique(HexPred_sp@data$fYEAR))
       
@@ -36,7 +36,7 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
       BAUs_spat <- subset(HexPred_sp, fYEAR == min(HexPred_sp@data$fYEAR))
       coordnames(BAUs_spat) <- c("LONGITUDE", "LATITUDE")
       
-      ST_BAUs <- auto_BAUs(manifold = STplane(),
+      ST_BAUs <- FRK::auto_BAUs(manifold = STplane(),
                            data = STObj,
                            spatial_BAUs = BAUs_spat,
                            tunit = "years")
@@ -59,7 +59,7 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
       STObj@data[, overlapping_fields] <- NULL
       
       # Create basis functions
-      basis <- auto_basis(STplane(),
+      basis <- FRK::auto_basis(STplane(),
                           ST_BAUs,
                           tunit = "years",
                           nres = 3L,

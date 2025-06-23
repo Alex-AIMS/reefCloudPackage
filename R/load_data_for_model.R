@@ -39,7 +39,7 @@ load_data_for_model <- function() {
   ), envir = .GlobalEnv)
 
   # Check and assign covariate info
-  rdata_cov_file <- str_replace(RDATA_FILE, "_", "_with_covariates")
+  rdata_cov_file <- stringr::str_replace(RDATA_FILE, "_", "_with_covariates")
   assign("RDATA_COV_FILE", rdata_cov_file, envir = .GlobalEnv)
 
   cov_path <- file.path(DATA_PATH, "processed", rdata_cov_file)

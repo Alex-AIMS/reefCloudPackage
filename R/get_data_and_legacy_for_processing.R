@@ -12,16 +12,17 @@ get_data_and_legacy_for_processing <- function() {
     ## reefCloudPackage::ReefCloud_tryCatch({
     load(file=paste0(DATA_PATH, "processed/Part1_", RDATA_FILE))
     data <- data %>%
-      mutate(DATA_TYPE = "Data",
+      dplyr::mutate(DATA_TYPE = "Data",
         COVER = NA)
     if(LEGACY_DATA) {
       load(file=paste0(DATA_PATH, "processed/Part1_",
         gsub("reef", "legacy", RDATA_FILE)))
       data <- data %>%
-        mutate(DATA_TYPE = "Data") %>%
-        bind_rows(legacy_data %>% mutate(DATA_TYPE = "Legacy"))
+        dplyr::mutate(DATA_TYPE = "Data") %>%
+        dplyr::bind_rows(legacy_data %>% 
+        dplyr::mutate(DATA_TYPE = "Legacy"))
     }
-    data <- data %>% mutate(DATA_TYPE = factor(DATA_TYPE))
+    data <- data %>% dplyr::mutate(DATA_TYPE = factor(DATA_TYPE))
   },
   stage_ = 3,
   order_ = 3,

@@ -8,11 +8,10 @@
 prep_group_data_for_modelling <- function(data, GROUP) {
  # status::status_try_catch(
  # {
-    ## ---- data_sub
     data.grp <- data %>%
-      filter(fGROUP == GROUP) %>%
-      droplevels() %>%
-      mutate(
+      dplyr::filter(fGROUP == GROUP) %>%
+      dplyr::droplevels() %>%
+      dplyr::mutate(
         Tier5 = factor(Tier5),
         Tier4 = factor(Tier4),
         Tier3 = factor(Tier3),
@@ -20,9 +19,8 @@ prep_group_data_for_modelling <- function(data, GROUP) {
         P_CODE = factor(P_CODE),
         Site = factor(paste(Tier5, SITE_NO)),
         Transect = factor(paste(Site, TRANSECT_NO))) %>%
-      arrange(Tier4, Tier5, Site, Transect, desc(as.numeric(as.character(fYEAR)))) %>%
-      mutate(fYEAR = factor(fYEAR, levels=unique(fYEAR)))
-    ## ----end
+      dplyr::arrange(Tier4, Tier5, Site, Transect, desc(as.numeric(as.character(fYEAR)))) %>%
+      dplyr::mutate(fYEAR = factor(fYEAR, levels=unique(fYEAR)))
   #},
   #stage_ = 4,
   #order_ = 2,

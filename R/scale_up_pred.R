@@ -78,17 +78,17 @@ scale_up_pred <- function(whichModel) {
       if (tier_col == "Tier5") {
 
         pred_tierIndex <- post_dist_df_tier5 %>%
-          dplyr::group_by(across(fYEAR, draw, tier_col, model_name)) %>%
+          dplyr::group_by(fYEAR, draw, !!sym(tier_col), model_name) %>%
           dplyr::summarize(
-            cover_prop = pred,
-            .groups = "drop"
+             cover_prop = pred,
+             .groups = "drop"
           ) %>%
           dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
 
       } else if (tier_col == "Tier4") {
 
         pred_tierIndex <- post_dist_df_all %>%
-          dplyr::group_by(across(fYEAR, draw, tier_col, model_name)) %>%
+          dplyr::group_by(fYEAR, draw, !!sym(tier_col), model_name) %>%
           dplyr::summarize(
             reef_total_area = sum(reef_area),
             cover = sum(weighted_pred, na.rm = TRUE),
@@ -115,7 +115,7 @@ scale_up_pred <- function(whichModel) {
       } else {
         pred_tierIndex <- post_dist_df_all |>
           dplyr::mutate(model_name = "FRK/INLA") |>
-          dplyr::group_by(across("fYEAR", "draw", tier_col, "model_name")) |>
+          dplyr::group_by(fYEAR, draw, !!sym(tier_col), model_name) |>
           dplyr::summarize(
             reef_total_area = sum(reef_area),
             cover = sum(weighted_pred, na.rm = TRUE),

@@ -65,10 +65,4 @@ get_covariates <- function() {
       suppressWarnings()
     save(cov_cyc, file = paste0(DATA_PATH, "primary/covariate_cyc.RData"))
   }
-
-  ## status::duplicate_status_item(
-  ##   stage = "2", order = "current", item = "CYC", name = "(Storms)",
-  ##   original_item = "get_geoserver_data"
-  ## )
-  ## status::remove_status_item(stage = 2, item = "get_geoserver_data") 
 }
