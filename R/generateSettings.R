@@ -14,7 +14,7 @@ generateSettings <- function() {
   status::status_try_catch(
   {
   ## Location of folder to store R data objects
-  DATA_PATH <<- "../data/"
+  DATA_PATH <<- "../data2/"
   if (!dir.exists(DATA_PATH)) dir.create(DATA_PATH)
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "DATA_PATH",
   ##   status = "success", update_display = FALSE)
