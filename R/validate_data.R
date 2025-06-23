@@ -12,9 +12,9 @@ validate_data <- function(data, rules) {
   result <- validate::confront(data, rules)
   invalid_rows <- reefCloudPackage::violating_rows(result)
   val <-   summary(result) |>
+    tibble::as_tibble()|>
     dplyr::mutate(description = description(rules)) |>
     dplyr::select(description, everything(), -name, -expression)
-    #tidy_validation(result, rules)
   if (any(val$fails)) {
     saveRDS(invalid_rows,
       file = paste0(AWS_OUTPUT_PATH, "invalid_rows.rds")
