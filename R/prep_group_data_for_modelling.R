@@ -10,7 +10,7 @@ prep_group_data_for_modelling <- function(data, GROUP) {
  # {
     data.grp <- data %>%
       dplyr::filter(fGROUP == GROUP) %>%
-      dplyr::droplevels() %>%
+      droplevels() %>%
       dplyr::mutate(
         Tier5 = factor(Tier5),
         Tier4 = factor(Tier4),

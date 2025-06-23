@@ -22,7 +22,7 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
       lon_idx <- which(names(data.grp.tier) == "LONGITUDE")
       lat_idx <- which(names(data.grp.tier) == "LATITUDE")
       
-      STObj <- FRK::stConstruct(x = data.grp.tier,
+      STObj <- stConstruct(x = data.grp.tier,
                            space = c(lon_idx, lat_idx),
                            time = "Year",
                            interval = TRUE)

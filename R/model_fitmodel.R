@@ -8,7 +8,7 @@ model_fitModel <- function(raw_cell_means = TRUE){
 
   status::status_set_stage(stage = 4, title = "Model data")
   ## reefCloudPackage::read_status()
-  ## CURRENT_STAGE <<- 4
+   CURRENT_STAGE <<- 4
 
   ## There are sufficient differences in the processing of benthic data
   ## between 'site' and 'tier' level analyses to warrent forking off the
