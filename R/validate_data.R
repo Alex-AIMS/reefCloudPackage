@@ -13,7 +13,7 @@ validate_data <- function(data, rules) {
   invalid_rows <- reefCloudPackage::violating_rows(result)
   val <-   validate::summary(result) |>
     tibble::as_tibble()|>
-    dplyr::mutate(description = description(rules)) |>
+    dplyr::mutate(description = validate::description(rules)) |>
     dplyr::select(description, everything(), -name, -expression) |>
     data.frame()
   if (any(val$fails)) {
