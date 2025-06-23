@@ -9,7 +9,7 @@
 #' @export
 get_covariates <- function() {
   COVARIATES <<- NULL
-  load(file=paste0(DATA_PATH,'primary/tier', as.numeric(BY_TIER) - 1, '.sf.RData'))
+  load(file=paste0(DATA_PATH,'primary/tier', as.numeric(BY_TIER), '.sf.RData')) 
   
   ## --- Degree Heating Weeks ---
   # get the geoserver info
@@ -17,23 +17,22 @@ get_covariates <- function() {
   
   cov_dhw <- reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "degrees_heating_weeks_tier")   
   if (exists("cov_dhw") & !is.null(cov_dhw)) {
-    cov_dhw <- st_simplify(cov_dhw, dTolerance = 0.001) |>
+    cov_dhw <- sf::st_simplify(cov_dhw, dTolerance = 0.001) |>
       suppressMessages() |>
       suppressWarnings() 
-    cov_dhw <- st_make_valid(tier.sf) %>% st_intersection(st_make_valid(cov_dhw)) |>
+    cov_dhw <- sf::st_make_valid(tier.sf) %>% sf::st_intersection(st_make_valid(cov_dhw)) |>
       suppressMessages() |>
       suppressWarnings()
     cov_dhw <- cov_dhw %>%
-      dplyr::rename(Tier5 = tier_id) %>%
       dplyr::mutate(Tier5 = as.factor(Tier5)) %>%
-      st_drop_geometry() %>%
-      group_by(Tier5, year) %>%
-      summarise(
+      sf::st_drop_geometry() %>%
+      dplyr::group_by(Tier5, year) %>%
+      dplyr::summarise(
         severity_dhw = max(severity),
         max_dhw = max(dhwmax),
         end_date = max(latest)
       ) %>%
-      ungroup() |>
+      dplyr::ungroup() |>
       suppressMessages() |>
       suppressWarnings()
     save(cov_dhw, file = paste0(DATA_PATH, "primary/covariate_dhw.RData"))
@@ -45,24 +44,23 @@ get_covariates <- function() {
 
   cov_cyc <- reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "storm4m_exposure_year_tier")   
   if (exists("cov_cyc") & !is.null(cov_cyc)) {
-    cov_cyc <- st_simplify(cov_cyc, dTolerance = 0.001) |>
+    cov_cyc <- sf::st_simplify(cov_cyc, dTolerance = 0.001) |>
       suppressMessages() |>
       suppressWarnings()
-    cov_cyc <- st_make_valid(tier.sf) %>% st_intersection(st_make_valid(cov_cyc)) |>
+    cov_cyc <- sf::st_make_valid(tier.sf) %>% sf::st_intersection(st_make_valid(cov_cyc)) |>
       suppressMessages() |>
       suppressWarnings()
     cov_cyc <- cov_cyc %>%
-      dplyr::rename(Tier5 = tier_id) %>%
       dplyr::mutate(Tier5 = as.factor(Tier5)) %>%
-      st_drop_geometry() %>%
-      group_by(Tier5, end_year) %>%
-      summarise(
+      sf::st_drop_geometry() %>%
+      dplyr::group_by(Tier5, end_year) %>%
+      dplyr::summarise(
         severity_cyc = max(severity),
         max_cyc = max(max_hrs),
         end_date = max(end_date)
       ) %>%
       dplyr::rename(year = end_year) %>%
-      ungroup() |>
+      dplyr::ungroup() |>
       suppressMessages() |>
       suppressWarnings()
     save(cov_cyc, file = paste0(DATA_PATH, "primary/covariate_cyc.RData"))

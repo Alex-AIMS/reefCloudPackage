@@ -52,7 +52,7 @@ load_data_for_model <- function() {
   load(file.path(DATA_PATH, "primary", "tier5.sf.RData"), envir = .GlobalEnv)
 
   # Define focal tier
-  assign("FOCAL_TIER", paste0('Tier', as.numeric(BY_TIER) - 1), envir = .GlobalEnv)
+  assign("FOCAL_TIER", paste0('Tier', as.numeric(BY_TIER)), envir = .GlobalEnv)
 
   # Import reef layer 
   load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'), envir = .GlobalEnv)

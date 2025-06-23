@@ -13,7 +13,7 @@ prepare_covariates <- function(data) {
   status::status_try_catch(
   {
     load(file=paste0(DATA_PATH, "processed/", RDATA_FILE))
-    load(paste0(DATA_PATH, 'primary/tier', 5, '.sf.RData'))
+    load(paste0(DATA_PATH, 'primary/tier', BY_TIER, '.sf.RData'))
     files <- list.files(path = paste0(DATA_PATH, "primary"),
       pattern = "covariate.*.RData$",
       full.names = TRUE)
@@ -29,15 +29,15 @@ prepare_covariates <- function(data) {
         data <- data %>% reefCloudPackage::add_cov_to_data(cov, cov_name) 
 
         ## fill in the missing years for each Tier5 in the covariates
-        year_range <- data %>% pull(REPORT_YEAR) %>% range()
+        year_range <- data %>% dplyr::pull(REPORT_YEAR) %>% range()
         full_cov_lookup <- data.frame(year = seq(year_range[1], year_range[2], by =  1)) %>%
-          crossing(Tier5 = unique(tier.sf$Tier5)) %>%
-          arrange(Tier5)
+          tidyr::crossing(Tier5 = unique(tier.sf$Tier5)) %>%
+          dplyr::arrange(Tier5)
         cov_list[[cov_name]] <-
           cov %>% reefCloudPackage::lag_covariates(year_range, full_cov_lookup, cov_name) 
       }
-      full_cov <- reduce(cov_list, function(x, y) {
-        full_join(x, y, by = c("Tier5", "year"))
+      full_cov <- purrr::reduce(cov_list, function(x, y) {
+        dplyr::full_join(x, y, by = c("Tier5", "year"))
        })
       save(full_cov, file=paste0(DATA_PATH, "processed/", "covariates_full_tier5.RData"))
       assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))

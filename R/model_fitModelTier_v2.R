@@ -53,13 +53,15 @@ model_fitModelTier_v2 <- function() {
     # # ---- Model Type 6: Hybrid model (auto switch between type5 and type2) ----
      if (MODEL_TYPE == 6) {
        # Define focal tier (e.g. Tier4)
-       #FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
+       FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
 
        # Filter focal tier based on data volume (≥3 sites, ≥2 years)
        data.grp.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$filtered_data
        reefCloudPackage::model_fitModelTier_type5_v2(data.grp.enough, tier.sf) 
 
        # Filtered-out tiers (insufficient data) 
+       # Define focal tier (e.g. Tier4)
+       FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
        data.grp.not.enough <- reefCloudPackage::filter_focaltier(data.grp, FOCAL_TIER)$removed_tiers
        reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
 
