@@ -28,7 +28,7 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
                            interval = TRUE)
       
       # Convert HexPred_reefid2 to sp object for BAU construction
-      HexPred_sp <- sp::as_Spatial(HexPred_reefid2)
+      HexPred_sp <- as_Spatial(HexPred_reefid2)
       nHEX <- nrow(subset(HexPred_sp, fYEAR == min(HexPred_sp@data$fYEAR)))
       nYEAR <- length(unique(HexPred_sp@data$fYEAR))
       
