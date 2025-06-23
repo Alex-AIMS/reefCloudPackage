@@ -26,6 +26,15 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       dplyr::select(-COVER) |>
       dplyr::mutate(across(Tier5, as.character))
 
+    #--- Check if enough data
+    test_tier <- reefCloudPackage::filter_focaltier(data.grp.tier, FOCAL_TIER)
+    
+     if (nrow(test_tier$filtered_data) == 0) {
+    #   msg <- paste("Not enough observations for", FOCAL_TIER, ":", TIER)
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting model--", msg = msg)
+     next
+    }
+
     #--- Join covariates
     tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf) |>
       dplyr::filter(!!sym(FOCAL_TIER) == TIER)

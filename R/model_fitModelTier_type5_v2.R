@@ -25,6 +25,15 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       dplyr::select(-COVER) |>
       dplyr::mutate(across(Tier5, as.character))
 
+    #--- Check if enough data
+    test_tier <- reefCloudPackage::filter_focaltier(data.grp.tier, FOCAL_TIER)
+    
+     if (nrow(test_tier$filtered_data) == 0) {
+    #   msg <- paste("Not enough observations for", FOCAL_TIER, ":", TIER)
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting model--", msg = msg)
+     next
+    }
+
     ## Join covariates
     tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf) |>
       dplyr::filter(!!sym(FOCAL_TIER) == TIER)
@@ -75,7 +84,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     ## Remove obs outside covariate grid
     data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)    
 
-    ## Log removed observations and stop if more than 30% of observations are outside tier5 cells 
+    ## Stop if more than 30% of observations are outside tier5 cells 
 
     diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
     # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
