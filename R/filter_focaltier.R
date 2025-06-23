@@ -19,7 +19,7 @@
 #' }
 #' @author Julie Vercelloni
 #' @export
-filter_focaltier <- function(data.grp, FOCAL_TIER) {
+filter_focaltier <- function(data.grp, FOCAL_TIER, n.spat, n.temp) {
   # status::status_try_catch(
   # {
   original_tiers <- unique(data.grp[[FOCAL_TIER]])
@@ -28,7 +28,7 @@ filter_focaltier <- function(data.grp, FOCAL_TIER) {
   tal_tier_spat <- data.grp |>
     dplyr::count(!!sym(FOCAL_TIER), LONGITUDE, LATITUDE) |>
     dplyr::count(!!sym(FOCAL_TIER)) |>
-    dplyr::filter(n > 3)
+    dplyr::filter(n > n.spat)
 
   data.grp.filtered <- data.grp |>
     dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_spat[[FOCAL_TIER]]) |>
@@ -38,7 +38,7 @@ filter_focaltier <- function(data.grp, FOCAL_TIER) {
   tal_tier_temp <- data.grp |>
     dplyr::count(!!sym(FOCAL_TIER), fYEAR) |>
     dplyr::count(!!sym(FOCAL_TIER)) |>
-    dplyr::filter(n > 2)
+    dplyr::filter(n > n.temp)
 
   data.grp.filtered <- data.grp.filtered |>
     dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_temp[[FOCAL_TIER]]) |>
