@@ -1,8 +1,7 @@
-#Spatio-temporal statistical modelling for coral cover 
+# Spatio-temporal statistical modelling for coral cover 
 =========================================================================================
 
 <!-- badges: start -->
-
 [![Ask Us Anything][0a]][0b]
 ![Open Source Love][0c]
 [![license](https://img.shields.io/badge/license-MIT%20+%20file%20LICENSE-lightgrey.svg)](https://choosealicense.com/)
