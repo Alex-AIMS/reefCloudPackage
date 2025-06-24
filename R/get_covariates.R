@@ -65,4 +65,11 @@ get_covariates <- function() {
       suppressWarnings()
     save(cov_cyc, file = paste0(DATA_PATH, "primary/covariate_cyc.RData"))
   }
+
+# Stop if both empty
+    if (nrow(cov_dhw) == 0 & nrow(cov_cyc) == 0) {
+    #   msg <- paste("Disturbance layers not available from the Geoserver ")
+    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Get covariates--", msg = msg)
+    stop("No disturbance layers")
+    }
 }
