@@ -1,4 +1,4 @@
-Spatio-temporal statistical modelling for coral cover 
+#Spatio-temporal statistical modelling for coral cover 
 =========================================================================================
 
 <!-- badges: start -->
@@ -10,6 +10,8 @@ Spatio-temporal statistical modelling for coral cover
 [0a]: https://img.shields.io/badge/Ask%20us-anything-1abc9c.svg
 [0b]: https://github.com/open-aims/bcs_mixing_model/issues/new
 [0c]: https://badges.frapsoft.com/os/v2/open-source.svg?v=103
+
+<!-- badges: end -->
 
 ## Warnings
 
@@ -35,37 +37,41 @@ The latest version of the modelling pipeline includes two types of models:
 
 
 ## Installation
-`remotes::install_github('ReefCloud/reefCloudPackage', ref = 'add_status', force = TRUE, dependencies = FALSE)`
 
-## Run the pipeline 
+```{r, echo=TRUE}
+remotes::install_github('ReefCloud/reefCloudPackage', ref = 'add_status', force = TRUE, dependencies = FALSE)
+```
 
+## Run the modelling workflow 
+
+```{r, echo=TRUE}
 1. Load the package
-`library(reefCloudPackage)`
+library(reefCloudPackage)
 
 2. Update function arguments 
-`args = c("--bucket=/data/ASM/",      #path to bucket
+args = c("--bucket=/data/AUS/",      #path to bucket
          "--domain=tier",            #tier or site
          "--by_tier=5",              #tier level
          "--model_type=6",           #model used for predictions
          "--debug=true",             #debug mode
          "--runStage=1",             #current running stage
          "--refresh_data=false"      #reload data
-)`
+)
 
 3. Load function arguments
-`reefCloudPackage::startMatter(args)`
+reefCloudPackage::startMatter(args)
 
 4. Load the data
-`reefCloudPackage::model_loadData()`
+reefCloudPackage::model_loadData()
 
 5. Process the data
-`reefCloudPackage::model_processData()`
+reefCloudPackage::model_processData()
 
 6. Fit the statistical models
-`reefCloudPackage::model_fitModel()`
+reefCloudPackage::model_fitModel()
+```
 
 ## License
-
 This repository is provided by the authors under the MIT License ([MIT](http://opensource.org/licenses/MIT)).
 
 ## Bug reporting
