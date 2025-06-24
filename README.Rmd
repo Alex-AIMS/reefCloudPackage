@@ -1,24 +1,75 @@
----
-output: github_document
----
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-
-# reefCloudPackage
+Spatio-temporal statistical modelling for coral cover 
+=========================================================================================
 
 <!-- badges: start -->
-[![Codecov test coverage](https://codecov.io/gh/reefCloudPackage/branch/main/graph/badge.svg)](https://app.codecov.io/gh/reefCloudPackage?branch=main)
-<!-- badges: end -->
 
-The goal of reefCloudPackage is to ...
+[![Ask Us Anything][0a]][0b]
+![Open Source Love][0c]
+[![license](https://img.shields.io/badge/license-MIT%20+%20file%20LICENSE-lightgrey.svg)](https://choosealicense.com/)
+
+[0a]: https://img.shields.io/badge/Ask%20us-anything-1abc9c.svg
+[0b]: https://github.com/open-aims/bcs_mixing_model/issues/new
+[0c]: https://badges.frapsoft.com/os/v2/open-source.svg?v=103
+
+## Warnings
+
+**1: The `data/` directory is not publicly accessible. To run the modelling pipeline, please contact the ReefCloud team to request access. This repository is primarily intended for supporting the ReefCloud public dashboard..**
+
+**2: The `DATA_PATH` variable should be updated, as it is currently pointing to the development folder.**
+
+**3: The latest version is dedicated exclusively to modelling coral cover values. Additional work is needed to explore the influences of cyclone exposure and heat stress events on other benthic groups.**
+
+## Content 
+
+This repository contains code to generate predicted coral cover values across multiple spatial scales. Model outputs are stored in the `AWS_PATH/outputs/tier` directory and include five CSV files:
+
+* Four files named `outputs5-2.csv` contain predicted values, uncertainty estimates, contrast values, and directional arrows for `Tier 5`, `Tier 4`, `Tier 3`, and `Tier 2` spatial levels within each country.
+
+* One file, `coef_table.csv`, summarizes the drivers of coral change at the marine ecoregion scale (`Tier 4`), including details of the associated statistical model.
+
+The latest version of the modelling pipeline includes two types of models:
+
+* Full spatio-temporal model: Incorporates disturbances when relevant. This model is applied to marine ecoregions that have at least three distinct monitoring locations, each with a minimum of two repeated surveys. It generates predictions for both observed and unobserved `Tier 5` locations. For further details, see Vercelloni et al. (in prep.) (add link to preprint).
+
+* Site-level model: Also includes disturbances when relevant. This model is applied to marine ecoregions with at least two distinct monitoring locations, each surveyed at least twice. Predictions are limited to `Tier 5` cells where data is available.
+
 
 ## Installation
+`remotes::install_github('ReefCloud/reefCloudPackage', ref = 'add_status', force = TRUE, dependencies = FALSE)`
+
+## Run the pipeline 
+
+1. Load the package
+`library(reefCloudPackage)`
+
+2. Update function arguments 
+`args = c("--bucket=/data/ASM/",      #path to bucket
+         "--domain=tier",            #tier or site
+         "--by_tier=5",              #tier level
+         "--model_type=6",           #model used for predictions
+         "--debug=true",             #debug mode
+         "--runStage=1",             #current running stage
+         "--refresh_data=false"      #reload data
+)`
+
+3. Load function arguments
+`reefCloudPackage::startMatter(args)`
+
+4. Load the data
+`reefCloudPackage::model_loadData()`
+
+5. Process the data
+`reefCloudPackage::model_processData()`
+
+6. Fit the statistical models
+`reefCloudPackage::model_fitModel()`
+
+## License
+
+This repository is provided by the authors under the MIT License ([MIT](http://opensource.org/licenses/MIT)).
+
+## Bug reporting
+* Please [report any issues or bugs](https://github.com/ReefCloud/reefCloudPackage/issues).
+The goal of reefCloudPackage is to ...
+
+
