@@ -4,7 +4,7 @@
 \alias{select_covariates}
 \title{Select Spatially Representative Covariates}
 \usage{
-select_covariates(x)
+select_covariates(x, i, N)
 }
 \arguments{
 \item{x}{A `sf` dataframe (e.g., `HexPred_sf`) containing covariates.}

@@ -10,8 +10,8 @@
 #' tier.sf <- readRDS("data/primary/tier5.sf.RData")
 #' tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf)
 #' }
-#' @export
-join_covariates_to_tier_lookup <- function(tier.sf, i , N) {
+
+join_covariates_to_tier_lookup_looped <- function(tier.sf, i , N) {
    status::status_try_catch(
    {
   load(file = paste0(DATA_PATH, 'primary/tiers.lookup.RData'))

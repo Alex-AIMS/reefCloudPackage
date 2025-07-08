@@ -4,7 +4,7 @@
 \alias{load_predictive_layers}
 \title{Load Predictive Layers}
 \usage{
-load_predictive_layers()
+load_predictive_layers(i, N)
 }
 \arguments{
 \item{NULL}{No arguments required.}

@@ -4,7 +4,7 @@
 \alias{make_reefid}
 \title{Make Reef ID}
 \usage{
-make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf)
+make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf, i, N)
 }
 \arguments{
 \item{tier.sf.joined}{A spatial layer with tier information (e.g., from `join_covariates_to_tier_lookup()`).}

@@ -23,7 +23,7 @@
 #' print(selected_vars)
 #' }
 #' @export
-select_covariates <- function(x) {
+select_covariates <- function(x, i , N) {
    status::status_try_catch(
    {
   variables_name_full <- names(x)
@@ -35,9 +35,19 @@ select_covariates <- function(x) {
     tidyr::pivot_longer(everything(), names_to = "column", values_to = "q70_value") |>
     dplyr::filter(q70_value != 0) |>
     dplyr::pull(column)
+   
+   # Update status 
+    old_item_name <- get_status_name(4, "select_covariates")
+     if (!str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
+     } else{
+        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+     }
+     status:::update_status_name(stage = 4, item = "select_covariates", name = new_item_name)
+
    },
    stage_ = 4,
-   order_ = 5,
+   order_ = 6,
    name_ = "Select covariates",
    item_ = "select_covariates"
    )

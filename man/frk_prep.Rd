@@ -4,7 +4,7 @@
 \alias{frk_prep}
 \title{frk_prep}
 \usage{
-frk_prep(data.grp.tier, HexPred_reefid2)
+frk_prep(data.grp.tier, HexPred_reefid2, i, N)
 }
 \arguments{
 \item{data.grp.tier}{Data frame with observations for model fitting, including columns: LONGITUDE, LATITUDE, fYEAR, TOTAL, etc.}

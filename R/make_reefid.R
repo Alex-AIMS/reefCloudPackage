@@ -9,7 +9,7 @@
 #' }
 #' @author Julie Vercelloni
 #' @export
-make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf) {
+make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) {
    status::status_try_catch(
    {
   sf::sf_use_s2(TRUE) |> suppressMessages()
@@ -50,10 +50,18 @@ make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf) {
     suppressMessages() |>
     suppressWarnings()
 
-#  sf::sf_use_s2(TRUE) |> suppressMessages()
+   # Update status 
+    old_item_name <- get_status_name(4, "make_reef_id")
+     if (!str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
+     } else{
+        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+     }
+     status:::update_status_name(stage = 4, item = "make_reef_id", name = new_item_name)
+     
    },
    stage_ = 4,
-   order_ = 6,
+   order_ = 7,
    name_ = "Make reef id",
    item_ = "make_reef_id"
    )

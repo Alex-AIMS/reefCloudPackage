@@ -27,7 +27,7 @@
 #' filtered_points <- rm_obs_outside(points_df, polygon_sf)
 #' }
 #' @export
-rm_obs_outside <- function(data.grp.tier, HexPred_reefid2) {
+rm_obs_outside <- function(data.grp.tier, HexPred_reefid2, i , N) {
    status::status_try_catch(
      {
   data.grp.tier.sf <- data.grp.tier |>
@@ -43,9 +43,19 @@ rm_obs_outside <- function(data.grp.tier, HexPred_reefid2) {
       LATITUDE  = sf::st_coordinates(.)[, 2]
     ) %>%
     sf::st_drop_geometry()
+
+   # Update status 
+    old_item_name <- get_status_name(4, "rm_obs_outside_tier5_cells")
+     if (!str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
+     } else{
+        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+     }
+     status:::update_status_name(stage = 4, item = "rm_obs_outside_tier5_cells", name = new_item_name)
+
      },
      stage_ = 4,
-     order_ = 8,
+     order_ = 10,
      name_ = "Remove obs outside tier5 cells",
      item_ = "rm_obs_outside_tier5_cells"
    )

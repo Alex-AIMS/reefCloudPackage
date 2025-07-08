@@ -4,7 +4,7 @@
 \alias{rm_obs_outside}
 \title{Remove observations outside spatial polygons}
 \usage{
-rm_obs_outside(data.grp.tier, HexPred_reefid2)
+rm_obs_outside(data.grp.tier, HexPred_reefid2, i, N)
 }
 \arguments{
 \item{data.grp.tier}{Data frame filtered by tier with coordinates (`LONGITUDE` and `LATITUDE` columns).}

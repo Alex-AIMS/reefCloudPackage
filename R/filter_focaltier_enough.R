@@ -1,0 +1,68 @@
+#' @title Filter Focal Tiers with Sufficient Spatio-Temporal Coverage
+#'
+#' @description
+#' Filters `data.grp` based on spatial and temporal thresholds defined by `n.spat` (minimum spatial sites)
+#' and `n.temp` (minimum temporal observations) for each level of `FOCAL_TIER`. 
+#' Only tiers with enough data coverage are retained.
+#'
+#' @param data.grp A data frame of survey records to filter.
+#' @param FOCAL_TIER A character string naming the column identifying focal tiers.
+#' @param n.spat Integer. Minimum number of distinct spatial sites (lat/lon combinations) per tier.
+#' @param n.temp Integer. Minimum number of distinct years per tier.
+#'
+#' @return A list:
+#' \describe{
+#'   \item{filtered_data}{Data with tiers meeting the spatio-temporal thresholds.}
+#'   \item{removed_tiers}{Subset of data for tiers removed due to insufficient coverage.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' result <- filter_focaltier_enough(data.grp, FOCAL_TIER = "Tier5", n.spat = 10, n.temp = 3)
+#' result$filtered_data
+#' }
+#' @author Julie Vercelloni
+#' @export
+filter_focaltier_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp) {
+   status::status_try_catch(
+   {
+  original_tiers <- unique(data.grp[[FOCAL_TIER]])
+
+  # Step 1: Spatial Filtering
+  tal_tier_spat <- data.grp |>
+    dplyr::count(!!sym(FOCAL_TIER), LONGITUDE, LATITUDE) |>
+    dplyr::count(!!sym(FOCAL_TIER)) |>
+    dplyr::filter(n > n.spat)
+
+  data.grp.filtered <- data.grp |>
+    dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_spat[[FOCAL_TIER]]) |>
+    droplevels()
+
+  # Step 2: Temporal Filtering
+  tal_tier_temp <- data.grp |>
+    dplyr::count(!!sym(FOCAL_TIER), fYEAR) |>
+    dplyr::count(!!sym(FOCAL_TIER)) |>
+    dplyr::filter(n > n.temp)
+
+  data.grp.filtered <- data.grp.filtered |>
+    dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_temp[[FOCAL_TIER]]) |>
+    droplevels() |>
+    data.frame()
+
+  # Step 3: Identify Removed Tiers
+  remaining_tiers <- unique(data.grp.filtered[[FOCAL_TIER]])
+  removed_tiers <- setdiff(original_tiers, remaining_tiers)
+
+  data.grp.removed <- data.grp |>
+    dplyr::filter(!!sym(FOCAL_TIER) %in% removed_tiers)
+    
+ # return(list(filtered_data = data.grp.filtered, removed_tiers = data.grp.removed))
+  return(filtered_data = data.grp.filtered)
+  },
+   stage_ = 4,
+   order_ = 3,
+   name_ = "Filter data with enough coverage",
+   item_ = "filter_data_enough"
+   )
+  
+}

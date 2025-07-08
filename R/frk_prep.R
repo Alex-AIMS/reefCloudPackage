@@ -12,7 +12,7 @@
 #' }
 #' @author Julie Vercelloni
 #' @export
-frk_prep <- function(data.grp.tier, HexPred_reefid2) {
+frk_prep <- function(data.grp.tier, HexPred_reefid2, i , N) {
    status::status_try_catch(
      {
       # Convert fYEAR to Date (start of year)
@@ -64,9 +64,18 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
                           tunit = "years",
                           nres = 3L,
                           regular = TRUE)
+    # Update status 
+      old_item_name <- get_status_name(4, "prep_FRK_objects")
+        if (!str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
+        } else{
+        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        }
+      status:::update_status_name(stage = 4, item = "prep_FRK_objects", name = new_item_name)
+
      },
      stage_ = 4,
-     order_ = 7,
+     order_ = 9,
      name_ = "Prep FRK objects",
      item_ = "prep_FRK_objects"
    )
