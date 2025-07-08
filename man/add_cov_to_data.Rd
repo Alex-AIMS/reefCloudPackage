@@ -7,20 +7,29 @@
 add_cov_to_data(data, cov, cov_name)
 }
 \arguments{
-\item{data}{Data on which model is fitted}
+\item{data}{A data frame containing the monitoring data (including fields like `Tier5`, `REPORT_YEAR`, `DATE`, etc.)}
 
-\item{cov}{Extracted disturbance layer corresponding to the monitored years}
+\item{cov}{A data frame containing the extracted disturbance layer values by year and `Tier5` spatial unit}
 
-\item{cov_name}{Name of the disturbance layer}
+\item{cov_name}{A string naming the disturbance layer, used to construct column names such as `severity_[name]`}
 }
 \value{
-Data with adjusted disturbance values
+A data frame with added and adjusted covariate columns: 
+`severity_[name]`, `max_[name]`, and their lagged versions for 1 and 2 years.
 }
 \description{
-Process spatial layers including time lags and adjusting values depending on survey dates
+This function merges a covariate layer (typically representing disturbance) with monitoring data. 
+It adjusts covariate values based on the timing of the surveys, computes lagged versions of the 
+covariate (e.g., 1-year and 2-year lags), and handles missing values by replacing them with 0.
+
+The adjustment logic ensures that if the disturbance occurred after the survey date, 
+the covariate value from the previous year is used instead.
 }
 \examples{
-examples
+# Example usage:
+# data <- readRDS("monitoring_data.rds")
+# cov <- readRDS("disturbance_layer.rds")
+# data_with_cov <- add_cov_to_data(data, cov, cov_name = "cyclone")
 }
 \author{
 Julie Vercelloni

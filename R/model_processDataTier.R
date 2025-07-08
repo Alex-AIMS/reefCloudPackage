@@ -1,10 +1,8 @@
 #' @title Process Benthic and Covariate Data at Tier Level
-#' 
 #' @description
 #' Loads benthic monitoring data (including legacy sources), assigns each record
 #' to spatial Tier levels, prepares data for modelling (e.g., by survey date and
 #' benthic group), and integrates spatial covariates from the geoserver.
-#'
 #' This function is typically used in workflows preparing data for either:
 #' - Simple hierarchical INLA models (site-based)
 #' - Full spatiotemporal FRK models (tier-based)
@@ -19,8 +17,9 @@
 #' model_processDataTier()
 #' @author Murray Logan
 #' @export
+
 model_processDataTier <- function(){
-  if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
+ #if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
   # Load legacy and current benthic data
   data <- reefCloudPackage::get_data_and_legacy_for_processing()

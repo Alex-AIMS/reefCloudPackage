@@ -7,11 +7,17 @@
 model_fitModel(raw_cell_means = TRUE)
 }
 \arguments{
-\item{raw_cell_means}{boolean. If TRUE, runs raw cell means. If FALSE, runs simple INLA cell means. Default is TRUE.}
+\item{raw_cell_means}{Logical. If TRUE, fits raw cell means model. If FALSE, fits tier-level model. Default is TRUE.}
 }
 \description{
-Fits model to data
+Fits the appropriate statistical model to benthic data, depending on the domain category.
+If `DOMAIN_CATEGORY` is "site", it runs the site-level model; otherwise, it fits the tier-level model.
+Optionally runs raw or smoothed cell means based on the `raw_cell_means` flag.
 }
 \examples{
-model_fitModel()
+# Fit the model using raw cell means
+model_fitModel(raw_cell_means = TRUE)
+}
+\author{
+Murray Logan
 }

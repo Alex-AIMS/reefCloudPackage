@@ -1,5 +1,5 @@
 #' Load Data for Model Execution
-#'
+#' 
 #' Loads benthic survey data and optionally identifies if covariates are available.
 #' This function checks for required `.RData` files in the processed data directory,
 #' sets up the list of target groups, and flags if covariate data is available.
@@ -15,7 +15,6 @@
 #'   \item \code{FOCAL_TIER} – character string indicating the modelling tier level (e.g., "Tier4").
 #'   \item \code{reef_layer.sf} – spatial reef layer object.
 #' }
-#'
 #' @param DATA_PATH Character. Path to the folder containing `processed/` and `primary/` data directories.
 #' @param RDATA_FILE Character. Name of the `.RData` file to load from the `processed/` directory.
 #' @return No return value. Loads data into the environment.
@@ -24,8 +23,8 @@
 #' @author Julie Vercelloni
 #' @export
 load_data_for_model <- function() {
-  # status::status_try_catch(
-  # {
+   status::status_try_catch(
+   {
   # Load main data file
   rdata_path <- file.path(DATA_PATH, "processed", RDATA_FILE)
   if (file.exists(rdata_path)) {
@@ -57,10 +56,10 @@ load_data_for_model <- function() {
   # Import reef layer 
   load(file=paste0(DATA_PATH, 'primary/reef_layer.sf.RData'), envir = .GlobalEnv)
 
-  # },
-  # stage_ = 4,
-  # order_ = 1,
-  # name_ = "Load data",
-  # item_ = "load_data"
-  # )
+   },
+   stage_ = 4,
+   order_ = 1,
+   name_ = "Load data",
+   item_ = "load_data"
+   )
 }

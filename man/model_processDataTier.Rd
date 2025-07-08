@@ -10,7 +10,6 @@ model_processDataTier()
 Loads benthic monitoring data (including legacy sources), assigns each record
 to spatial Tier levels, prepares data for modelling (e.g., by survey date and
 benthic group), and integrates spatial covariates from the geoserver.
-
 This function is typically used in workflows preparing data for either:
 - Simple hierarchical INLA models (site-based)
 - Full spatiotemporal FRK models (tier-based)

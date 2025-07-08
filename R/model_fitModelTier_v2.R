@@ -6,11 +6,9 @@
 #' @author Julie Vercelloni
 #' @export
 model_fitModelTier_v2 <- function() {
-  # status::status_try_catch(
-  # {
 
   # ---- Load input data tables for modelling ----
-  reefCloudPackage::load_data_for_model()  
+  reefCloudPackage::load_data_for_model() 
 
   # ---- Define target benthic group ----
   # For now, modelling "hard corals" only
@@ -71,11 +69,4 @@ model_fitModelTier_v2 <- function() {
        # Attribute changes - effect size of disturbances
        reefCloudPackage::attribute_changes()
      }
-
-  # stage_ = 4,
-  # order_ = 15,
-  # name_ = "Model fitting complete; predictions, changes attribution and contrasts saved to AWS bucket",
-  # item_ = "model_fit_save_complete"
-
-  # }
 }

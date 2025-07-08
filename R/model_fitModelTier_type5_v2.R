@@ -81,7 +81,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
      if (diff_perc > 30) {
     #   msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
-    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg)
+    #   status:::status_log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg)
      next
     }
 
@@ -100,7 +100,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
 
     #  if (result_rank$status == "fail"){
     #    # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
-    #    # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg )
+    #    # status:::status_log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg )
     #  next
     #  }
 
@@ -123,7 +123,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     ## Handle failed model
     if (length(M) == 0) {
   #    msg <- paste("Model failed to fit for", FOCAL_TIER, ":", TIER)
-  #    reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg)
+  #    status:::status_log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg)
       next
     }
 

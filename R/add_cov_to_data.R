@@ -1,30 +1,40 @@
 #' @title Add covariates to data
-#' @description Process spatial layers including time lags and adjusting values depending on survey dates
-#' @param data Data on which model is fitted
-#' @param cov Extracted disturbance layer corresponding to the monitored years
-#' @param cov_name Name of the disturbance layer
-#' @return Data with adjusted disturbance values
-#' @examples examples
+#'
+#' @description 
+#' This function merges a covariate layer (typically representing disturbance) with monitoring data. 
+#' It adjusts covariate values based on the timing of the surveys, computes lagged versions of the 
+#' covariate (e.g., 1-year and 2-year lags), and handles missing values by replacing them with 0.
+#'
+#' The adjustment logic ensures that if the disturbance occurred after the survey date, 
+#' the covariate value from the previous year is used instead.
+#'
+#' @param data A data frame containing the monitoring data (including fields like `Tier5`, `REPORT_YEAR`, `DATE`, etc.)
+#' @param cov A data frame containing the extracted disturbance layer values by year and `Tier5` spatial unit
+#' @param cov_name A string naming the disturbance layer, used to construct column names such as `severity_[name]`
+#'
+#' @return A data frame with added and adjusted covariate columns: 
+#' `severity_[name]`, `max_[name]`, and their lagged versions for 1 and 2 years.
+#'
+#' @examples 
+#' # Example usage:
+#' # data <- readRDS("monitoring_data.rds")
+#' # cov <- readRDS("disturbance_layer.rds")
+#' # data_with_cov <- add_cov_to_data(data, cov, cov_name = "cyclone")
 #' @author Julie Vercelloni
 #' @export
 
 add_cov_to_data <- function(data, cov, cov_name) {
   data %>%  
-  #  mutate(Tier5 = as.numeric(as.character(Tier5))) %>%
     dplyr::left_join(cov, by = c("Tier5" = "Tier5",
                           "REPORT_YEAR" = "year")) %>%
-    ## replace NA's for severity_* and max_*
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
                   ~ replace_na(.x, replace = 0))) %>% 
-    ## arrange according to REEF, SITE_NO, TRANSECT_NO, fDEPTH, fYEAR
     dplyr::group_by(REEF, SITE_NO, TRANSECT_NO, fDEPTH, fGROUP) %>% 
     dplyr::arrange(fYEAR) %>% 
-    ## determine whether end_date is after date, then use previous row
     dplyr::rowwise() %>% 
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
                   list(~adjust_cov_for_after_surveys(DATE, end_date, cov, Tier5, cur_column())),
                   .names = "{.col}")) %>% 
-    ## add lags
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
                   list(lag1 =  ~ get_lag_cov(REPORT_YEAR-1, cov, Tier5, cur_column())),
                   .names = "{.col}.{.fn}")) %>% 

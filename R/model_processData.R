@@ -1,12 +1,25 @@
 #' @title Process data
-#' @description ## This script predominantly loads the benthic data (including legacy
-## versions) before forking on whether the eventual analysis should
-## fit a site model (simple hierarchical INLA model) or tier (full
-## spatiotemporal FRK model).
-#' @examples model_processData()
+#' @description 
+#' This function is the main entry point for processing benthic data 
+#' used in the modelling pipeline. It performs the following steps:
+#'
+#' 1. Loads the primary benthic data from an `.RData` file.
+#' 2. Optionally processes legacy benthic data if available.
+#' 3. Routes the data processing logic depending on whether the 
+#'    analysis is targeting a site-level model (INLA) or a tier-level 
+#'    model (FRK).
+#' The processed datasets are saved into the `processed/` folder for use 
+#' in later modelling steps. Logging and error handling are managed by 
+#' the `status` package to track the data pipeline.
+#' The function requires the `DATA_PATH`, `RDATA_FILE`, `DOMAIN_CATEGORY`, 
+#' and optionally `LEGACY_DATA` global variables to be set. These control 
+#' file paths and the type of model being run.
+#' @examples 
+#' model_processData()
+#' @author Murray Logan
 #' @export
 model_processData <- function(){
-  if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
+ # if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
   status::status_set_stage(stage = 3, title = "Process data")
 
   ## load in the benthic data

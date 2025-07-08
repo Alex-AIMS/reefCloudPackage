@@ -14,8 +14,9 @@ model_loadData <- function(){
   if(.Platform$OS.type == "unix") {
     reefCloudPackage::model_loadData_unix()
   } else if (.Platform$OS.type == "windows"){
-    #msg <- paste("Pipeline is not supported on Windows. Execution stopped.")
-    #reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model load data--", msg = msg)
+    msg <- paste("Pipeline is not supported on Windows. Execution stopped.")
+    status:::status_log("ERROR", log_file = log_file, "--Model load data--", msg = msg)
+    stop(msg)
     #reefCloudPackage::model_loadData_windows()
   }
 }

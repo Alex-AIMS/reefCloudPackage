@@ -7,7 +7,7 @@
 #' - spatial tiers data (tiers[2-5].shp)\cr
 #' - covariates data (?)
 #' @examples model_loadData_windows()
-#' @export
+##' @export
 model_loadData_windows <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 

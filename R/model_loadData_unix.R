@@ -16,9 +16,6 @@ model_loadData_unix <- function(){
   if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
   status::status_set_stage(stage = 2, title = "Obtain data")
 
-  ## reefCloudPackage::read_status()
-  CURRENT_STAGE <<- 2
-
   ## Benthic data =============================================================
   ## 1. Retrieve the benthic data from the S3 bucket
   reefCloudPackage::retrieve_benthic_data()
