@@ -33,7 +33,7 @@ join_covariates_to_tier_lookup <- function(tier.sf, i , N) {
      
    },
    stage_ = 4,
-   order_ = 3,
+   order_ = 4,
    name_ = "Join covariates to tier lookup",
    item_ = "join_covariates_to_tier_lookup"
    )

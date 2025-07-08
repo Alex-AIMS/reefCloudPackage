@@ -27,11 +27,11 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
       dplyr::mutate(across(Tier5, as.character))
 
     ## Join covariates
-    tier.sf.joined <- join_covariates_to_tier_lookup(tier.sf, i, N) |> #reefCloudPackage::
+    tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf, i, N) |> 
       dplyr::filter(!!sym(FOCAL_TIER) == TIER)
 
     ## Load covariate layers
-    full_cov_raw <- load_predictive_layers(i , N) |> #reefCloudPackage::
+    full_cov_raw <- reefCloudPackage::load_predictive_layers(i , N) |> 
       dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) |>
       dplyr::rename(fYEAR = year) |>
       dplyr::filter(between(fYEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR)))
@@ -46,7 +46,7 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
       dplyr::mutate(across(matches("^max_dhw.*"), ~ ifelse(.x >= out_dhw & As.Data == "No", NA, .x)))
 
     ## Select covariates
-    selected_covar <- select_covariates(HexPred_sf, i , N) #reefCloudPackage::
+    selected_covar <- reefCloudPackage::select_covariates(HexPred_sf, i , N) 
 
     ## Scale covariates
     HexPred_sf <- HexPred_sf |>
@@ -56,7 +56,7 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
      ))
 
     ## Add reefid and fill missing years
-    covs.hexpred_tier_sf_v2_prep <- make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) #reefCloudPackage::
+    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) 
  
      # Optional: Check missing reefid
      # missing_reefid <- covs.hexpred_tier_sf_v2_prep |>
@@ -74,7 +74,7 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
       sf::st_as_sf(sf_column_name = "geometry")
 
     ## Remove obs outside covariate grid
-    data.grp.tier.ready <- rm_obs_outside(data.grp.tier, HexPred_reefid2, i , N)    #reefCloudPackage::
+    data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2, i , N)    
 
     ## Stop if more than 30% of observations are outside tier5 cells 
     diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
@@ -86,7 +86,7 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
     }
 
     ## Prep FRK model inputs
-    obj_frk <- frk_prep(data.grp.tier.ready, HexPred_reefid2, i , N) #reefCloudPackage::
+    obj_frk <- reefCloudPackage::frk_prep(data.grp.tier.ready, HexPred_reefid2, i , N) 
 
     ## Define model formula
     model_formula <- if (length(selected_covar) == 0) {
@@ -96,13 +96,13 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
     }
 
     # ## Test for rank deficiencies - not working yet
-    result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
+   # result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
 
-     if (result_rank$status == "fail"){
+   #  if (result_rank$status == "fail"){
        # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
        # status:::status_log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg )
-     next
-     }
+   #  next
+   #  }
 
     ## Update formula 
     model_formula <- as.formula(result_rank$formula)
@@ -133,7 +133,7 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
 
      },
      stage_ = 4,
-     order_ = 11,
+     order_ = 10,
      name_ = "Fit FRK model",
      item_ = "FRK_fit"
    )
@@ -193,7 +193,7 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
 
      },
      stage_ = 4,
-     order_ = 12,
+     order_ = 11,
      name_ = "Saved FRK outputs",
      item_ = "FRK_saved"
    )

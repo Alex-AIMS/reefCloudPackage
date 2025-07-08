@@ -55,7 +55,7 @@ rm_obs_outside <- function(data.grp.tier, HexPred_reefid2, i , N) {
 
      },
      stage_ = 4,
-     order_ = 10,
+     order_ = 8,
      name_ = "Remove obs outside tier5 cells",
      item_ = "rm_obs_outside_tier5_cells"
    )
