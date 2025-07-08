@@ -8,8 +8,7 @@
 #' @export
 
 model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
-  # status::status_try_catch(
-  # {
+
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
   data.grp <- data.grp.enough
 
@@ -107,6 +106,8 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     # model_formula <- as.formula(result_rank$formula)
 
     ## Fit FRK model
+    status::status_try_catch(
+     {
     M <- FRK(
       f = model_formula,
       data = list(obj_frk$STObj),
@@ -118,7 +119,13 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       method = "TMB",
       est_error = FALSE
     )
-
+     },
+     stage_ = 4,
+     order_ = 9,
+     name_ = "Fit FRK model",
+     item_ = "FRK_fit"
+   )
+  
     ## Handle failed model
     if (length(M) == 0) {
       msg <- paste("Model failed to fit for", FOCAL_TIER, ":", TIER)
@@ -129,7 +136,8 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     ##############################
     #### Predict & summarise
     ##############################
-
+  status::status_try_catch(
+     {
     pred <- FRK::predict(M, type = "mean", nsim = 1000)
 
     post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
@@ -147,11 +155,18 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       sf::st_as_sf(sf_column_name = "geometry") |>
       dplyr::mutate(Unc = .upper - .lower,
                     Tier5_fYEAR = paste0(Tier5, fYEAR))
-
+     },
+     stage_ = 4,
+     order_ = 10,
+     name_ = "Extract predictions",
+     item_ = "FRK_pred"
+   )
+  
     ##############################
     #### Save outputs
     ##############################
-
+  status::status_try_catch(
+     {
     saveRDS(
       list(
         form = model_formula,
@@ -162,12 +177,11 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       ),
       file = paste0(DATA_PATH, "modelled/", "FRK_", FOCAL_TIER, "_", TIER, ".RData")
     )
+     },
+     stage_ = 4,
+     order_ = 11,
+     name_ = "Saved model outputs",
+     item_ = "FRK_saved"
+   )
   }
-  # },
-  # stage_ = 4,
-  # order_ = 10,
-  # name_ = "Fit FRK models",
-  # item_ = "FRK_fit"
-  # )
-
 }

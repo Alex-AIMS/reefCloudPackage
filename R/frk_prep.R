@@ -66,7 +66,7 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
                           regular = TRUE)
      },
      stage_ = 4,
-     order_ = 8,
+     order_ = 7,
      name_ = "Prep FRK objects",
      item_ = "prep_FRK_objects"
    )
