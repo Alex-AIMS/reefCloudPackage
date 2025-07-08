@@ -31,7 +31,7 @@ join_covariates_to_tier_lookup_looped <- function(tier.sf, i , N) {
      }
      status:::update_status_name(stage = 4, item = "join_covariates_to_tier_lookup", name = new_item_name)
      
-   },
+   }#,
  #  stage_ = 4,
  #  order_ = 3,
  #  name_ = "Join covariates to tier lookup",
