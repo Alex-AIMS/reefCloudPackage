@@ -24,8 +24,8 @@
 #' }
 #' @export
 select_covariates <- function(x) {
-  # status::status_try_catch(
-  # {
+   status::status_try_catch(
+   {
   variables_name_full <- names(x)
   variables_name_full <- grep("^max", variables_name_full, value = TRUE)
   
@@ -35,11 +35,11 @@ select_covariates <- function(x) {
     tidyr::pivot_longer(everything(), names_to = "column", values_to = "q70_value") |>
     dplyr::filter(q70_value != 0) |>
     dplyr::pull(column)
-  # },
-  # stage_ = 4,
-  # order_ = 6,
-  # name_ = "Select covariates",
-  # item_ = "select_covariates"
-  # )
+   },
+   stage_ = 4,
+   order_ = 5,
+   name_ = "Select covariates",
+   item_ = "select_covariates"
+   )
   return(filtered_data)
 }

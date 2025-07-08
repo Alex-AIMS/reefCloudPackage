@@ -28,8 +28,8 @@
 #' }
 #' @export
 rm_obs_outside <- function(data.grp.tier, HexPred_reefid2) {
-  # status::status_try_catch(
-  #   {
+   status::status_try_catch(
+     {
   data.grp.tier.sf <- data.grp.tier |>
     sf::st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
 
@@ -43,12 +43,12 @@ rm_obs_outside <- function(data.grp.tier, HexPred_reefid2) {
       LATITUDE  = sf::st_coordinates(.)[, 2]
     ) %>%
     sf::st_drop_geometry()
-  #   },
-  #   stage_ = 4,
-  #   order_ = 8,
-  #   name_ = "Remove obs outside tier5 cells",
-  #   item_ = "rm_obs_outside_tier5_cells"
-  # )
+     },
+     stage_ = 4,
+     order_ = 8,
+     name_ = "Remove obs outside tier5 cells",
+     item_ = "rm_obs_outside_tier5_cells"
+   )
   
   return(data.grp.tier.filtered)
 }

@@ -76,12 +76,11 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)    
 
     ## Stop if more than 30% of observations are outside tier5 cells 
-
     diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
-    # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
+
      if (diff_perc > 30) {
-    #   msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
-    #   status:::status_log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg)
+       msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
+       status:::status_log("ERROR", log_file = log_file, "--Fitting FRK model--", msg = msg)
      next
     }
 
@@ -95,7 +94,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
       as.formula(paste("COUNT ~ 1 + (1 | reefid) +", paste(selected_covar, collapse = " + ")))
     }
 
-    # # ## Test for rank deficiencies 
+    # # ## Test for rank deficiencies - not working yet
     # result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
 
     #  if (result_rank$status == "fail"){
@@ -122,8 +121,8 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
 
     ## Handle failed model
     if (length(M) == 0) {
-  #    msg <- paste("Model failed to fit for", FOCAL_TIER, ":", TIER)
-  #    status:::status_log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg)
+      msg <- paste("Model failed to fit for", FOCAL_TIER, ":", TIER)
+      status:::status_log("ERROR", log_file = log_file, "--Fitting FRK model--", msg = msg)
       next
     }
 

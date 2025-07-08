@@ -13,8 +13,8 @@
 #' @author Julie Vercelloni
 #' @export
 frk_prep <- function(data.grp.tier, HexPred_reefid2) {
-  # status::status_try_catch(
-  #   {
+   status::status_try_catch(
+     {
       # Convert fYEAR to Date (start of year)
       data.grp.tier$Year <- as.Date(paste0(as.character(data.grp.tier$fYEAR), "-01-01"))
       data.grp.tier$k_Z <- data.grp.tier$TOTAL  # number of trials
@@ -64,12 +64,12 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2) {
                           tunit = "years",
                           nres = 3L,
                           regular = TRUE)
-  #   },
-  #   stage_ = 4,
-  #   order_ = 9,
-  #   name_ = "Prep FRK objects",
-  #   item_ = "prep_FRK_objects"
-  # )
+     },
+     stage_ = 4,
+     order_ = 8,
+     name_ = "Prep FRK objects",
+     item_ = "prep_FRK_objects"
+   )
   
   obj_frk <- list("ST_BAUs" = ST_BAUs, "STObj" = STObj, "basis" = basis)
   return(obj_frk)

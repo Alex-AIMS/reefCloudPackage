@@ -6,8 +6,8 @@
 #' @examples prep_group_data_for_modelling(data, GROUP)
 #' @export
 prep_group_data_for_modelling <- function(data, GROUP) {
- # status::status_try_catch(
- # {
+  status::status_try_catch(
+  {
     data.grp <- data %>%
       dplyr::filter(fGROUP == GROUP) %>%
       droplevels() %>%
@@ -21,11 +21,11 @@ prep_group_data_for_modelling <- function(data, GROUP) {
         Transect = factor(paste(Site, TRANSECT_NO))) %>%
       dplyr::arrange(Tier4, Tier5, Site, Transect, desc(as.numeric(as.character(fYEAR)))) %>%
       dplyr::mutate(fYEAR = factor(fYEAR, levels=unique(fYEAR)))
-  #},
-  #stage_ = 4,
-  #order_ = 2,
-  #name_ = "Filter for benthic group",
-  #item_ = "filter_for_benthic_group"
-  #)
+  },
+  stage_ = 4,
+  order_ = 2,
+  name_ = "Filter for benthic group",
+  item_ = "filter_for_benthic_group"
+  )
   return(data.grp)
 }

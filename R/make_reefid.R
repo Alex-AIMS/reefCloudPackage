@@ -10,8 +10,8 @@
 #' @author Julie Vercelloni
 #' @export
 make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf) {
-  # status::status_try_catch(
-  # {
+   status::status_try_catch(
+   {
   sf::sf_use_s2(TRUE) |> suppressMessages()
 
   covs.hexpred_tier_sf <- HexPred_sf |>
@@ -51,11 +51,11 @@ make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf) {
     suppressWarnings()
 
 #  sf::sf_use_s2(TRUE) |> suppressMessages()
-  # },
-  # stage_ = 4,
-  # order_ = 7,
-  # name_ = "Make reef id",
-  # item_ = "make_reef_id"
-  # )
+   },
+   stage_ = 4,
+   order_ = 6,
+   name_ = "Make reef id",
+   item_ = "make_reef_id"
+   )
   return(covs.hexpred_tier_sf_v2_prep)
 }

@@ -12,8 +12,8 @@
 #' @author Julie Vercelloni
 #' @export
 load_predictive_layers <- function() {
-  # status::status_try_catch(
-  # {
+   status::status_try_catch(
+   {
   files <- list.files(path = paste0(DATA_PATH, "processed"),
                       pattern = "covariates_full_tier5.RData", full.names = TRUE)
 
@@ -22,11 +22,11 @@ load_predictive_layers <- function() {
   } else {
     stop("Predictive layers not found")
   }
-  # },
-  # stage_ = 4,
-  # order_ = 5,
-  # name_ = "Load predictive layers",
-  # item_ = "load_predictive_layers"
-  # )
+   },
+   stage_ = 4,
+   order_ = 4,
+   name_ = "Load predictive layers",
+   item_ = "load_predictive_layers"
+   )
   return(full_cov_raw)
 }
