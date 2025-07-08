@@ -4,7 +4,7 @@
 \alias{filter_focaltier_enough}
 \title{Filter Focal Tiers with Sufficient Spatio-Temporal Coverage}
 \usage{
-filter_focaltier_enough(data.grp, FOCAL_TIER, n.spat, n.temp)
+filter_focaltier_enough(data.grp, FOCAL_TIER, n.spat, n.temp, i, N)
 }
 \arguments{
 \item{data.grp}{A data frame of survey records to filter.}

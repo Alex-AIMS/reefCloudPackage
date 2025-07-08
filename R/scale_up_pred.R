@@ -10,8 +10,8 @@
 #' @export
 scale_up_pred <- function(whichModel) {
 
-  # status::status_try_catch(
-  # {
+   status::status_try_catch(
+   {
 
   # ---- Load input data tables for modelling ----
   reefCloudPackage::load_data_for_model()
@@ -27,9 +27,9 @@ scale_up_pred <- function(whichModel) {
 
     # Stop if files don't exist 
     if (length(files) == 0) {
-    #   msg <- paste("No model outputs for the region")
-    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model predictions--", msg = msg)
-    stop("No model outputs found")
+      msg <- paste("No model outputs for the region")
+      status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
+      stop("No model outputs found")
     }
 
 
@@ -71,10 +71,10 @@ scale_up_pred <- function(whichModel) {
       )
     
     # Log warning 
-    #if (anyNA(post_dist_df_tier5) || anyNA(post_dist_df_all)) {
-     #msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
-     #reefCloudPackage::log("WARNING", logFile = LOG_FILE, "--Model predictions--", msg = msg)
-    # }
+    if (anyNA(post_dist_df_tier5) || anyNA(post_dist_df_all)) {
+     msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
+     status:::status_log("WARNING", log_file = log_file, "--Model predictions--", msg = msg)
+     }
 
     # Remove NAs (model saved in wrong folder)
     post_dist_df_tier5 <- post_dist_df_tier5 %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
@@ -82,8 +82,8 @@ scale_up_pred <- function(whichModel) {
    
     # Stop if empty
     if (nrow(post_dist_df_tier5) == 0) {
-    #   msg <- paste("No model outputs for the region")
-    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model predictions--", msg = msg)
+       msg <- paste("No model outputs for the region")
+       status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
     stop("No model outputs found")
     }
 
@@ -168,14 +168,15 @@ scale_up_pred <- function(whichModel) {
 
   # CASE 2: Other INLA cellmeans model types (error message will show for now)
   } else {
-    # msg <- paste("Code not updated for the model type", whichModel)
-    # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Model outputs--", msg = msg)
+     msg <- paste("Code not updated for the model type", whichModel)
+     status:::status_log("ERROR", log_file = log_file, "--Model outputs--", msg = msg)
+     stop("Code not updated")
   }
 
-  # },
-  # stage_ = 4,
-  # order_ = 13,
-  # name_ = "Scaling-up model predictions and export",
-  # item_ = "model_prediction"
-  # )
+   },
+   stage_ = 4,
+   order_ = 16,
+   name_ = "Scaling-up model predictions and export",
+   item_ = "model_prediction"
+   )
 }

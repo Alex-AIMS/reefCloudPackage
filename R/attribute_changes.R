@@ -8,8 +8,8 @@
 #' @author Julie Vercelloni
 #' @export
 attribute_changes <- function() {
-  # status::status_try_catch(
-  # {
+   status::status_try_catch(
+   {
 
   # ---- Load input data tables for modelling ----
   reefCloudPackage::load_data_for_model()
@@ -25,9 +25,9 @@ attribute_changes <- function() {
   
   # Stop if files don't exist 
   if (length(files) == 0) {
-    #   msg <- paste("No model outputs for the region")
-    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Attribute changes--", msg = msg)
-   stop("No model outputs found")
+       msg <- paste("No model outputs for the region")
+       status:::status_log("ERROR", log_file = log_file, "--Attribute changes--", msg = msg)
+       stop("No model outputs found")
     }
 
   model_list <- list()
@@ -89,9 +89,9 @@ attribute_changes <- function() {
           dplyr::select(all_of(colnames(tiers.lookup)[start_col:ncol(tiers.lookup)])) %>%
           dplyr::distinct())
     } else {
-      # Optional: Logging for unsupported model type
-      # msg <- paste("Unsupported model type for", FOCAL_TIER, ":", dist_df[[i, 3]])
-      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Attribute changes--", msg = msg)
+      msg <- paste("Unsupported model type for", FOCAL_TIER, ":", dist_df[[i, 3]])
+      status:::status_log("ERROR", log_file = log_file, "--Attribute changes--", msg = msg)
+      stop("Code not updated")
     }
   }
 
@@ -110,10 +110,10 @@ attribute_changes <- function() {
     dplyr::ungroup()
 
   # Log warning 
-  # if (anyNA(coef_table)) {
-  #   msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
-  #   reefCloudPackage::log("WARNING", logFile = LOG_FILE, "--Attribute changes--", msg = msg)
-  # }
+   if (anyNA(coef_table)) {
+     msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
+     status:::status_log("WARNING", log_file = log_file, "--Attribute changes--", msg = msg)
+   }
 
   # Remove NAs (model saved in wrong folder) and rename
   coef_table <- coef_table %>% 
@@ -121,9 +121,9 @@ attribute_changes <- function() {
 
   # Stop if empty
     if (nrow(coef_table) == 0) {
-    #   msg <- paste("No model outputs for the region")
-    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Attribute changes--", msg = msg)
-    stop("No model outputs found")
+       msg <- paste("No model outputs for the region")
+       status:::status_log("ERROR", log_file = log_file, "--Attribute changes--", msg = msg)
+       stop("No model outputs found")
     }
 
   coef_table <- coef_table %>%
@@ -153,11 +153,10 @@ attribute_changes <- function() {
   cli::cli_alert_success("Attribution of changes compiled into coef table.")
 
   invisible(coef_table)
-  # status metadata
-  # stage_ = 4,
-  # order_ = 14,
-  # name_ = "Attribution of changes complete; coef table saved to AWS bucket",
-  # item_ = "covariate_effects"
-
-  # }
+    },
+  stage_ = 4,
+  order_ = 17,
+  name_ = "Attribution of changes complete; coef table saved to AWS bucket",
+  item_ = "covariate_effects"
+   )
 }

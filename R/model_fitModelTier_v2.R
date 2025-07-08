@@ -54,13 +54,13 @@ model_fitModelTier_v2 <- function() {
        FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
 
        # Filter focal tier based on data volume (≥3 sites, ≥2 years)
-       data.grp.enough <- reefCloudPackage::filter_focaltier_enough(data.grp, FOCAL_TIER, n.spat = 3, n.temp = 2)
+       data.grp.enough <- reefCloudPackage::filter_focaltier_enough(data.grp, FOCAL_TIER, n.spat = 3, n.temp = 2, i = 1, N = 1)
        reefCloudPackage::model_fitModelTier_type5_v3(data.grp.enough, tier.sf) 
 
        # Filtered-out tiers (insufficient data) 
        # Define focal tier (e.g. Tier4)
        FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
-       data.grp.not.enough <- reefCloudPackage::filter_focaltier_not_enough(data.grp, FOCAL_TIER, n.spat = 3, n.temp = 2)
+       data.grp.not.enough <- reefCloudPackage::filter_focaltier_not_enough(data.grp, FOCAL_TIER, n.spat = 3, n.temp = 2, i =1 , N = 1)
        reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
 
        # Scale-up predictions

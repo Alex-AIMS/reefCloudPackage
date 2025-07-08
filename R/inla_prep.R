@@ -6,9 +6,9 @@
 #' @return returned arguments description
 #' @examples examples
 #' @export
-inla_prep <- function(data.grp.tier.ready, HexPred_reefid2) {
-  # status::status_try_catch(
-  # {
+inla_prep <- function(data.grp.tier.ready, HexPred_reefid2, i ,N) {
+   status::status_try_catch(
+   {
 
 data.grp.tier.ready <- data.grp.tier.ready %>%
   dplyr::mutate(fYEAR = as.character(fYEAR))
@@ -29,10 +29,19 @@ data.sub <- left_join(data.grp.tier.ready, HexPred_reefid2) %>%
   droplevels()
 
 return(list(data.sub = data.sub))
-  # },
-  # stage_ = 4,
-  # order_ = 11,
-  # name_ = "Prep INLA objects",
-  # item_ = "prep_INLA_objects"
-  # )
+
+ # Update status 
+  old_item_name <- get_status_name(4, "prep_INLA_objects")
+        if (!str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
+        } else{
+        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        }
+      status:::update_status_name(stage = 4, item = "filter_data_prep_INLA_objects", name = new_item_name)
+   },
+   stage_ = 4,
+   order_ = 13,
+   name_ = "Prep INLA objects",
+   item_ = "prep_INLA_objects"
+   )
 }

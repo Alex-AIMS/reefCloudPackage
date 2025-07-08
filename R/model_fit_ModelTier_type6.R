@@ -13,12 +13,15 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
   data.grp <- data.grp.not.enough
 
+  tiers <- unique(data.grp[[FOCAL_TIER]])
+  N <- length(unique(data.grp[[FOCAL_TIER]]))
+
   ######################
   ###################### START THE LOOP
 
-  for (TIER in unique(data.grp[[FOCAL_TIER]])) {
+  for (i in seq_along(tiers)) {
 
-    TIER <<- as.character(TIER)
+    TIER <<- as.character(tiers[i])
 
     #--- Filter input data
     data.grp.tier <- data.grp |>
@@ -27,20 +30,20 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       dplyr::mutate(across(Tier5, as.character))
 
     #--- Check if enough data
-    test_tier <- reefCloudPackage::filter_focaltier(data.grp.tier, FOCAL_TIER, n.spat = 2, n.temp = 2)
+    test_tier <- reefCloudPackage::filter_focaltier_enough(data.grp.tier, FOCAL_TIER, n.spat = 2, n.temp = 2, i, N)
     
      if (nrow(test_tier$filtered_data) == 0) {
-    #   msg <- paste("Not enough observations for", FOCAL_TIER, ":", TIER)
-    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting model--", msg = msg)
+       msg <- paste("Not enough observations for", FOCAL_TIER, ":", TIER)
+       status:::status_log("ERROR", log_file = log_file, "--Fitting model--", msg = msg)
      next
     }
 
     #--- Join covariates
-    tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf) |>
+    tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf, i, N) |>
       dplyr::filter(!!sym(FOCAL_TIER) == TIER)
 
     #--- Load and filter predictive layers
-    full_cov_raw <- reefCloudPackage::load_predictive_layers() |>
+    full_cov_raw <- reefCloudPackage::load_predictive_layers(i, N) |>
       dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) |>
       dplyr::rename(fYEAR = year) |>
       dplyr::filter(
@@ -61,7 +64,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
                            ~ ifelse(.x >= out_dhw & As.Data == "No", NA, .x)))
 
     #--- Select covariates
-    selected_covar <- reefCloudPackage::select_covariates(HexPred_sf)
+    selected_covar <- reefCloudPackage::select_covariates(HexPred_sf, i, N)
 
     ## Scale covariates
     HexPred_sf <- HexPred_sf |>
@@ -71,7 +74,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
      ))
 
     #--- Create reefid
-    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf) 
+    covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf, i, N) 
 
     #--- Merge reefid with covariates
     HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
@@ -86,20 +89,19 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       sf::st_as_sf(sf_column_name = "geometry")
 
     #--- Filter observations outside Tier5
-    data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2)
+    data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2, i, N)
    
     ## Log removed observations and stop if more than 30% of observations are outside tier5 cells 
 
     diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
-    # diff_db <- setdiff(data.grp.tier, data.grp.tier.ready)
      if (diff_perc > 30) {
-    #   msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
-    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg)
+       msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
+       status:::status_log("ERROR", log_file = log_file, "--Fitting INLA model--", msg = msg)
      next
     }
 
     #--- Prepare model objects
-    obj_inla <- inla_prep(data.grp.tier.ready, HexPred_reefid2)
+    obj_inla <- inla_prep(data.grp.tier.ready, HexPred_reefid2, i, N)
     data.sub <- obj_inla$data.sub
 
     #--- Build formula
@@ -127,13 +129,12 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     model_formula_full <- as.formula(formula_string)
     model_formula <- reefCloudPackage::rm_factor(model_formula_full, data.sub)
 
-
     ## Test for rank deficiencies 
     # result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
 
     # if (result_rank$status == "fail"){
     #   # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
-    #   # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg )
+    #   # status:::status_log("ERROR", log_file = log_file, "--Fitting INLA model--", msg = msg )
     # next
     # }
 
@@ -142,6 +143,8 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     # model_formula <- as.formula(result_rank$formula)
 
     #--- Fit model
+    status::status_try_catch(
+     {
     M <- INLA::inla(
       model_formula,
       family = "binomial",
@@ -152,12 +155,32 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       silent = 2L
     )
 
+    # Update status 
+      old_item_name <- get_status_name(4, "INLA_fit")
+        if (!str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
+        } else{
+        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        }
+      status:::update_status_name(stage = 4, item = "INLA_fit", name = new_item_name)
+
+     },
+     stage_ = 4,
+     order_ = 14,
+     name_ = "Fit INLA model",
+     item_ = "INLA_fit"
+   )
+
     # Handle failed model
     if (length(M) == 0) {
-      # msg <- paste("Model failed to fit for", FOCAL_TIER, ":", TIER)
-      # reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Fitting INLA model--", msg = msg)
+       msg <- paste("Model failed to fit for", FOCAL_TIER, ":", TIER)
+       status:::status_log("ERROR", log_file = log_file, "--Fitting INLA model--", msg = msg)
       next
     }
+
+  #   ##############################
+  #   #### Predict & summarise
+  #   ##############################
 
 n_samples <- 1000
 samples <- INLA::inla.posterior.sample(n_samples, M)
@@ -168,15 +191,15 @@ predictor_idx <- grep("^Predictor", rownames(samples[[1]]$latent))
 # 3. Extract predictor samples
 latent_samples <- sapply(samples, function(x) x$latent[predictor_idx])
 
-    #--- Predictions at data locations
-   # pred_summary <- M$summary.linear.predictor
+#--- Predictions at data locations
+
 post_dist_df <- as.data.frame(latent_samples) |>
   dplyr::mutate(
     fYEAR = data.sub$fYEAR,
     Tier5 = data.sub$Tier5
   ) |>
   tidyr::pivot_longer(
-    cols = -c(fYEAR, Tier5), #, id_loc
+    cols = -c(fYEAR, Tier5), 
     names_to = "draw",
     values_to = "pred"
   ) |>
@@ -189,7 +212,7 @@ post_dist_df <- as.data.frame(latent_samples) |>
   ) |>
   dplyr::select(fYEAR, Tier5, id_loc, draw, pred, model_name)
   
-    #--- Summary predictions by Tier5
+#--- Summary predictions by Tier5
   tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
 
     pred_sum_sf <- post_dist_df |>
@@ -205,7 +228,11 @@ post_dist_df <- as.data.frame(latent_samples) |>
         Tier5_fYEAR = paste0(Tier5, fYEAR)
       )
 
-    #--- Save results
+  #   ##############################
+  #   #### Save outputs
+  #   ##############################
+    status::status_try_catch(
+     {
     saveRDS(
       list(
         form = model_formula,
@@ -216,11 +243,20 @@ post_dist_df <- as.data.frame(latent_samples) |>
       ),
       file = paste0(DATA_PATH, "modelled/", "INLA_", FOCAL_TIER, "_", TIER, ".RData")
     )
-  }
-  # },
-  # stage_ = 4,
-  # order_ = 12,
-  # name_ = "Fit INLA models",
-  # item_ = "INLA_fit"
-  # )  
+      # Update status 
+      old_item_name <- get_status_name(4, "INLA_saved")
+        if (!str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
+        } else{
+        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        }
+      status:::update_status_name(stage = 4, item = "INLA_saved", name = new_item_name)
+
+     },
+     stage_ = 4,
+     order_ = 15,
+     name_ = "Saved INLA outputs",
+     item_ = "INLA_saved"
+   )
+   }  
 }

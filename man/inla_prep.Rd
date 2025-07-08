@@ -4,7 +4,7 @@
 \alias{inla_prep}
 \title{Function}
 \usage{
-inla_prep(data.grp.tier.ready, HexPred_reefid2)
+inla_prep(data.grp.tier.ready, HexPred_reefid2, i, N)
 }
 \arguments{
 \item{parameters}{description}

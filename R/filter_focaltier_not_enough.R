@@ -23,7 +23,7 @@
 #' }
 #' @author Julie Vercelloni
 #' @export
-filter_focaltier_not_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp) {
+filter_focaltier_not_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp , i , N) {
    status::status_try_catch(
    {
   original_tiers <- unique(data.grp[[FOCAL_TIER]])
@@ -55,12 +55,20 @@ filter_focaltier_not_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp) {
 
   data.grp.removed <- data.grp |>
     dplyr::filter(!!sym(FOCAL_TIER) %in% removed_tiers)
-    
- # return(list(filtered_data = data.grp.filtered, removed_tiers = data.grp.removed))
+
   return(removed_tiers = data.grp.removed)
+
+  # Update status 
+  old_item_name <- get_status_name(4, "filter_data_not_enough")
+        if (!str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
+        } else{
+        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        }
+      status:::update_status_name(stage = 4, item = "filter_data_not_enough", name = new_item_name)
   },
    stage_ = 4,
-   order_ = 13,
+   order_ = 12,
    name_ = "Filter data without enough coverage",
    item_ = "filter_data_not_enough"
    )

@@ -57,11 +57,7 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
 
     ## Add reefid and fill missing years
     covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) 
- 
-     # Optional: Check missing reefid
-     # missing_reefid <- covs.hexpred_tier_sf_v2_prep |>
-     #   sf::st_drop_geometry() |> purrr::map_df(~sum(is.na(.)))
- 
+
    HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
       dplyr::group_by(Tier5) |>
       dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
@@ -100,12 +96,12 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
 
    #  if (result_rank$status == "fail"){
        # msg <- paste("Model is ranking deficient for", FOCAL_TIER, ":", TIER)
-       # status:::status_log("ERROR", logFile = LOG_FILE, "--Fitting FRK model--", msg = msg )
+       # status:::status_log("ERROR", log_file = log_file, "--Fitting FRK model--", msg = msg )
    #  next
    #  }
 
     ## Update formula 
-    model_formula <- as.formula(result_rank$formula)
+   # model_formula <- as.formula(result_rank$formula)
 
     ## Fit FRK model
     status::status_try_catch(
