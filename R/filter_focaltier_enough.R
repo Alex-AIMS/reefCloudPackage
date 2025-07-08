@@ -12,8 +12,7 @@
 #'
 #' @return A list:
 #' \describe{
-#'   \item{filtered_data}{Data with tiers meeting the spatio-temporal thresholds.}
-#'   \item{removed_tiers}{Subset of data for tiers removed due to insufficient coverage.}
+#'   \item{data.grp.enough}{Data with tiers meeting the spatio-temporal thresholds.}
 #' }
 #'
 #' @examples
@@ -44,20 +43,20 @@ filter_focaltier_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp, i , N)
     dplyr::count(!!sym(FOCAL_TIER)) |>
     dplyr::filter(n > n.temp)
 
-  data.grp.filtered <- data.grp.filtered |>
+  data.grp.enough <- data.grp.filtered |>
     dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_temp[[FOCAL_TIER]]) |>
     droplevels() |>
     data.frame()
 
   # Step 3: Identify Removed Tiers
-  remaining_tiers <- unique(data.grp.filtered[[FOCAL_TIER]])
+  remaining_tiers <- unique(data.grp.enough[[FOCAL_TIER]])
   removed_tiers <- setdiff(original_tiers, remaining_tiers)
 
   data.grp.removed <- data.grp |>
     dplyr::filter(!!sym(FOCAL_TIER) %in% removed_tiers)
 
-  return(filtered_data = data.grp.filtered)
-
+  return(data.grp.enough)
+  
   # Update status 
   old_item_name <- get_status_name(4, "filter_data_enough")
         if (!str_detect(old_item_name, "\\[")) {

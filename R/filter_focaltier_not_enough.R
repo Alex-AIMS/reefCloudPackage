@@ -12,8 +12,7 @@
 #'
 #' @return A list:
 #' \describe{
-#'   \item{filtered_data}{Data with tiers meeting the spatio-temporal thresholds.}
-#'   \item{removed_tiers}{Subset of data for tiers removed due to insufficient coverage.}
+#'   \item{data.grp.not.enough}{Data with tiers not meeting the spatio-temporal thresholds.}
 #' }
 #'
 #' @examples
@@ -53,10 +52,10 @@ filter_focaltier_not_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp , i
   remaining_tiers <- unique(data.grp.filtered[[FOCAL_TIER]])
   removed_tiers <- setdiff(original_tiers, remaining_tiers)
 
-  data.grp.removed <- data.grp |>
+  data.grp.not.enough <- data.grp |>
     dplyr::filter(!!sym(FOCAL_TIER) %in% removed_tiers)
 
-  return(removed_tiers = data.grp.removed)
+  return(data.grp.not.enough)
 
   # Update status 
   old_item_name <- get_status_name(4, "filter_data_not_enough")

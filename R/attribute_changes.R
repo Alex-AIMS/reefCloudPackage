@@ -156,7 +156,7 @@ attribute_changes <- function() {
     },
   stage_ = 4,
   order_ = 17,
-  name_ = "Attribution of changes complete; coef table saved to AWS bucket",
+  name_ = "Attribution of changes complete",
   item_ = "covariate_effects"
    )
 }

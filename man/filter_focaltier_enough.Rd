@@ -18,8 +18,7 @@ filter_focaltier_enough(data.grp, FOCAL_TIER, n.spat, n.temp, i, N)
 \value{
 A list:
 \describe{
-  \item{filtered_data}{Data with tiers meeting the spatio-temporal thresholds.}
-  \item{removed_tiers}{Subset of data for tiers removed due to insufficient coverage.}
+  \item{data.grp.enough}{Data with tiers meeting the spatio-temporal thresholds.}
 }
 }
 \description{

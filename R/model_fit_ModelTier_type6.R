@@ -32,7 +32,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     #--- Check if enough data
     test_tier <- reefCloudPackage::filter_focaltier_enough(data.grp.tier, FOCAL_TIER, n.spat = 2, n.temp = 2, i, N)
     
-     if (nrow(test_tier$filtered_data) == 0) {
+     if (nrow(test_tier) == 0) {
        msg <- paste("Not enough observations for", FOCAL_TIER, ":", TIER)
        status:::status_log("ERROR", log_file = log_file, "--Fitting model--", msg = msg)
      next
