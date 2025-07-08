@@ -50,5 +50,5 @@ startMatter <- function(args = commandArgs()) {
   ## reefCloudPackage::openingBanner()        ## display an opening banner
   status::display_status_terminal()        ## display an opening banner
   ## reefCloudPackage::save_status()
-
+  reefCloudPackage::get_status_name()  ## function to go in the status package 
 }
