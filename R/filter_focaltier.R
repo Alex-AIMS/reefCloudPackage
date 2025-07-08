@@ -18,9 +18,9 @@
 #' removed <- result$removed_tiers
 #' }
 #' @author Julie Vercelloni
-#' @export
+
 filter_focaltier <- function(data.grp, FOCAL_TIER, n.spat, n.temp) {
-   status::status_try_catch(
+  # status::status_try_catch(
    {
   original_tiers <- unique(data.grp[[FOCAL_TIER]])
 
@@ -54,10 +54,10 @@ filter_focaltier <- function(data.grp, FOCAL_TIER, n.spat, n.temp) {
     
   return(list(filtered_data = data.grp.filtered, removed_tiers = data.grp.removed))
   },
-   stage_ = 4,
-   order_ = 3,
-   name_ = "Filter for data coverage",
-   item_ = "filter_data_coverage"
-   )
+ #  stage_ = 4,
+ #  order_ = 3,
+ #  name_ = "Filter for data coverage",
+ #  item_ = "filter_data_coverage"
+ #  )
   
 }
