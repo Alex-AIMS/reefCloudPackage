@@ -30,7 +30,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       dplyr::mutate(across(Tier5, as.character))
 
     #--- Check if enough data
-    test_tier <- reefCloudPackage::filter_focaltier_enough(data.grp.tier, FOCAL_TIER, n.spat = 2, n.temp = 2, i, N)
+    test_tier <- reefCloudPackage::filter_focaltier_enough(data.grp.tier, FOCAL_TIER, n.spat = 2, n.temp = 1, i, N)
     
      if (nrow(test_tier) == 0) {
        msg <- paste("Not enough observations for", FOCAL_TIER, ":", TIER)
@@ -100,15 +100,35 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
      next
     }
 
+     ## Test if more than one reef in the final data 
+    test_reefid <- HexPred_reefid2 %>% filter(Tier5 %in% data.grp.tier.ready$Tier5)
+
     #--- Prepare model objects
-    obj_inla <- inla_prep(data.grp.tier.ready, HexPred_reefid2, i, N)
+    obj_inla <- reefCloudPackage::inla_prep(data.grp.tier.ready, HexPred_reefid2, i, N)
     data.sub <- obj_inla$data.sub
 
     #--- Build formula
-    if (length(selected_covar) == 0) {
+    if (length(selected_covar) == 0 && length(unique(test_reefid$reefid)) > 1) {
       formula_string <- paste(
         "COUNT ~ fYEAR +",
         "f(reefid, model = 'iid') +",
+        "f(P_CODE, model = 'iid') +",
+        "f(Site, model = 'iid') +",
+        "f(Transect, model = 'iid') +",
+        "f(fDEPTH, model = 'iid', hyper = list(prec = list(param = c(0.001, 0.001))))"
+      )
+    } else if (length(selected_covar) == 0 && length(unique(test_reefid$reefid)) == 1) {
+      formula_string <- paste(
+        "COUNT ~ fYEAR +",
+        "f(P_CODE, model = 'iid') +",
+        "f(Site, model = 'iid') +",
+        "f(Transect, model = 'iid') +",
+        "f(fDEPTH, model = 'iid', hyper = list(prec = list(param = c(0.001, 0.001))))"
+      )
+     } else if (length(selected_covar) != 0 && length(unique(test_reefid$reefid)) == 1) {
+      formula_string <- paste(
+        "COUNT ~ fYEAR +",
+        paste(selected_covar, collapse = " + "), "+",
         "f(P_CODE, model = 'iid') +",
         "f(Site, model = 'iid') +",
         "f(Transect, model = 'iid') +",
@@ -182,18 +202,18 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
   #   #### Predict & summarise
   #   ##############################
 
-n_samples <- 1000
-samples <- INLA::inla.posterior.sample(n_samples, M)
+  n_samples <- 1000
+  samples <- INLA::inla.posterior.sample(n_samples, M)
 
-# 2. Identify the predictor indices
-predictor_idx <- grep("^Predictor", rownames(samples[[1]]$latent))
+  # 2. Identify the predictor indices
+  predictor_idx <- grep("^Predictor", rownames(samples[[1]]$latent))
 
-# 3. Extract predictor samples
-latent_samples <- sapply(samples, function(x) x$latent[predictor_idx])
+  # 3. Extract predictor samples
+  latent_samples <- sapply(samples, function(x) x$latent[predictor_idx])
 
-#--- Predictions at data locations
+  #--- Predictions at data locations
 
-post_dist_df <- as.data.frame(latent_samples) |>
+  post_dist_df <- as.data.frame(latent_samples) |>
   dplyr::mutate(
     fYEAR = data.sub$fYEAR,
     Tier5 = data.sub$Tier5
@@ -212,7 +232,7 @@ post_dist_df <- as.data.frame(latent_samples) |>
   ) |>
   dplyr::select(fYEAR, Tier5, id_loc, draw, pred, model_name)
   
-#--- Summary predictions by Tier5
+  #--- Summary predictions by Tier5
   tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
 
     pred_sum_sf <- post_dist_df |>

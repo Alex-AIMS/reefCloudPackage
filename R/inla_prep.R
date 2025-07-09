@@ -37,7 +37,7 @@ return(list(data.sub = data.sub))
         } else{
         new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
         }
-      status:::update_status_name(stage = 4, item = "filter_data_prep_INLA_objects", name = new_item_name)
+      status:::update_status_name(stage = 4, item = "prep_INLA_objects", name = new_item_name)
    },
    stage_ = 4,
    order_ = 13,

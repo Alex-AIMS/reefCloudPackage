@@ -58,7 +58,15 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
     ## Add reefid and fill missing years
     covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) 
 
+    #n_removed <- sum(is.na(covs.hexpred_tier_sf_v2_prep$reefid) | covs.hexpred_tier_sf_v2_prep$reefid == "NA")
+
+    #if (n_removed > 0) {
+    #  msg <- paste(n_removed, 'rows with missing or invalid reefid were removed for', FOCAL_TIER, ":", TIER)
+    #  status:::status_log("WARNING", log_file = log_file, "--Fitting FRK model--", msg = msg )
+    #}
+
    HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
+    #  dplyr::filter(!is.na(reefid))  |>
       dplyr::group_by(Tier5) |>
       dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
       ungroup()
@@ -81,16 +89,22 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
      next
     }
 
+    ## Test if more than one reef in the final data 
+    test_reefid <- HexPred_reefid2 %>% filter(Tier5 %in% data.grp.tier.ready$Tier5)
+
     ## Prep FRK model inputs
-    obj_frk <- reefCloudPackage::frk_prep(data.grp.tier.ready, HexPred_reefid2, i , N) 
+    obj_frk <- reefCloudPackage::frk_prep(data.grp.tier.ready, HexPred_reefid2, i , N)  
 
     ## Define model formula
-    model_formula <- if (length(selected_covar) == 0) {
-      as.formula("COUNT ~ 1 + (1 | reefid)")
-    } else {
-      as.formula(paste("COUNT ~ 1 + (1 | reefid) +", paste(selected_covar, collapse = " + ")))
-    }
-
+    model_formula <- if (length(selected_covar) == 0 && length(unique(test_reefid$reefid)) > 1) {
+        as.formula("COUNT ~ 1 + (1 | reefid)")
+       } else if (length(selected_covar) == 0 && length(unique(test_reefid$reefid)) == 1) {
+        as.formula("COUNT ~ 1")
+      } else if (length(selected_covar) != 0 && length(unique(test_reefid$reefid)) == 1) {
+        as.formula( paste("COUNT ~ 1 +", paste(selected_covar, collapse = " + ")))
+      } else {
+       as.formula(paste("COUNT ~ 1 + (1 | reefid) +", paste(selected_covar, collapse = " + ")))
+  }
     # ## Test for rank deficiencies - not working yet
    # result_rank <- reefCloudPackage::rank_checks(data.grp.tier.ready, HexPred_reefid2, selected_covar)
 

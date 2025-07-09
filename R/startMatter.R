@@ -42,7 +42,7 @@ startMatter <- function(args = commandArgs()) {
   ## Start by clearing all local data folders
   if (REFRESH_DATA) reefCloudPackage::clear_data()
   CURRENT_STAGE <<- 1
-  reefCloudPackage::generateSettings()     ## generate the rest of the path and naming settings
+  reefCloudPackage::generateSettings()     ## generate the rest of the path and naming settings 
   reefCloudPackage::initialise_log()       ## create the log file
   reefCloudPackage::config()               ## create directory structure if it does not yet exist
   reefCloudPackage::checkPackages()        ## load required packages
