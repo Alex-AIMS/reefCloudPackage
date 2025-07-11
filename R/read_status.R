@@ -3,7 +3,7 @@
 #' @param parameters description
 #' @return returned arguments description
 #' @examples examples 
-#' @export
+##' @export
 read_status <- function() {
     STATUS <- readRDS(file = paste0(DATA_PATH, "STATUS.RData"))
     assign("STATUS", STATUS, env = globalenv())

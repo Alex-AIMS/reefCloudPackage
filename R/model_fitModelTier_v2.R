@@ -2,10 +2,10 @@
 #' @description Fits spatio-temporal models to data at a tier level for benthic groups.
 #' Selects and fits model types 1 to 6 based on `MODEL_TYPE` and scales up the predictions.s
 #' @examples
-#' model_fitModelTier_v2()
+#' model_fitModelTier()
 #' @author Julie Vercelloni
-#' @export
-model_fitModelTier_v2 <- function() {
+##' @export
+model_fitModelTier <- function() {
 
   # ---- Load input data tables for modelling ----
   reefCloudPackage::load_data_for_model() 
@@ -55,7 +55,7 @@ model_fitModelTier_v2 <- function() {
 
        # Filter focal tier based on data volume (≥3 sites, ≥2 years)
        data.grp.enough <- reefCloudPackage::filter_focaltier_enough(data.grp, FOCAL_TIER, n.spat = 3, n.temp = 2, i = 1, N = 1)
-       reefCloudPackage::model_fitModelTier_type5_v3(data.grp.enough, tier.sf) 
+       reefCloudPackage::model_fitModelTier_type5(data.grp.enough, tier.sf) 
 
        # Filtered-out tiers (insufficient data) 
        # Define focal tier (e.g. Tier4)

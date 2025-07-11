@@ -3,9 +3,9 @@
 #' @param data.grp.enough Data frame with sufficient data for modelling (filtered upstream)
 #' @param tier.sf Tier-level shapefile (e.g., Tier3 or Tier4 spatial scale)
 #' @examples
-#' model_fitModelTier_type5_v2(my_data_filtered, my_tier_sf)
+#' model_fitModelTier_type5_v3(my_data_filtered, my_tier_sf)
 #' @author Julie Vercelloni
-#' @export
+##' @export
 model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
 
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)

@@ -7,7 +7,7 @@
 #' @return void. Modifies STATUS only
 #' @examples change_status(stage = "SETTINGS", item = "DEBUG_MODE",
 #' status = "success", update_display = FALSE)
-#' @export
+##' @export
 change_status <- function(stage, item, status, update_display = TRUE) {
     STATUS[[stage]]$status[which(STATUS[[stage]]$item == item)] <- status
     assign("STATUS", STATUS, env = globalenv())

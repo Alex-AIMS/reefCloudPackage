@@ -22,11 +22,11 @@
 
 ## Content 
 
-This repository contains code to generate predicted coral cover values across multiple spatial scales. Model outputs are stored in the `AWS_PATH/outputs/tier` directory and include nine CSV files:
+This repository contains code to generate predicted coral cover values across multiple spatial scales. Model outputs are stored in the `AWS_PATH/outputs/tier` directory and include several CSV files:
 
-* Eight files named `outputs5-2.csv` are generated, each containing the following information:
+Eight files named `outputs_tier5-2.csv` are generated, each containing the following information:
 
-- `Spatial unit (Tier5-2)`: Represents the spatial scale. 
+- `Spatial unit (Tier5-2)`: The spatial scale of prediction. 
 - `Year`: The year for which the prediction was made.
 - `Median`: The median predicted coral cover.
 - `Lower`: The lower bound of the 95% credible interval for the prediction.
@@ -39,7 +39,16 @@ This repository contains code to generate predicted coral cover values across mu
 
 The data tables with names containing `_data` correspond to the predicted coral cover values at data tier locations only. 
 
-* One file, `coef_table.csv`, sprovides a summary of the drivers of coral change at the marine ecoregion scale (`Tier 4`), along with details of the associated statistical model. It includes the following columns:
+Four files names `info_tier5-2.csv` provide additional information about the spatial units and underlying data. Each file includes the following columns:
+- `Spatial unit (Tier5-2)`: The spatial scale of prediction.
+- `Size.area`:  Area of each spatial unit, in square kilometers.
+- `Year.range`: The time span covered by the predictions.
+- `data.tier`: Proportion of Tier5 units containing actual data (%).
+- `new.tier`: Proportion of Tier5 units where predictions were imputed (%).
+- `FRK.prop`: Proportion of predictions generated using FRK models (%).
+- `INLA.prop`: Proportion of predictions generated using INLA models (%).
+
+One file, `coef_table.csv`, provides a summary of the drivers of coral change at the marine ecoregion scale (`Tier 4`), along with details of the associated statistical model. It includes the following columns:
 
 - `Tier4`: Name of the marine ecoregion.
 - `Variable`: Covariates included in the statistical model.
@@ -52,9 +61,11 @@ The data tables with names containing `_data` correspond to the predicted coral 
 
 The latest version of the modelling pipeline includes two statistical models:
 
-* Full spatio-temporal model: Incorporates disturbances when relevant. This model is applied to marine ecoregions that have at least three distinct monitoring locations, each with a minimum of two repeated surveys. It generates predictions for both observed and unobserved `Tier 5` locations. For further details, see Vercelloni et al. (in prep.) (add link to preprint).
+* Full spatio-temporal model: Incorporates disturbances when relevant. This model is applied to marine ecoregions that have at least three distinct monitoring locations, each with a minimum of two repeated surveys. It generates predictions for both observed and unobserved `Tier 5` units. For further details, see Vercelloni et al. (in prep.) (add link to preprint).
 
-* Site-level model: Also includes disturbances when relevant. This model is applied to marine ecoregions with at least two distinct monitoring locations, each surveyed at least twice. Predictions are limited to `Tier 5` cells where data is available.
+* Site-level model: Also includes disturbances when relevant. This model is applied to marine ecoregions with at least two distinct surveyed years. Predictions are limited to `Tier 5` Tier5 units containing data.
+
+A companion package, `status` provides progress updates in the R console during model execution and logs any error messages encountered.    
 
 ## Installation
 

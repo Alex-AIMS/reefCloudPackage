@@ -14,7 +14,7 @@
 #' }
 #'
 #' @author Julie Vercelloni
-#' @export
+##' @export
 rank_checks <- function(data.grp.tier.ready, HexPred_reefid2, selected_covar) {
 
   data.grp.tier.ready.avg <- data.grp.tier.ready %>%

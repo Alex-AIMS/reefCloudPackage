@@ -10,7 +10,6 @@
 #' model_fitModel(raw_cell_means = TRUE)
 #' @author Murray Logan
 #' @export
-#' 
 model_fitModel <- function(raw_cell_means = TRUE){
 
   status::status_set_stage(stage = 4, title = "Model data")
@@ -24,7 +23,7 @@ model_fitModel <- function(raw_cell_means = TRUE){
   if (DOMAIN_CATEGORY == "site") {
     reefCloudPackage::model_fitModelSite(raw_cell_means)
   } else {
-    reefCloudPackage::model_fitModelTier_v2() 
+    reefCloudPackage::model_fitModelTier() 
     if (GENERATE_REPORT) reefCloudPackage::model_summariseModelTier()
   }
 

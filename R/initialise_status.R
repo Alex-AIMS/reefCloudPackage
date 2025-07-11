@@ -9,7 +9,7 @@
 #'     - status: the status of the item (determines symbol)\cr
 #' @return returned arguments description
 #' @examples examples
-#' @export
+##' @export
 initialise_status <- function() {
     ## Check if status file already exists
     ## if it does load it, otherwise build a new one

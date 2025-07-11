@@ -9,7 +9,7 @@
 #' get_status_name(stage = 3, item = "load_benthic_data")
 #' }
 #' @author Murray Logan
-
+##' @export
  get_status_name <- function(stage, item){
     status_$status[[stage]]$names[which(status_$status[[stage]]$item == item)]   
  }

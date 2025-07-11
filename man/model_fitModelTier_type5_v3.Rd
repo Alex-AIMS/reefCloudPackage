@@ -15,7 +15,7 @@ model_fitModelTier_type5_v3(data.grp.enough, tier.sf)
 Fits FRK model to monitoring data at a given tier level, including covariate processing, quality control, model fitting and predictions.
 }
 \examples{
-model_fitModelTier_type5_v2(my_data_filtered, my_tier_sf)
+model_fitModelTier_type5_v3(my_data_filtered, my_tier_sf)
 }
 \author{
 Julie Vercelloni

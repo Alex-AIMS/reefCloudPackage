@@ -4,7 +4,7 @@
 #' @param item item to be added
 #' @param label name of item to be added
 #' @param update_display boolean indicating if change to STATUS displayed on screen
-#' @export
+##' @export
 add_status <- function(stage, item, label, status, update_display = TRUE) {
     STATUS[[stage]]$items <- c(STATUS[[stage]]$items, item)
     STATUS[[stage]]$labels <- c(STATUS[[stage]]$labels, label)

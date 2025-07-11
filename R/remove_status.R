@@ -4,7 +4,7 @@
 #' @param parameters description
 #' @return returned arguments description
 #' @examples examples 
-#' @export
+##' @export
 remove_status <- function(stage, item) {
     wch <- which(STATUS[[stage]]$item == item)
     STATUS[[stage]]$items <- STATUS[[stage]]$items[-wch]

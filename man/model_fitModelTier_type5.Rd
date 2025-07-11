@@ -4,16 +4,19 @@
 \alias{model_fitModelTier_type5}
 \title{Fit model at tier level}
 \usage{
-model_fitModelTier_type5(data.grp, tier.sf)
+model_fitModelTier_type5(data.grp.enough, tier.sf)
 }
 \arguments{
-\item{data.grp}{data on which model is fitted}
+\item{data.grp.enough}{Data frame with sufficient data for modelling (filtered upstream)}
 
-\item{covs.hexpred}{covariates shapefile}
+\item{tier.sf}{Tier-level shapefile (e.g., Tier3 or Tier4 spatial scale)}
 }
 \description{
-Fits model to data at tier level
+Fits FRK model to monitoring data at a given tier level, including covariate processing, quality control, model fitting and predictions.
 }
 \examples{
-model_fitModelTier()
+model_fitModelTier_type5(my_data_filtered, my_tier_sf)
+}
+\author{
+Julie Vercelloni
 }
