@@ -63,9 +63,12 @@ The latest version of the modelling pipeline includes two statistical models:
 
 ## Run the modelling workflow 
 
-1. Load the package:
-```library(reefCloudPackage)```
-```library(status)```
+1. Load the packages:
+
+<pre lang="markdown"> 
+library(reefCloudPackage)
+library(status)
+</pre>
 
 2. Update function arguments for `AUS` region: 
 
@@ -80,16 +83,24 @@ args = c("--bucket=/data/AUS/",      #path to bucket
 ) </pre>
 
 3. Load function arguments:
-```reefCloudPackage::startMatter(args)```
+<pre lang="markdown"> 
+reefCloudPackage::startMatter(args)
+</pre>
 
 4. Load the data:
-```reefCloudPackage::model_loadData()```
+<pre lang="markdown"> 
+reefCloudPackage::model_loadData()
+</pre>
 
 5. Process the data:
-```reefCloudPackage::model_processData()```
+<pre lang="markdown"> 
+reefCloudPackage::model_processData()
+</pre>
 
 6. Fit the statistical models:
-```reefCloudPackage::model_fitModel()```
+<pre lang="markdown"> 
+reefCloudPackage::model_fitModel()
+</pre>
 
 ## Further Information
 `reefCloudPackage` is provided by the [Australian Institute of Marine Science](https://www.aims.gov.au/) under the MIT License ([MIT](https://opensource.org/license/mit)).
