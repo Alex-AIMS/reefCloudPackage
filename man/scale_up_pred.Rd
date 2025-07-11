@@ -19,3 +19,6 @@ to scale up predictions across different tiers, extract covariate effect sizes, 
 \examples{
 scale_up_pred("type6")
 }
+\author{
+Julie Vercelloni
+}
