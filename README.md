@@ -69,14 +69,15 @@ The latest version of the modelling pipeline includes two statistical models:
 
 2. Update function arguments for `AUS` region: 
 
-<pre lang="markdown"> ```r args = c("--bucket=/data/AUS/",      #path to bucket
+<pre lang="markdown"> 
+args = c("--bucket=/data/AUS/",      #path to bucket
          "--domain=tier",            #tier or site
          "--by_tier=5",              #tier level
          "--model_type=6",           #model used for predictions
          "--debug=true",             #debug mode
          "--runStage=1",             #current running stage
          "--refresh_data=false"      #reload data
-)``` </pre>
+) </pre>
 
 3. Load function arguments:
 ```reefCloudPackage::startMatter(args)```
