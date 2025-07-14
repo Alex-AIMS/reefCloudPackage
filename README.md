@@ -17,6 +17,8 @@
 
 **2: The latest version is dedicated exclusively to modelling coral cover values. Additional work is needed to explore the influences of cyclone exposure and heat stress events on other benthic groups.**
 
+**3: `00_for_dev.R` is for development only.**
+
 ## Content 
 
 This repository contains code to generate predicted coral cover values across multiple spatial scales. Model outputs are stored in the `<AWS_PATH>/outputs/tier` directory and include several CSV files (where `<AWS_PATH> = "--bucket=/data/*"`):
@@ -65,9 +67,11 @@ The latest version of the modelling pipeline includes two statistical models:
 A companion package, `status` provides progress updates in the R console during model execution and logs any error messages encountered.    
 
 ## Installation
-```docker pull ghcr.io/reefcloud/reefcloudpackage:main```
-```remotes::install_github('ReefCloud/reefCloudPackage', force = TRUE, dependencies = FALSE)```
-```remotes::install_github('open-AIMS/status', force = TRUE)```
+<pre lang="markdown"> 
+docker pull ghcr.io/reefcloud/reefcloudpackage:main
+remotes::install_github('ReefCloud/reefCloudPackage', force = TRUE, dependencies = FALSE)
+remotes::install_github('open-AIMS/status', force = TRUE)
+</pre>
 
 ## Run the modelling workflow 
 

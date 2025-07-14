@@ -9,4 +9,3 @@ data/global_settings.RData
 data/log/
 old.R
 tests/data
-00_main.R
