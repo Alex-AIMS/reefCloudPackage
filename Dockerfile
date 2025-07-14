@@ -201,6 +201,7 @@ RUN R -e "options(repos = \
 RUN R -e "options(repos = \
   list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
   remotes::install_github('ReefCloud/reefCloudPackage', ref = 'main');   \
+  remotes::install_github('open-AIMS/status', force = TRUE); \
 "  
 
 ## In order to get the covariates directly from the server
@@ -220,7 +221,11 @@ RUN R -e "options(repos = \
 
 RUN R -e "options(repos = \
   list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
+  install.packages('validate');   \
   install.packages('tidybayes');   \
+  install.packages('sn');   \
+  install.packages('pkgdown');   \
+  install.packages('usethis');   \
 "  
 
 RUN apt-get clean
