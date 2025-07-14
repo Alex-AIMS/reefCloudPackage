@@ -15,10 +15,7 @@
 
 **1: The `data/` directory is not publicly accessible. To run the modelling pipeline, please contact the ReefCloud team to request access. This repository is primarily intended for supporting the ReefCloud public dashboard.**
 
-
-**2: The `DATA_PATH` variable should be updated using the function ```reefCloudPackage::generateSettings()```.**
-
-**3: The latest version is dedicated exclusively to modelling coral cover values. Additional work is needed to explore the influences of cyclone exposure and heat stress events on other benthic groups.**
+**2: The latest version is dedicated exclusively to modelling coral cover values. Additional work is needed to explore the influences of cyclone exposure and heat stress events on other benthic groups.**
 
 ## Content 
 
