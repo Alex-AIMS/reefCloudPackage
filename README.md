@@ -19,7 +19,7 @@
 
 ## Content 
 
-This repository contains code to generate predicted coral cover values across multiple spatial scales. Model outputs are stored in the `AWS_PATH/outputs/tier` directory and include several CSV files:
+This repository contains code to generate predicted coral cover values across multiple spatial scales. Model outputs are stored in the `<AWS_PATH>/outputs/tier` directory and include several CSV files (where `<AWS_PATH> = "--bucket=/data/*"`):
 
 Eight files named `outputs_tier5-2.csv` are generated, each containing the following information:
 
@@ -65,9 +65,9 @@ The latest version of the modelling pipeline includes two statistical models:
 A companion package, `status` provides progress updates in the R console during model execution and logs any error messages encountered.    
 
 ## Installation
-
-```remotes::install_github('ReefCloud/reefCloudPackage', ref = 'add_status', force = TRUE, dependencies = FALSE)```
-```remotes::install_github('open-AIMS/status', ref = 'adapt', force = TRUE)```
+```docker pull ghcr.io/reefcloud/reefcloudpackage:main```
+```remotes::install_github('ReefCloud/reefCloudPackage', force = TRUE, dependencies = FALSE)```
+```remotes::install_github('open-AIMS/status', force = TRUE)```
 
 ## Run the modelling workflow 
 
@@ -81,7 +81,7 @@ library(status)
 2. Update function arguments for `AUS` region: 
 
 <pre lang="markdown"> 
-args = c("--bucket=/data/AUS/",      #path to bucket
+args = c("--bucket=/data/AUS/",      #<AWS_PATH>
          "--domain=tier",            #tier or site
          "--by_tier=5",              #tier level
          "--model_type=6",           #model used for predictions
