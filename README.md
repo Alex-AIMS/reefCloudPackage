@@ -12,12 +12,11 @@
 <!-- badges: end -->
 
 ## Warnings
+**1: To execute the modelling pipeline, run the `00_main.R` script. Note that `00_for_dev.R` is for development only.**
 
-**1: The `data/` directory is not publicly accessible. To run the modelling pipeline, please contact the ReefCloud team to request access. This repository is primarily intended for supporting the ReefCloud public dashboard.**
+**2: The `data/` directory is not publicly accessible. To run the modelling pipeline, please contact the ReefCloud team to request access. This repository is primarily intended for supporting the ReefCloud public dashboard.**
 
-**2: The latest version is dedicated exclusively to modelling coral cover values. Additional work is needed to explore the influences of cyclone exposure and heat stress events on other benthic groups.**
-
-**3: `00_for_dev.R` is for development only.**
+**3: The latest version is dedicated exclusively to modelling coral cover values. Additional work is needed to explore the influences of cyclone exposure and heat stress events on other benthic groups.**
 
 ## Content 
 
@@ -66,52 +65,10 @@ The latest version of the modelling pipeline includes two statistical models:
 
 A companion package, `status` provides progress updates in the R console during model execution and logs any error messages encountered.    
 
-## Installation
+## Workflow
 <pre lang="markdown"> 
 docker pull ghcr.io/reefcloud/reefcloudpackage:main
-remotes::install_github('ReefCloud/reefCloudPackage', force = TRUE, dependencies = FALSE)
-remotes::install_github('open-AIMS/status', force = TRUE)
-</pre>
-
-## Run the modelling workflow 
-
-1. Load the packages:
-
-<pre lang="markdown"> 
-library(reefCloudPackage)
-library(status)
-</pre>
-
-2. Update function arguments for `AUS` region: 
-
-<pre lang="markdown"> 
-args = c("--bucket=/data/AUS/",      #<AWS_PATH>
-         "--domain=tier",            #tier or site
-         "--by_tier=5",              #tier level
-         "--model_type=6",           #model used for predictions
-         "--debug=true",             #debug mode
-         "--runStage=1",             #current running stage
-         "--refresh_data=false"      #reload data
-) </pre>
-
-3. Load function arguments:
-<pre lang="markdown"> 
-reefCloudPackage::startMatter(args)
-</pre>
-
-4. Load the data:
-<pre lang="markdown"> 
-reefCloudPackage::model_loadData()
-</pre>
-
-5. Process the data:
-<pre lang="markdown"> 
-reefCloudPackage::model_processData()
-</pre>
-
-6. Fit the statistical models:
-<pre lang="markdown"> 
-reefCloudPackage::model_fitModel()
+run 00_main.R
 </pre>
 
 ## Further Information
