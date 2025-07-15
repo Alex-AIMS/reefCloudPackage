@@ -12,11 +12,13 @@
 <!-- badges: end -->
 
 ## Warnings
-**1: To execute the modelling pipeline, run the `00_main.R` script. Note that `00_for_dev.R` is for development only.**
+**1: To execute the modelling pipeline, run the `00_main.R` script.**
 
 **2: The `data/` directory is not publicly accessible. To run the modelling pipeline, please contact the ReefCloud team to request access. This repository is primarily intended for supporting the ReefCloud public dashboard.**
 
 **3: The latest version is dedicated exclusively to modelling coral cover values. Additional work is needed to explore the influences of cyclone exposure and heat stress events on other benthic groups.**
+
+**4. Note that `00_for_dev.R` is for development only.**
 
 ## Content 
 
