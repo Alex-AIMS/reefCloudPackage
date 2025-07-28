@@ -15,7 +15,7 @@ get_covariates <- function() {
   # get the geoserver info
   reefCloudPackage::get_geoserver_info()
   
-  cov_dhw <- reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "degrees_heating_weeks_tier")   
+  cov_dhw <-  reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "reefcloud:degrees_heating_weeks_tier", rc_client)   
   if (exists("cov_dhw") & !is.null(cov_dhw)) {
     cov_dhw <- sf::st_simplify(cov_dhw, dTolerance = 0.001) |>
       suppressMessages() |>
@@ -42,7 +42,7 @@ get_covariates <- function() {
   # get the geoserver info
   reefCloudPackage::get_geoserver_info()
 
-  cov_cyc <- reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "storm4m_exposure_year_tier")   
+  cov_cyc <-  reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "reefcloud:storm4m_exposure_year_tier", rc_client)   
   if (exists("cov_cyc") & !is.null(cov_cyc)) {
     cov_cyc <- sf::st_simplify(cov_cyc, dTolerance = 0.001) |>
       suppressMessages() |>
@@ -68,8 +68,8 @@ get_covariates <- function() {
 
 # Stop if both empty
     if (nrow(cov_dhw) == 0 & nrow(cov_cyc) == 0) {
-    #   msg <- paste("Disturbance layers not available from the Geoserver ")
-    #   reefCloudPackage::log("ERROR", logFile = LOG_FILE, "--Get covariates--", msg = msg)
+     msg <- paste("Disturbance layers not available from the geoserver")
+     status:::status_log("ERROR", logFile = log_file, "--Get covariates--", msg = msg)
     stop("No disturbance layers")
     }
 }
