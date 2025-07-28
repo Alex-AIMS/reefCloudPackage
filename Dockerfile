@@ -187,7 +187,7 @@ RUN R -e "options(repos = \
   install.packages('statmod');   \
   install.packages('TMB');   \
   install.packages('ggpubr');   \
-  remotes::install_github('andrewzm/FRK', ref = '2023_03_RandomEffects');   \
+  remotes::install_github('andrewzm/FRK');   \
   install.packages('rnaturalearth');   \
   install.packages('rnaturalearthdata');   \
   install.packages('ggnewscale');   \
