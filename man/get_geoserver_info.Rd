@@ -12,8 +12,7 @@ This function loads available reefCloud layers and geoserver URL into the global
 }
 \examples{
 get_geoserver_info()
-# This will load `geo_info` in the global environment 
-# with `rc_lyrs` (available layers) and `url` (parsed URL).
+# This will load `rc_client` in the global environment 
 }
 \author{
 Murray Logan

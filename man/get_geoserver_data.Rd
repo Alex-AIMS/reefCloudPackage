@@ -18,11 +18,11 @@ A spatial data frame containing the filtered data from the geoserver.
 Downloads and filters spatial data from the geoserver for a specified tier and coverage name.
 }
 \details{
-Requires BY_TIER, DATA_PATH, and geo_info to be available in the environment.
+Requires BY_TIER, DATA_PATH, and rc_client to be available in the environment.
 }
 \examples{
 get_geoserver_info()
-cov_data <- get_geoserver_data(Tier = 4, cov_name = "degrees_heating_weeks_tier")
+cov_data <- get_geoserver_data(Tier = 4, cov_name = "degrees_heating_weeks_tier", rc_client)
 }
 \author{
 Murray Logan
