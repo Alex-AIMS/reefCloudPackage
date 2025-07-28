@@ -4,7 +4,7 @@
 \alias{get_geoserver_data}
 \title{Get Data from Geoserver}
 \usage{
-get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = NULL)
+get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = NULL, rc_client)
 }
 \arguments{
 \item{Tier}{An integer indicating the tier of the data to be retrieved.}
