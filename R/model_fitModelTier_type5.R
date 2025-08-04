@@ -49,11 +49,11 @@ model_fitModelTier_type5 <- function(data.grp.enough, tier.sf){
     selected_covar <- reefCloudPackage::select_covariates(HexPred_sf, i , N) 
 
     ## Scale covariates
-    HexPred_sf <- HexPred_sf |>
-      dplyr::mutate(across(
-       matches("^severity.*|^max.*"),
-      ~ as.numeric((. - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE))
-     ))
+   # HexPred_sf <- HexPred_sf |>
+   #   dplyr::mutate(across(
+   #    matches("^severity.*|^max.*"),
+   #   ~ as.numeric((. - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE))
+   #  ))
 
     ## Add reefid and fill missing years
     covs.hexpred_tier_sf_v2_prep <- reefCloudPackage::make_reefid(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) 
