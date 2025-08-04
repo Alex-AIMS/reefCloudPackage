@@ -11,6 +11,6 @@
 #' @export
 
 get_lag_cov <- function(yr, cov, tier5, .x) {
-  val <- cov %>% filter(Tier5 == Tier5, year == yr) %>% pull(.x)
+  val <- cov %>% filter(Tier5 == tier5, year == yr) %>% pull(.x)
   return(ifelse(length(val) == 0, 0, val))
 }
