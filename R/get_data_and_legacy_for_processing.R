@@ -9,7 +9,6 @@
 get_data_and_legacy_for_processing <- function() {
   status::status_try_catch(
   {
-    ## reefCloudPackage::ReefCloud_tryCatch({
     load(file=paste0(DATA_PATH, "processed/Part1_", RDATA_FILE))
     data <- data %>%
       dplyr::mutate(DATA_TYPE = "Data",

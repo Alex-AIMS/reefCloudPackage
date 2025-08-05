@@ -20,6 +20,7 @@ make_tiers_lookup <- function() {
         dplyr::select(-one_of('Group_2')) %>%
         suppressMessages() %>%
         suppressWarnings()
+    TIERS <- c('tier2', 'tier3', 'tier4', 'tier5')
     for (i in TIERS[TIERS!='tier5']) {
         load(paste0(DATA_PATH, 'primary/', i, '.sf.RData'))
         tiers.sf <- tiers.sf %>%

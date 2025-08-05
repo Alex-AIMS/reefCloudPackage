@@ -9,7 +9,7 @@
 #' }
 #' @author Murray Logan
 #' @export
-prepare_covariates <- function(data) {
+prepare_covariates <- function() {
   status::status_try_catch(
   {
     load(file=paste0(DATA_PATH, "processed/", RDATA_FILE))

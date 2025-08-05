@@ -4,7 +4,7 @@
 \alias{prepare_covariates}
 \title{Prepare Covariates}
 \usage{
-prepare_covariates(data)
+prepare_covariates()
 }
 \arguments{
 \item{data}{The benthic data frame used to align and join covariates.}

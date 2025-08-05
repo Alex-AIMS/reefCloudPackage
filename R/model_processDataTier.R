@@ -19,8 +19,6 @@
 #' @export
 
 model_processDataTier <- function(){
- #if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
-
   # Load legacy and current benthic data
   data <- reefCloudPackage::get_data_and_legacy_for_processing()
 
@@ -33,7 +31,7 @@ model_processDataTier <- function(){
   # Aggregate and prepare data for modelling:
   # - Summarise point data by year, depth, transect, and benthic group
   # - Compute proportional cover
-  reefCloudPackage::prepare_data(data) 
+  data <- reefCloudPackage::prepare_data(data) 
 
   # Load and process environmental covariates (e.g., temperature, waves)
   reefCloudPackage::prepare_covariates() 

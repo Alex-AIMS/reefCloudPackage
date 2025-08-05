@@ -33,13 +33,13 @@ add_cov_to_data <- function(data, cov, cov_name) {
     dplyr::arrange(fYEAR) %>% 
     dplyr::rowwise() %>% 
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  list(~adjust_cov_for_after_surveys(DATE, end_date, cov, tier5, cur_column())),
+                  list(~adjust_cov_for_after_surveys(DATE, end_date, cov, Tier5, cur_column())),
                   .names = "{.col}")) %>% 
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  list(lag1 =  ~ get_lag_cov(REPORT_YEAR-1, cov, tier5, cur_column())),
+                  list(lag1 =  ~ get_lag_cov(REPORT_YEAR-1, cov, Tier5, cur_column())),
                   .names = "{.col}.{.fn}")) %>% 
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  list(lag2 =  ~ get_lag_cov(REPORT_YEAR-2, cov, tier5, cur_column())),
+                  list(lag2 =  ~ get_lag_cov(REPORT_YEAR-2, cov, Tier5, cur_column())),
                   .names = "{.col}.{.fn}")) %>% 
     dplyr::select(-end_date) %>% 
     dplyr::ungroup()
