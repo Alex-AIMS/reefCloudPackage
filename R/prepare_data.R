@@ -40,7 +40,8 @@ prepare_data <- function(data) {
         TOTAL = ifelse(!is.na(COVER), NA, TOTAL),
         PERC_COVER = ifelse(!is.na(COVER), NA, PERC_COVER)) %>%
       suppressMessages() %>%
-      suppressWarnings() ->
+      suppressWarnings() %>%
+      filter(fGROUP == "HARD CORAL") ->  # for the benchmarking only 
       data
     save(data, file=paste0(DATA_PATH, "processed/", RDATA_FILE))
     write_csv(data %>% dplyr::select(-fYEAR),
