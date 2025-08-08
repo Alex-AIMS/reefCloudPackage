@@ -72,10 +72,10 @@ model_fitModelTier_type5 <- function(data.grp.enough, tier.sf){
     ## Remove obs outside covariate grid
     data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2, i , N)    
 
-    ## Stop if more than 30% of observations are outside tier5 cells 
+    ## Stop if more than 10% of observations are outside tier5 cells 
     diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
 
-     if (diff_perc > 30) {
+     if (diff_perc > 10) {
        msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
        status:::status_log("ERROR", log_file = log_file, "--Fitting FRK model--", msg = msg)
      next

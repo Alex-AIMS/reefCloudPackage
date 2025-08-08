@@ -118,8 +118,8 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
    # model_formula <- as.formula(result_rank$formula)
 
     ## Fit FRK model
-    status::status_try_catch(
-     {
+   # status::status_try_catch(
+   #  {
     M <- FRK(
       f = model_formula,
       data = list(obj_frk$STObj),
@@ -141,12 +141,12 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
         }
       status:::update_status_name(stage = 4, item = "FRK_fit", name = new_item_name)
 
-     },
-     stage_ = 4,
-     order_ = 10,
-     name_ = "Fit FRK model",
-     item_ = "FRK_fit"
-   )
+    # },
+    # stage_ = 4,
+    # order_ = 10,
+    # name_ = "Fit FRK model",
+    # item_ = "FRK_fit"
+   #)
   
     ## Handle failed model
     if (length(M) == 0) {
@@ -179,8 +179,8 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
   #   ##############################
   #   #### Save outputs
   #   ##############################
-    status::status_try_catch(
-     {
+    #status::status_try_catch(
+    # {
     saveRDS(
       list(
         form = model_formula,
@@ -201,11 +201,11 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
         }
       status:::update_status_name(stage = 4, item = "FRK_saved", name = new_item_name)
 
-     },
-     stage_ = 4,
-     order_ = 11,
-     name_ = "Saved FRK outputs",
-     item_ = "FRK_saved"
-   )
+    # },
+    # stage_ = 4,
+    # order_ = 11,
+    # name_ = "Saved FRK outputs",
+    # item_ = "FRK_saved"
+   #)
    }
 }
