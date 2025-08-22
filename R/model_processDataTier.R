@@ -31,8 +31,7 @@ model_processDataTier <- function(){
   # Aggregate and prepare data for modelling:
   # - Summarise point data by year, depth, transect, and benthic group
   # - Compute proportional cover
-  data <- reefCloudPackage::prepare_data(data) %>%
-   filter(fGROUP == "HARD CORAL") # for the benchmarking only 
+  data <- reefCloudPackage::prepare_data(data) 
 
   # Load and process environmental covariates (e.g., temperature, waves)
   reefCloudPackage::prepare_covariates() 
