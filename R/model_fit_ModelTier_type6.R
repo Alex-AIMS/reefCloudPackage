@@ -6,9 +6,6 @@
 #' @author Julie Vercelloni
 #' @export
 model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
-  # status::status_try_catch(
-  # {
-
   # Define spatial scale
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
   data.grp <- data.grp.not.enough
@@ -28,15 +25,6 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       dplyr::filter(data.grp[[FOCAL_TIER]] == TIER) |>
       dplyr::select(-COVER) |>
       dplyr::mutate(across(Tier5, as.character))
-
-    #--- Check if enough data, at least two monitored years
-    test_tier <- reefCloudPackage::filter_focaltier_enough(data.grp.tier, FOCAL_TIER, n.spat = 1, n.temp = 2, i, N)
-    
-     if (nrow(test_tier) == 0) {
-       msg <- paste("Not enough observations for", FOCAL_TIER, ":", TIER)
-       status:::status_log("ERROR", log_file = log_file, "--Fitting model--", msg = msg)
-     next
-    }
 
     #--- Join covariates
     tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf, i, N) |>

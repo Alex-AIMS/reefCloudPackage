@@ -60,8 +60,13 @@ model_fitModelTier <- function() {
        # Filtered-out tiers (insufficient data) 
        # Define focal tier (e.g. Tier4)
        FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
+
        data.grp.not.enough <- reefCloudPackage::filter_focaltier_not_enough(data.grp, FOCAL_TIER, n.spat = 3, n.temp = 2, i =1 , N = 1)
        reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
+      
+       # Remove all datasets from the primary and processed data folders (as not needed anymore)
+      unlink(list.files(paste0(DATA_PATH, "primary/"), full.names = TRUE), recursive = TRUE)
+      unlink(list.files(paste0(DATA_PATH, "processed/"), full.names = TRUE), recursive = TRUE)
 
        # Scale-up predictions
        reefCloudPackage::scale_up_pred("type6") 
