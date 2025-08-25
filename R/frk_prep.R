@@ -62,8 +62,8 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2, i , N) {
       basis <- FRK::auto_basis(STplane(),
                           ST_BAUs,
                           tunit = "years",
-                          nres = 2L, #for dev
-                          #nres = 3L,
+                          #nres = 2L, #for dev
+                          nres = 3L,
                           regular = TRUE)
     # Update status 
       old_item_name <- get_status_name(4, "prep_FRK_objects")
