@@ -52,11 +52,20 @@ model_perc <- post_dist_df_all %>%
 tables <- list(sum_area, year_range, data_perc, model_perc)
 
 # Iteratively left join all by `tier_col`
-all_info <- reduce(tables, left_join, by = tier_col)  %>%
-            dplyr::rename(
-              Size.area = sum_area, Year.range = year_range, data.tier = data,
-              new.tier = new, FRK.prop = FRK,
-              INLA.prop = INLA
-            ) 
+all_info <- reduce(tables, left_join, by = tier_col) %>%
+  dplyr::rename(
+    Size.area = sum_area,
+    Year.range = year_range,
+    data.tier = data,
+    new.tier = new
+  )
+
+# ensure FRK and INLA exist
+if (!"FRK" %in% names(all_info)) all_info$FRK <- 0
+if (!"INLA" %in% names(all_info)) all_info$INLA <- 0
+
+all_info <- all_info %>%
+  rename(FRK.prop = FRK, INLA.prop = INLA)
+  
 return(all_info)
 }
