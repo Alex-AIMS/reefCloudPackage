@@ -29,6 +29,7 @@ get_tiers <- function() {
         }
       }
     }
+    rm(tier.sf)
     if (DATA_FROM == "S3") {
       for (i in 2:5) {
         reefCloudPackage::load_aws(file = "tiers", i, ".zip", level = "primary/GIS")

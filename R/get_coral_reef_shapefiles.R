@@ -26,6 +26,7 @@ get_coral_reef_shape_files <- function() {
         DATA_PATH,
         "/primary/reef_layer.sf.RData"
       ))
+      rm(reef_layer.sf)
       sf_files <- list.files(path = paste0(DATA_PATH, "/primary/"),
                              pattern = "reef_500_poly.*",
                              full.names = TRUE)
