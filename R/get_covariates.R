@@ -36,7 +36,6 @@ get_covariates <- function() {
       suppressMessages() |>
       suppressWarnings()
     save(cov_dhw, file = paste0(DATA_PATH, "primary/covariate_dhw.RData"))
-    rm(cov_dhw)
   }
 
   ## --- Cyclones ---
@@ -65,7 +64,6 @@ get_covariates <- function() {
       suppressMessages() |>
       suppressWarnings()
     save(cov_cyc, file = paste0(DATA_PATH, "primary/covariate_cyc.RData"))
-    rm(cov_cyc)
   }
 
 # Stop if both empty
@@ -74,4 +72,6 @@ get_covariates <- function() {
      status:::status_log("ERROR", logFile = log_file, "--Get covariates--", msg = msg)
     stop("No disturbance layers")
     }
+
+  rm(cov_cyc, cov_dhw)
 }
