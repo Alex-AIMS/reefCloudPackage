@@ -29,7 +29,8 @@ model_loadData_unix <- function(){
   ## 4. Validate data
   rules <- reefCloudPackage::validate_rules()
   result <- reefCloudPackage::validate_benthic_data(data, rules) 
-  
+  rm(rules, result)
+
   ## 4. Save data
   reefCloudPackage::save_benthic_data(data)
   

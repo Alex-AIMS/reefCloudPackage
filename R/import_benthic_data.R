@@ -11,12 +11,8 @@ import_benthic_data <- function() {
   {
     ## Read data into a R
     data <- read_csv(paste0(DATA_PATH, "primary/", CSV_FILE),
-      ## col_types = "cdccccdddddcdTcdcc",
-      ## col_types = "cdcddccccdTcdcc",
       col_types = "cdcddccdcdTcdcc",
-      #col_types = "cicddcciciTcicc",
       trim_ws = TRUE) %>%
-      #lazy = TRUE
       mutate(SITE_DEPTH = as.character(SITE_DEPTH))
   },
   stage_ = 2,

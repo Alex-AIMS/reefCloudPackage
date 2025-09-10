@@ -18,6 +18,7 @@ unzip_benthic_data <- function() {
         cli_alert_success("Benthic data successfully unzipped to: {.file {paste0(DATA_PATH, 'primary/')}}")
       }
     }
+  file.remove(paste0(DATA_PATH, "primary/",FILENAME, ".zip"))
   },
   stage_ = 2,
   order_ = 2,

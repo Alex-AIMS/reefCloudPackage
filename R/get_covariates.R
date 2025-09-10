@@ -36,6 +36,7 @@ get_covariates <- function() {
       suppressMessages() |>
       suppressWarnings()
     save(cov_dhw, file = paste0(DATA_PATH, "primary/covariate_dhw.RData"))
+    rm(cov_dhw)
   }
 
   ## --- Cyclones ---
@@ -64,6 +65,7 @@ get_covariates <- function() {
       suppressMessages() |>
       suppressWarnings()
     save(cov_cyc, file = paste0(DATA_PATH, "primary/covariate_cyc.RData"))
+    rm(cov_cyc)
   }
 
 # Stop if both empty
