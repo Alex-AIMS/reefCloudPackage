@@ -25,11 +25,12 @@ prepare_covariates <- function() {
     load(paste0(DATA_PATH, 'primary/tier', BY_TIER, '.sf.RData'))
     
       for (f in files) {
+      
         cov_name <- gsub('.*covariate_(.*).RData', '\\1', f)
         cov <- get(load(file = f))
 
         ## join to benthic data
-        data <- data %>% reefCloudPackage::add_cov_to_data(data, cov, cov_name) 
+        data <- reefCloudPackage::add_cov_to_data(data, cov, cov_name) 
 
         ## fill in the missing years for each Tier5 in the covariates
         year_range <- data %>% dplyr::pull(REPORT_YEAR) %>% range()
