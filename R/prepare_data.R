@@ -45,6 +45,7 @@ prepare_data <- function(data) {
     save(data, file=paste0(DATA_PATH, "processed/", RDATA_FILE))
     write_csv(data %>% dplyr::select(-fYEAR),
       file = paste0(AWS_OUTPUT_PATH, gsub('.csv','_tier.csv', CSV_FILE)))
+    rm(data)
     if (!DEBUG_MODE) cli_alert_success("Benthic data successfully processed")
     if (GENERATE_REPORT) {
       ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
@@ -58,5 +59,5 @@ prepare_data <- function(data) {
   name_ = "Prepare data",
   item_ = "prepare_data"
   )
-  return(data)
+#  return(data)
 }

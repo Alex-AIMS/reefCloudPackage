@@ -36,6 +36,7 @@ make_tiers_lookup <- function() {
         suppressMessages() %>%
         suppressWarnings()
     save(tiers.lookup, file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+    rm(tiers.lookup, tiers.sf, TIERS)
   },
   stage_ = 3,
   order_ = 4,

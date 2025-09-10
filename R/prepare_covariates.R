@@ -12,24 +12,28 @@
 prepare_covariates <- function() {
   status::status_try_catch(
   {
-    load(file=paste0(DATA_PATH, "processed/", RDATA_FILE))
-    load(paste0(DATA_PATH, 'primary/tier', BY_TIER, '.sf.RData'))
     files <- list.files(path = paste0(DATA_PATH, "primary"),
       pattern = "covariate.*.RData$",
       full.names = TRUE)
     files <- gsub("//", "/", files)
+   
     if (length(files)>0) {
       cov_list <- vector("list", length(files)) 
       names(cov_list) <- gsub('.*covariate_(.*).RData', '\\1', files)
+    
+    load(file=paste0(DATA_PATH, "processed/", RDATA_FILE))
+    load(paste0(DATA_PATH, 'primary/tier', BY_TIER, '.sf.RData'))
+    
       for (f in files) {
         cov_name <- gsub('.*covariate_(.*).RData', '\\1', f)
         cov <- get(load(file = f))
 
         ## join to benthic data
-        data <- data %>% reefCloudPackage::add_cov_to_data(cov, cov_name) 
+        data <- data %>% reefCloudPackage::add_cov_to_data(data, cov, cov_name) 
 
         ## fill in the missing years for each Tier5 in the covariates
         year_range <- data %>% dplyr::pull(REPORT_YEAR) %>% range()
+
         full_cov_lookup <- data.frame(year = seq(year_range[1], year_range[2], by =  1)) %>%
           tidyr::crossing(Tier5 = unique(tier.sf$Tier5)) %>%
           dplyr::arrange(Tier5)
@@ -42,6 +46,7 @@ prepare_covariates <- function() {
       save(full_cov, file=paste0(DATA_PATH, "processed/", "covariates_full_tier5.RData"))
       assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))
       save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE)) 
+      rm(full_cov, full_cov_lookup, year_range, data)
     }
   },
   stage_ = 3,

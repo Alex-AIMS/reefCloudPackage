@@ -31,8 +31,8 @@ model_processDataTier <- function(){
   # Aggregate and prepare data for modelling:
   # - Summarise point data by year, depth, transect, and benthic group
   # - Compute proportional cover
-  data <- reefCloudPackage::prepare_data(data) 
+  reefCloudPackage::prepare_data(data) # data <- 
 
-  # Load and process environmental covariates (e.g., temperature, waves)
+  # Load and process environmental covariates (e.g., cyclones, heat stress)
   reefCloudPackage::prepare_covariates() 
 }

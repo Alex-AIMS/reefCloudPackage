@@ -19,7 +19,6 @@
 #' @author Murray Logan
 #' @export
 model_processData <- function(){
- # if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
   status::status_set_stage(stage = 3, title = "Process data")
 
   ## load in the benthic data
@@ -31,6 +30,7 @@ model_processData <- function(){
       dplyr::rename(any_of(c("REEF" = "REEF_NAME", "REEF" = "SITE_NAME"))) %>%
       mutate(VARIABLE ="ALL")
     save(data, file=paste0(DATA_PATH, "processed/Part1_", RDATA_FILE))
+   rm(data)
   },
   stage_ = 3,
   order_ = 1,
@@ -49,6 +49,7 @@ model_processData <- function(){
           any_of(c("ID" = "ELEMENT_ID"))) %>%
         mutate(VARIABLE ="ALL")
       save(legacy_data, file=paste0(DATA_PATH, "processed/Part1_", gsub('reef', 'legacy', RDATA_FILE)))
+    rm(legacy_data)
     },
     stage_ = 3,
     order_ = 2,

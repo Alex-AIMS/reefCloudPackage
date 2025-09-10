@@ -30,7 +30,7 @@ assign_spatial_data <- function(data) {
     data <- data %>%
       dplyr::left_join(data.site) %>%
       suppressMessages()
-
+    rm(data.site)
     data <- data %>% dplyr::filter(!is.na(GROUP_DESC))  # this is necessary to counteract spurious joins to tiers
     if (!DEBUG_MODE) cli_alert_success("Spatial domains successfully applied to the benthic data")
   },
