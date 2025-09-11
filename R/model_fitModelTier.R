@@ -63,15 +63,11 @@ model_fitModelTier <- function() {
 
        data.grp.not.enough <- reefCloudPackage::filter_focaltier_not_enough(data.grp, FOCAL_TIER, n.spat = 3, n.temp = 2, i =1 , N = 1)
        reefCloudPackage::model_fitModelTier_type6(data.grp.not.enough, tier.sf)
-      
-       # Remove all datasets from the primary and processed data folders (as not needed anymore)
-      unlink(list.files(paste0(DATA_PATH, "primary/"), full.names = TRUE), recursive = TRUE)
-      unlink(list.files(paste0(DATA_PATH, "processed/"), full.names = TRUE), recursive = TRUE)
 
        # Scale-up predictions
-       reefCloudPackage::scale_up_pred("type6") 
+       #reefCloudPackage::scale_up_pred("type6") 
 
        # Attribute changes - effect size of disturbances
-       reefCloudPackage::attribute_changes()
+       #reefCloudPackage::attribute_changes()
      }
 }

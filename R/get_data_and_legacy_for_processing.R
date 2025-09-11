@@ -23,8 +23,8 @@ get_data_and_legacy_for_processing <- function() {
     }
     data <- data %>% dplyr::mutate(DATA_TYPE = factor(DATA_TYPE))
   file.remove(paste0(DATA_PATH, "processed/Part1_", RDATA_FILE))
-  file.remove(paste0(DATA_PATH, "processed/Part1_",
-        gsub("reef", "legacy", RDATA_FILE)))
+  #file.remove(paste0(DATA_PATH, "processed/Part1_",
+  #      gsub("reef", "legacy", RDATA_FILE)))
   },
   stage_ = 3,
   order_ = 3,
