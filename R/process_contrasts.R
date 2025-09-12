@@ -50,4 +50,6 @@ process_contrasts <- function(cellmeans_wide, tier_col) {
     ggdist::median_hdci(value) |>
     select(-.width, -.interval) |>
     left_join(direction_arrow, by = "year")
+  
+  rm(plot_data, fold_change, direction_arrow)
 }

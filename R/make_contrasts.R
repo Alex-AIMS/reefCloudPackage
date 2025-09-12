@@ -18,5 +18,6 @@ make_contrasts <- function(pred_tierIndex, tier_col) {
   
   # Now process contrasts on each list
   predictions_list <- map(cellmeans_wide_list, ~reefCloudPackage::process_contrasts(.x, tier_col = tier_col))
+  rm(cellmeans_wide_list)
   return(predictions_list)
 }

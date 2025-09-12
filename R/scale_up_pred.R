@@ -14,8 +14,11 @@ scale_up_pred <- function(whichModel) {
   status::status_try_catch({
 
     # ---- Load input data tables for modelling ----
-    reefCloudPackage::load_data_for_model()
+   # reefCloudPackage::load_data_for_model()
 
+
+  #  load(file.path(DATA_PATH, "primary", "tier5.sf.RData"), envir = .GlobalEnv)
+  
     # ---- CASE 1: FRK/INLA model output (type5/type6) ----
     if (whichModel %in% c("type5", "type6")) {
       
@@ -63,6 +66,8 @@ scale_up_pred <- function(whichModel) {
           )
       }
 
+      rm(data_list)
+
       # Keep only valid elements
       post_dist_df_list <- post_dist_df_list |> purrr::keep(~ "model_name" %in% names(.x))
 
@@ -79,10 +84,8 @@ scale_up_pred <- function(whichModel) {
         ) |>
         dplyr::select(fYEAR, Tier5, id_loc, draw, pred, model_name, tier_type)
       )
-
-      # Bind all Tier5 rows
-      post_dist_df_tier5 <- dplyr::bind_rows(post_dist_df_list) %>%
-        dplyr::left_join(tiers.lookup)
+    
+    load(file.path(DATA_PATH, "primary", "tiers.lookup.RData"), envir = .GlobalEnv)
 
       # Bind and weight all tiers
       post_dist_df_all <- dplyr::bind_rows(post_dist_df_list) %>%
@@ -91,24 +94,7 @@ scale_up_pred <- function(whichModel) {
           reef_area = reef_area / 1000000,
           weighted_pred = pred * reef_area
         )
-
-      # Log warnings for NAs
-      if (anyNA(post_dist_df_tier5) || anyNA(post_dist_df_all)) {
-        msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
-        status:::status_log("WARNING", log_file = log_file, "--Model predictions--", msg = msg)
-      }
-
-      # Drop NA rows (likely wrongly saved)
-      post_dist_df_tier5 <- post_dist_df_tier5 %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
-      post_dist_df_all <- post_dist_df_all %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
-
-      # Stop if empty
-      if (nrow(post_dist_df_tier5) == 0) {
-        msg <- paste("No model outputs for the region")
-        status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
-        stop("No model outputs found")
-      }
-
+      
       # ---- Process outputs for all tiers (data + new) ----
       for (tierIndex in seq(as.numeric(BY_TIER), 2)) {
 
@@ -123,6 +109,20 @@ scale_up_pred <- function(whichModel) {
               .groups = "drop"
             ) %>%
             dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
+        
+        predictions <- reefCloudPackage::make_contrasts(pred_tierIndex, tier_col)
+
+        pred_tierIndex <- dplyr::bind_rows(predictions) %>%
+            dplyr::rename(
+              Median = value, Lower = .lower, Upper = .upper,
+              Fold.Change = fold_change, P.up = prob_up,
+              P.down = prob_down, Change = arrow, Model.name = model_name,
+              Year = year
+            ) %>%
+            dplyr::select(
+              !!sym(tier_col), Year, Median, Lower, Upper, Fold.Change, P.up, P.down, Change, Model.name
+            )
+
 
         } else if (tier_col == "Tier4") {
 
@@ -140,9 +140,9 @@ scale_up_pred <- function(whichModel) {
             ) %>%
             dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
 
-          predictions <- reefCloudPackage::make_contrasts(pred_tierIndex, tier_col)
+        predictions <- reefCloudPackage::make_contrasts(pred_tierIndex, tier_col)
 
-          pred_tierIndex <- dplyr::bind_rows(predictions) %>%
+        pred_tierIndex <- dplyr::bind_rows(predictions) %>%
             dplyr::rename(
               Median = value, Lower = .lower, Upper = .upper,
               Fold.Change = fold_change, P.up = prob_up,
@@ -170,9 +170,9 @@ scale_up_pred <- function(whichModel) {
             ) %>%
             dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
 
-          predictions <- reefCloudPackage::make_contrasts(pred_tierIndex, tier_col)
+        predictions <- reefCloudPackage::make_contrasts(pred_tierIndex, tier_col)
 
-          pred_tierIndex <- dplyr::bind_rows(predictions) %>%
+        pred_tierIndex <- dplyr::bind_rows(predictions) %>%
             dplyr::rename(
               Median = value, Lower = .lower, Upper = .upper,
               Fold.Change = fold_change, P.up = prob_up,
@@ -202,8 +202,35 @@ scale_up_pred <- function(whichModel) {
           quote = "none"
         )
       }
+      
+      rm(pred_tierIndex, info_region)
 
       # ---- Process data-only tiers ----
+
+      # Bind all Tier5 rows
+      post_dist_df_tier5 <- dplyr::bind_rows(post_dist_df_list) %>%
+        dplyr::left_join(tiers.lookup)
+
+      rm(post_dist_df_list)
+
+      # Log warnings for NAs
+      if (anyNA(post_dist_df_tier5) || anyNA(post_dist_df_all)) {
+        msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
+        status:::status_log("WARNING", log_file = log_file, "--Model predictions--", msg = msg)
+      }
+
+      # Drop NA rows (likely wrongly saved)
+      post_dist_df_tier5 <- post_dist_df_tier5 %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
+      post_dist_df_all <- post_dist_df_all %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
+
+      # Stop if empty
+      if (nrow(post_dist_df_tier5) == 0) {
+        msg <- paste("No model outputs for the region")
+        status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
+        stop("No model outputs found")
+      }
+
+
       for (tierIndex in seq(as.numeric(BY_TIER), 2)) {
 
         tier_col <- paste0("Tier", tierIndex)
@@ -218,6 +245,19 @@ scale_up_pred <- function(whichModel) {
               .groups = "drop"
             ) %>%
             dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
+
+          predictions <- reefCloudPackage::make_contrasts(pred_tierIndex, tier_col)
+
+          pred_tierIndex <- dplyr::bind_rows(predictions) %>%
+            dplyr::rename(
+              Median = value, Lower = .lower, Upper = .upper,
+              Fold.Change = fold_change, P.up = prob_up,
+              P.down = prob_down, Change = arrow, Model.name = model_name,
+              Year = year
+            ) %>%
+            dplyr::select(
+              !!sym(tier_col), Year, Median, Lower, Upper, Fold.Change, P.up, P.down, Change, Model.name
+            )
 
         } else if (tier_col == "Tier4") {
 
