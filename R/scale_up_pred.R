@@ -15,8 +15,6 @@ scale_up_pred <- function(whichModel) {
 
     # ---- Load input data tables for modelling ----
    # reefCloudPackage::load_data_for_model()
-
-
   #  load(file.path(DATA_PATH, "primary", "tier5.sf.RData"), envir = .GlobalEnv)
   
     # ---- CASE 1: FRK/INLA model output (type5/type6) ----
@@ -66,7 +64,7 @@ scale_up_pred <- function(whichModel) {
           )
       }
 
-      rm(data_list)
+      rm(data.list)
 
       # Keep only valid elements
       post_dist_df_list <- post_dist_df_list |> purrr::keep(~ "model_name" %in% names(.x))
@@ -94,7 +92,30 @@ scale_up_pred <- function(whichModel) {
           reef_area = reef_area / 1000000,
           weighted_pred = pred * reef_area
         )
-      
+    
+      # Bind all Tier5 rows
+      post_dist_df_tier5 <- dplyr::bind_rows(post_dist_df_list) %>%
+        dplyr::left_join(tiers.lookup)
+
+      rm(post_dist_df_list)
+
+      # Log warnings for NAs
+      if (anyNA(post_dist_df_tier5) || anyNA(post_dist_df_all)) {
+        msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
+        status:::status_log("WARNING", log_file = log_file, "--Model predictions--", msg = msg)
+      }
+
+      # Drop NA rows (likely wrongly saved)
+      post_dist_df_tier5 <- post_dist_df_tier5 %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
+      post_dist_df_all <- post_dist_df_all %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
+
+      # Stop if empty
+      if (nrow(post_dist_df_tier5) == 0) {
+        msg <- paste("No model outputs for the region")
+        status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
+        stop("No model outputs found")
+      }
+
       # ---- Process outputs for all tiers (data + new) ----
       for (tierIndex in seq(as.numeric(BY_TIER), 2)) {
 
@@ -206,30 +227,6 @@ scale_up_pred <- function(whichModel) {
       rm(pred_tierIndex, info_region)
 
       # ---- Process data-only tiers ----
-
-      # Bind all Tier5 rows
-      post_dist_df_tier5 <- dplyr::bind_rows(post_dist_df_list) %>%
-        dplyr::left_join(tiers.lookup)
-
-      rm(post_dist_df_list)
-
-      # Log warnings for NAs
-      if (anyNA(post_dist_df_tier5) || anyNA(post_dist_df_all)) {
-        msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
-        status:::status_log("WARNING", log_file = log_file, "--Model predictions--", msg = msg)
-      }
-
-      # Drop NA rows (likely wrongly saved)
-      post_dist_df_tier5 <- post_dist_df_tier5 %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
-      post_dist_df_all <- post_dist_df_all %>% dplyr::filter(if_all(everything(), ~ !is.na(.)))
-
-      # Stop if empty
-      if (nrow(post_dist_df_tier5) == 0) {
-        msg <- paste("No model outputs for the region")
-        status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
-        stop("No model outputs found")
-      }
-
 
       for (tierIndex in seq(as.numeric(BY_TIER), 2)) {
 
