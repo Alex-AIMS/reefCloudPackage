@@ -187,7 +187,7 @@ RUN R -e "options(repos = \
   install.packages('statmod');   \
   install.packages('TMB');   \
   install.packages('ggpubr');   \
-  remotes::install_github('andrewzm/FRK');   \
+  remotes::install_github('andrewzm/FRK', ref = 'sumaggregation');   \
   install.packages('rnaturalearth');   \
   install.packages('rnaturalearthdata');   \
   install.packages('ggnewscale');   \
@@ -226,6 +226,7 @@ RUN R -e "options(repos = \
   install.packages('sn');   \
   install.packages('pkgdown');   \
   install.packages('usethis');   \
+  install.packages('Qtools'); \
 "  
 
 RUN apt-get clean
