@@ -17,7 +17,7 @@ scale_up_pred <- function(whichModel) {
    # reefCloudPackage::load_data_for_model()
   #  load(file.path(DATA_PATH, "primary", "tier5.sf.RData"), envir = .GlobalEnv)
   
-    # ---- CASE 1: FRK/INLA model output (type5/type6) ----
+  # ---- CASE 1: FRK/INLA model output (type5/type6) ----
     if (whichModel %in% c("type5", "type6")) {
       
       files <- list.files(

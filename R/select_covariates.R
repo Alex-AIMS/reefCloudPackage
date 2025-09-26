@@ -1,6 +1,6 @@
 #' Select Spatially Representative Covariates
 #'
-#' Selects covariates from a spatial dataset if their 70th percentile value is greater than 0,
+#' Selects covariates from a spatial dataset if their 75th mid-quantile value is greater than 0,
 #' assuming such variables are spatially representative.
 #'
 #' @param x A `sf` dataframe (e.g., `HexPred_sf`) containing covariates.
@@ -14,8 +14,8 @@
 #' # Example mock data
 #' hex_grid <- st_sf(
 #'   geometry = st_sfc(st_point(c(1, 2)), st_point(c(3, 4))),
-#'   max_temp = c(0.1, 0.5),
-#'   max_salinity = c(0, 0),
+#'   max_dhw = c(0.1, 0.5),
+#'   max_cyc = c(0, 0),
 #'   max_wave = c(1.2, 1.5)
 #' )
 #' 
@@ -31,11 +31,12 @@ select_covariates <- function(x, i , N) {
   
   filtered_data <- x |>
     dplyr::select(all_of(variables_name_full)) |>
-    dplyr::summarise(across(everything(), ~ quantile(.x, probs = 0.70, na.rm = TRUE))) |>
-    tidyr::pivot_longer(everything(), names_to = "column", values_to = "q70_value") |>
-    dplyr::filter(q70_value != 0) |>
+    st_drop_geometry() |>
+    dplyr::summarise(across(everything(), ~ mid_quant_75(.x))) |>
+    tidyr::pivot_longer(everything(), names_to = "column", values_to = "q75_value") |>
+    dplyr::filter(q75_value != 0) |>
     dplyr::pull(column)
-   
+
    # Update status 
     old_item_name <- get_status_name(4, "select_covariates")
      if (!str_detect(old_item_name, "\\[")) {

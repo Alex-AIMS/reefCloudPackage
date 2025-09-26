@@ -13,7 +13,7 @@ select_covariates(x, i, N)
 A character vector of selected covariate names.
 }
 \description{
-Selects covariates from a spatial dataset if their 70th percentile value is greater than 0,
+Selects covariates from a spatial dataset if their 75th mid-quantile value is greater than 0,
 assuming such variables are spatially representative.
 }
 \examples{
@@ -24,8 +24,8 @@ library(dplyr)
 # Example mock data
 hex_grid <- st_sf(
   geometry = st_sfc(st_point(c(1, 2)), st_point(c(3, 4))),
-  max_temp = c(0.1, 0.5),
-  max_salinity = c(0, 0),
+  max_dhw = c(0.1, 0.5),
+  max_cyc = c(0, 0),
   max_wave = c(1.2, 1.5)
 )
 
