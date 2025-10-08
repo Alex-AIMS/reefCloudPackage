@@ -37,7 +37,7 @@ config <- function(){
 
     ## reefCloudPackage::change_status(stage = "STAGE1", item = "Prepare file system", status = "success",
     ##                          update_display = FALSE)
-    status::add_status_item(stage = 1, item = "prepare_file_system", name = "Prepare file system", status = "success")
+    #status::add_status_item(stage = 1, item = "prepare_file_system", name = "Prepare file system", status = "success")
   },
   stage_ = 1,
   order_ = 5,
