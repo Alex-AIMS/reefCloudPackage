@@ -1,0 +1,59 @@
+## Get R version 4.4.1
+FROM rocker/r-ver:4.4.1
+
+## Set memory and environment optimizations for R
+ENV R_MAX_VSIZE=64Gb
+ENV R_GC_MEM_GROW=3
+
+## Install system packages first
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libudunits2-dev \
+    libssl-dev \
+    libgdal-dev \
+    libproj-dev \
+    libgeos-dev \
+    cmake \
+    libfontconfig1-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    glpk-utils \
+    libglpk-dev \ 
+    git \
+    wget \
+    curl \
+    gdebi-core \
+    libsodium-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+## Copy local package source into container
+COPY . /tmp/reefCloudPackage
+
+## Install R packages (abbreviated for speed - only critical ones)
+RUN R -e "options(repos = 'https://packagemanager.posit.co/cran/2024-09-01/'); \
+  install.packages(c('remotes', 'tidyverse')); \
+  install.packages(c('cli', 'crayon', 'validate', 'sf', 'sp', 'stars', 'fmesher', 'spacetime')); \
+  install.packages(c('rstan', 'brms', 'tidybayes', 'emmeans', 'DHARMa', 'Hmisc')); \
+  install.packages(c('future', 'insight', 'HDInterval', 'ggdist', 'posterior', 'lubridate')); \
+  remotes::install_github('open-AIMS/status', force = TRUE);"
+
+## Install INLA
+RUN wget https://inla.r-inla-download.org/R/stable/src/contrib/INLA_24.05.10.tar.gz \
+  && R CMD INSTALL --clean --no-multiarch --without-keep.source --byte-compile --resave-data --compact-docs --no-demo INLA_24.05.10.tar.gz \
+  && rm INLA_24.05.10.tar.gz
+
+## Install FRK and other spatial packages
+RUN R -e "options(repos = 'https://packagemanager.posit.co/cran/2024-09-01/'); \
+  install.packages(c('sparseinv', 'statmod', 'TMB', 'ggpubr', 'geojsonR', 'geojsonsf', 's2')); \
+  remotes::install_github('andrewzm/FRK', ref = 'sumaggregation');"
+
+## Install LOCAL reefCloudPackage with our fixes
+RUN R -e "remotes::install_local('/tmp/reefCloudPackage', force = TRUE, dependencies = FALSE);"
+
+## Create R environment configuration
+RUN mkdir -p /usr/local/lib/R/etc/ && \
+    echo "options(expressions = 50000)" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "options(warn = 1)" >> /usr/local/lib/R/etc/Rprofile.site
+
+RUN mkdir /home/project
+WORKDIR /home/project

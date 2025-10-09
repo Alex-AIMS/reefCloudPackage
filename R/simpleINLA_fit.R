@@ -92,6 +92,7 @@ simpleINLA_fit <- function(data.sub, GROUP, TIER, .data) {
   save(mod, file=paste0(DATA_PATH,'modelled/simplemod_',DOMAIN_NAME, "_", GROUP, '_TIER', TIER, '.RData'))
   draws <- inla.posterior.sample(1000, result=mod, seed=123) %>% suppressWarnings()
   save(draws, file=paste0(DATA_PATH,'modelled/simpledraws_', DOMAIN_NAME, "_", GROUP, '_TIER', TIER, '.RData'))
+  rm(mod); gc()
   list(form = form,
        family = family,
        data.pred = data.pred

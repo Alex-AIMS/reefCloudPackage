@@ -42,10 +42,17 @@ startMatter <- function(args = commandArgs()) {
   ## Start by clearing all local data folders
   if (REFRESH_DATA) reefCloudPackage::clear_data()
   CURRENT_STAGE <<- 1
-  reefCloudPackage::generateSettings()     ## generate the rest of the path and naming settings 
+  reefCloudPackage::generateSettings()     ## generate the rest of the path and naming settings
   reefCloudPackage::initialise_log()       ## create the log file
   reefCloudPackage::config()               ## create directory structure if it does not yet exist
   reefCloudPackage::checkPackages()        ## load required packages
+
+  ## Configure INLA for memory efficiency
+  if (requireNamespace("INLA", quietly = TRUE)) {
+    INLA::inla.setOption(scale.model.default = FALSE)
+    INLA::inla.setOption(inla.mode = "compact")
+  }
+
   reefCloudPackage::analysis_stage()       ## read in the stage that the analysis is up to
   ## reefCloudPackage::openingBanner()        ## display an opening banner
   status::display_status_terminal()        ## display an opening banner

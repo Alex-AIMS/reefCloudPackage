@@ -1,6 +1,10 @@
 ## Get R version 4.4.1
 FROM rocker/r-ver:4.4.1
 
+## Set memory and environment optimizations for R
+ENV R_MAX_VSIZE=64Gb
+ENV R_GC_MEM_GROW=3
+
 ## Install packages
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
@@ -198,9 +202,12 @@ RUN R -e "options(repos = \
   install.packages('s2');   \
 "  
 
+## Copy local package with tier loading fix
+COPY . /tmp/reefCloudPackage
+
 RUN R -e "options(repos = \
   list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
-  remotes::install_github('ReefCloud/reefCloudPackage', ref = 'main');   \
+  remotes::install_local('/tmp/reefCloudPackage', force = TRUE, dependencies = FALSE);   \
   remotes::install_github('open-AIMS/status', force = TRUE); \
 "  
 
@@ -230,6 +237,11 @@ RUN R -e "options(repos = \
 "  
 
 RUN apt-get clean
+
+## Create R environment configuration for memory efficiency
+RUN mkdir -p /usr/local/lib/R/etc/ && \
+    echo "options(expressions = 50000)" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "options(warn = 1)" >> /usr/local/lib/R/etc/Rprofile.site
 
 # USER users
 

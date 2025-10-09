@@ -23,8 +23,12 @@ get_covariates <- function() {
     cov_dhw <- sf::st_make_valid(tier.sf) %>% sf::st_intersection(st_make_valid(cov_dhw)) |>
       suppressMessages() |>
       suppressWarnings()
+
+    # Determine which Tier column to use based on BY_TIER
+    tier_col <- paste0("Tier", BY_TIER)
+
     cov_dhw <- cov_dhw %>%
-      dplyr::mutate(Tier5 = as.factor(Tier5)) %>%
+      dplyr::mutate(Tier5 = as.factor(!!sym(tier_col))) %>%
       sf::st_drop_geometry() %>%
       dplyr::group_by(Tier5, year) %>%
       dplyr::summarise(
@@ -50,8 +54,12 @@ get_covariates <- function() {
     cov_cyc <- sf::st_make_valid(tier.sf) %>% sf::st_intersection(st_make_valid(cov_cyc)) |>
       suppressMessages() |>
       suppressWarnings()
+
+    # Determine which Tier column to use based on BY_TIER
+    tier_col <- paste0("Tier", BY_TIER)
+
     cov_cyc <- cov_cyc %>%
-      dplyr::mutate(Tier5 = as.factor(Tier5)) %>%
+      dplyr::mutate(Tier5 = as.factor(!!sym(tier_col))) %>%
       sf::st_drop_geometry() %>%
       dplyr::group_by(Tier5, end_year) %>%
       dplyr::summarise(

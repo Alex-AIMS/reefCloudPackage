@@ -1,0 +1,14 @@
+# R Environment Configuration for AWS Deployment
+# Copy this file to .Renviron and adjust values as needed
+
+# Memory Management
+R_MAX_VSIZE=8Gb
+R_GC_MEM_GROW=3
+
+# Performance Tuning
+R_DEFAULT_PACKAGES=datasets,utils,grDevices,graphics,stats,methods
+
+# INLA Settings (these are also set in startMatter.R but can be overridden here)
+# Uncomment to enable additional memory-saving INLA options
+# INLA_NUM_THREADS=1
+# INLA_CGENERIC_DEBUG=FALSE

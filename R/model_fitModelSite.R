@@ -208,6 +208,7 @@ model_fitModelSite <- function(raw_cell_means=TRUE){
           save(mod, file=paste0(DATA_PATH,'modelled/simplemod_',DOMAIN_NAME, "_", iSITE_ZONE_DEPTH,'.RData'))
           draws <- inla.posterior.sample(1000, result=mod, seed=123) %>% suppressWarnings()
           save(draws, file=paste0(DATA_PATH,'modelled/simpledraws_', DOMAIN_NAME, "_", iSITE_ZONE_DEPTH,'.RData'))
+          rm(mod, draws); gc()
           cli::cli_progress_update(force=TRUE)
           ## ----end
           ## ---- simpleINLAYearGroup

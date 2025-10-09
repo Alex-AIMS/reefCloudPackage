@@ -6,9 +6,9 @@
 #' @examples prep_group_data_for_modelling(data, GROUP)
 #' @export
 prep_group_data_for_modelling <- function(data, GROUP) {
-  status::status_try_catch(
+  data.grp <- status::status_try_catch(
   {
-    data.grp <- data %>%
+    data %>%
       dplyr::filter(fGROUP == GROUP) %>%
       droplevels() %>%
       dplyr::mutate(

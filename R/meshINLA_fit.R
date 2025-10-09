@@ -21,4 +21,5 @@ meshINLA_fit <- function(form, spatial_and_stack.list) {
   save(mod.inla, file=paste0(DATA_PATH,'modelled/meshmod_', DOMAIN_NAME, "_", GROUP, "_TIER", TIER, '.RData'))
   draws <- inla.posterior.sample(1000, result=mod.inla, seed=123) %>%  suppressWarnings()
   save(draws, file=paste0(DATA_PATH,'modelled/meshdraws_', DOMAIN_NAME, "_", GROUP, '_TIER', TIER, '.RData'))
+  rm(mod.inla); gc()
 }

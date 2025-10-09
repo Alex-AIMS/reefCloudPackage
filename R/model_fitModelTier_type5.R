@@ -173,7 +173,7 @@ model_fitModelTier_type5 <- function(data.grp.enough, tier.sf){
       file = paste0(DATA_PATH, "modelled/", "FRK_", FOCAL_TIER, "_", TIER, ".RData")
     )
 
-    # Update status 
+    # Update status
       old_item_name <- get_status_name(4, "FRK_saved")
         if (!str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
@@ -188,5 +188,10 @@ model_fitModelTier_type5 <- function(data.grp.enough, tier.sf){
      name_ = "Saved FRK outputs",
      item_ = "FRK_saved"
    )
+
+   # Clean up memory after each tier iteration
+   rm(M, pred, post_dist_df, pred_sum_sf, obj_frk, HexPred_reefid2, HexPred_sf,
+      full_cov_raw, data.grp.tier, tier.sf.joined, covs.hexpred_tier_sf_v2_prep)
+   gc()
    }
 }

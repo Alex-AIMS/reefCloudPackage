@@ -216,6 +216,7 @@ model_fitModelTier_type3 <- function(data.grp){
             save(mod.inla, file=paste0(DATA_PATH,'modelled/meshmod_', DOMAIN_NAME, "_", GROUP, '.RData'))
             draws <- inla.posterior.sample(1000, result=mod.inla, seed=123) %>%  suppressWarnings()
             save(draws, file=paste0(DATA_PATH,'modelled/meshdraws_', DOMAIN_NAME, "_", GROUP, '.RData'))
+            rm(mod.inla, draws); gc()
             cli::cli_progress_update(force=TRUE)
             ## ----end
             ## ---- meshINLAFullPosteriors
