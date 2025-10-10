@@ -11,14 +11,13 @@ library(status)
 
 # Set command line arguments
 args <- c(
-  "--bucket=/home/project/data",
+  "--bucket=/data/AUS/",
   "--domain=tier",
-  "--by_tier=4",
-  "--model_type=5",
+  "--by_tier=5",
+  "--model_type=6",
   "--debug=true",
-  "--runStage=-1",
-  "--refresh_data=true",
-  "--generate_report=true"
+  "--runStage=1",
+  "--refresh_data=false"
 )
 
 cat("Starting analysis with arguments:\n")

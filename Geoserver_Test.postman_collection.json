@@ -1,0 +1,280 @@
+{
+	"info": {
+		"_postman_id": "reefcloud-geoserver-test",
+		"name": "ReefCloud Geoserver WFS Tests",
+		"description": "Test collection for debugging geoserver access issues in reefCloudPackage",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. GetCapabilities (Basic Test)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br",
+						"type": "text"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://geoserver.apps.aims.gov.au/reefcloud/ows?service=WFS&version=1.0.0&request=GetCapabilities",
+					"protocol": "https",
+					"host": [
+						"geoserver",
+						"apps",
+						"aims",
+						"gov",
+						"au"
+					],
+					"path": [
+						"reefcloud",
+						"ows"
+					],
+					"query": [
+						{
+							"key": "service",
+							"value": "WFS"
+						},
+						{
+							"key": "version",
+							"value": "1.0.0"
+						},
+						{
+							"key": "request",
+							"value": "GetCapabilities"
+						}
+					]
+				},
+				"description": "Test basic connectivity to geoserver and list available WFS layers"
+			},
+			"response": []
+		},
+		{
+			"name": "2. GetFeature - Degree Heating Weeks (DHW)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br",
+						"type": "text"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://geoserver.apps.aims.gov.au/reefcloud/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=reefcloud:degrees_heating_weeks_tier&srsName=EPSG:4326&bbox=110.0,-45.0,155.0,-10.0&maxFeatures=10",
+					"protocol": "https",
+					"host": [
+						"geoserver",
+						"apps",
+						"aims",
+						"gov",
+						"au"
+					],
+					"path": [
+						"reefcloud",
+						"ows"
+					],
+					"query": [
+						{
+							"key": "service",
+							"value": "WFS"
+						},
+						{
+							"key": "version",
+							"value": "1.0.0"
+						},
+						{
+							"key": "request",
+							"value": "GetFeature"
+						},
+						{
+							"key": "typeName",
+							"value": "reefcloud:degrees_heating_weeks_tier",
+							"description": "DHW covariate layer"
+						},
+						{
+							"key": "srsName",
+							"value": "EPSG:4326",
+							"description": "WGS84 coordinate system"
+						},
+						{
+							"key": "bbox",
+							"value": "110.0,-45.0,155.0,-10.0",
+							"description": "Bounding box for Australian waters"
+						},
+						{
+							"key": "maxFeatures",
+							"value": "10",
+							"description": "Limit results for testing"
+						}
+					]
+				},
+				"description": "Fetch degree heating weeks data - used by get_covariates.R line 18"
+			},
+			"response": []
+		},
+		{
+			"name": "3. GetFeature - Cyclone Exposure",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en-US,en;q=0.9",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Encoding",
+						"value": "gzip, deflate, br",
+						"type": "text"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://geoserver.apps.aims.gov.au/reefcloud/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=reefcloud:storm4m_exposure_year_tier&srsName=EPSG:4326&bbox=110.0,-45.0,155.0,-10.0&maxFeatures=10",
+					"protocol": "https",
+					"host": [
+						"geoserver",
+						"apps",
+						"aims",
+						"gov",
+						"au"
+					],
+					"path": [
+						"reefcloud",
+						"ows"
+					],
+					"query": [
+						{
+							"key": "service",
+							"value": "WFS"
+						},
+						{
+							"key": "version",
+							"value": "1.0.0"
+						},
+						{
+							"key": "request",
+							"value": "GetFeature"
+						},
+						{
+							"key": "typeName",
+							"value": "reefcloud:storm4m_exposure_year_tier",
+							"description": "Cyclone exposure layer"
+						},
+						{
+							"key": "srsName",
+							"value": "EPSG:4326",
+							"description": "WGS84 coordinate system"
+						},
+						{
+							"key": "bbox",
+							"value": "110.0,-45.0,155.0,-10.0",
+							"description": "Bounding box for Australian waters"
+						},
+						{
+							"key": "maxFeatures",
+							"value": "10",
+							"description": "Limit results for testing"
+						}
+					]
+				},
+				"description": "Fetch cyclone/storm exposure data - used by get_covariates.R line 49"
+			},
+			"response": []
+		},
+		{
+			"name": "4. GetFeature - No Headers (Test if headers matter)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://geoserver.apps.aims.gov.au/reefcloud/ows?service=WFS&version=1.0.0&request=GetCapabilities",
+					"protocol": "https",
+					"host": [
+						"geoserver",
+						"apps",
+						"aims",
+						"gov",
+						"au"
+					],
+					"path": [
+						"reefcloud",
+						"ows"
+					],
+					"query": [
+						{
+							"key": "service",
+							"value": "WFS"
+						},
+						{
+							"key": "version",
+							"value": "1.0.0"
+						},
+						{
+							"key": "request",
+							"value": "GetCapabilities"
+						}
+					]
+				},
+				"description": "Test if request works without browser headers - helps isolate the issue"
+			},
+			"response": []
+		}
+	]
+}

@@ -11,6 +11,20 @@
 
 <!-- badges: end -->
 
+## Analysis Parameters (Arguments):
+
+'''r
+args = c("--bucket=/data/AUS/",      #path to bucket
+         "--domain=tier",            #tier or site
+         "--by_tier=5",              #tier level
+         "--model_type=6",           #model used for predictions
+         "--debug=true",             #debug mode
+         "--runStage=1",             #current running stage
+         "--refresh_data=false"      #reload data
+)
+'''
+
+
 ## Warnings
 **1: To execute the modelling pipeline, run the `00_main.R` script.**
 
