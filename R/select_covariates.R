@@ -32,7 +32,7 @@ select_covariates <- function(x, i , N) {
   filtered_data <- x |>
     dplyr::select(all_of(variables_name_full)) |>
     st_drop_geometry() |>
-    dplyr::summarise(across(everything(), ~ mid_quant_75(.x))) |>
+    dplyr::summarise(across(everything(), ~ reefCloudPackage::mid_quant_75(.x))) |>
     tidyr::pivot_longer(everything(), names_to = "column", values_to = "q75_value") |>
     dplyr::filter(q75_value != 0) |>
     dplyr::pull(column)

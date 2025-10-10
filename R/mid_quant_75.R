@@ -17,6 +17,8 @@
 #' @export
 
 mid_quant_75 <- function(y){
-    ymid <- midquantile(y, probs = 3/4)
+  y <- as.numeric(as.character(y))
+  y <- y[!is.na(y)]
+  ymid <- Qtools::midquantile(y, probs = 3/4)
     return(ymid$y)
   }
