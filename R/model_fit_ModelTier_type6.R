@@ -24,6 +24,17 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
   # OPTIMIZATION 2: Pre-load predictive layers once (eliminates redundant I/O)
   full_cov_raw_base <- reefCloudPackage::load_predictive_layers(1, N)
 
+  # OPTIMIZATION 7: Pre-aggregate predictive layers by FOCAL_TIER (reduces memory and filtering ops)
+  # Group predictive layers by the FOCAL_TIER to avoid repeated filtering
+  full_cov_by_tier <- full_cov_raw_base |>
+    dplyr::left_join(
+      tier.sf |> sf::st_drop_geometry() |> dplyr::select(Tier5, !!sym(FOCAL_TIER)),
+      by = "Tier5"
+    ) |>
+    dplyr::group_by(!!sym(FOCAL_TIER)) |>
+    dplyr::group_split()
+  names(full_cov_by_tier) <- sapply(full_cov_by_tier, function(x) as.character(x[[FOCAL_TIER]][1]))
+
   # OPTIMIZATION 3: Parallelize tier processing (3-4x speedup with 3 cores)
   # Calculate safe number of parallel workers (each INLA model uses ~15-20GB)
   # With 64GB RAM limit, use max 3 cores
@@ -49,9 +60,8 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf, i, N) |>
       dplyr::filter(!!sym(FOCAL_TIER) == TIER)
 
-    #--- Load and filter predictive layers (use pre-loaded data)
-    full_cov_raw <- full_cov_raw_base |>
-      dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) |>
+    #--- Load and filter predictive layers (use pre-aggregated data by tier)
+    full_cov_raw <- full_cov_by_tier[[TIER]] |>
       dplyr::rename(fYEAR = year) |>
       dplyr::filter(
         between(fYEAR,

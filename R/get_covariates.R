@@ -9,12 +9,12 @@
 #' @export
 get_covariates <- function() {
   COVARIATES <<- NULL
-  load(file=paste0(DATA_PATH,'primary/tier', as.numeric(BY_TIER), '.sf.RData')) 
-  
-  ## --- Degree Heating Weeks ---
-  # get the geoserver info
+  load(file=paste0(DATA_PATH,'primary/tier', as.numeric(BY_TIER), '.sf.RData'))
+
+  # OPTIMIZATION #1: Get geoserver info ONCE (not per covariate)
   reefCloudPackage::get_geoserver_info()
-  
+
+  ## --- Degree Heating Weeks ---
   cov_dhw <-  reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "reefcloud:degrees_heating_weeks_tier", rc_client)
   if (exists("cov_dhw") & !is.null(cov_dhw)) {
     cov_dhw <- sf::st_simplify(cov_dhw, dTolerance = 0.001) |>
@@ -49,9 +49,7 @@ get_covariates <- function() {
   }
 
   ## --- Cyclones ---
-  # get the geoserver info
-  reefCloudPackage::get_geoserver_info()
-
+  # Reuse rc_client from above (no second call to get_geoserver_info)
   cov_cyc <-  reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "reefcloud:storm4m_exposure_year_tier", rc_client)
   if (exists("cov_cyc") & !is.null(cov_cyc)) {
     cov_cyc <- sf::st_simplify(cov_cyc, dTolerance = 0.001) |>
