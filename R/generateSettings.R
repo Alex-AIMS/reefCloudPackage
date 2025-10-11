@@ -14,8 +14,14 @@ generateSettings <- function() {
   status::status_try_catch(
   {
   ## Location of folder to store R data objects
-  DATA_PATH <<- "../data4/"
-  if (!dir.exists(DATA_PATH)) dir.create(DATA_PATH)
+  # Use AWS_PATH if available (from parseCLA), otherwise fall back to "../data4/"
+  DATA_PATH <<- if (exists("AWS_PATH") && !is.null(AWS_PATH)) {
+    # Remove trailing slash(es) from AWS_PATH to avoid double slashes
+    gsub("/*$", "/", AWS_PATH)
+  } else {
+    "../data4/"
+  }
+  if (!dir.exists(DATA_PATH)) dir.create(DATA_PATH, recursive = TRUE)
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "DATA_PATH",
   ##   status = "success", update_display = FALSE)
   status::add_setting(element = "data_path", item = DATA_PATH, name = "Data path")
