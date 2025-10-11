@@ -37,7 +37,7 @@ select_covariates <- function(x, i , N) {
     dplyr::filter(q75_value != 0) |>
     dplyr::pull(column)
 
-   # Update status 
+   # Update status
     old_item_name <- get_status_name(4, "select_covariates")
      if (!str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
@@ -46,11 +46,11 @@ select_covariates <- function(x, i , N) {
      }
      status:::update_status_name(stage = 4, item = "select_covariates", name = new_item_name)
 
+    return(filtered_data)
    },
    stage_ = 4,
    order_ = 6,
    name_ = "Select covariates",
    item_ = "select_covariates"
    )
-  return(filtered_data)
 }
