@@ -32,11 +32,11 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     full_cov_raw <- reefCloudPackage::load_predictive_layers() |>
       dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) |>
       dplyr::rename(fYEAR = year) |>
-      dplyr::filter(between(fYEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR)))
+      dplyr::filter(dplyr::between(fYEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR)))
 
     ## Apply quality control thresholds
-    out_cycl <- quantile(full_cov_raw$max_cyc, probs = 0.975)
-    out_dhw  <- quantile(full_cov_raw$max_dhw, probs = 0.975)
+    out_cycl <- stats::quantile(full_cov_raw$max_cyc, probs = 0.975)
+    out_dhw  <- stats::quantile(full_cov_raw$max_dhw, probs = 0.975)
     
     HexPred_sf <- full_cov_raw |>
       dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
@@ -45,6 +45,11 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
 
     ## Select covariates
     selected_covar <- reefCloudPackage::select_covariates(HexPred_sf)
+
+    ## If select_covariates failed, treat as empty (no covariates)
+    if (!is.character(selected_covar) || length(selected_covar) == 0 || any(grepl("Error", selected_covar))) {
+      selected_covar <- character(0)
+    }
 
     ## Scale covariates
     HexPred_sf <- HexPred_sf |>
@@ -63,11 +68,11 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
    HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
       dplyr::group_by(Tier5) |>
       dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
-      ungroup()
+      dplyr::ungroup()
 
-    HexPred_reefid2 <- inner_join(HexPred_sf |> data.frame(), HexPred_reefid) |>
+    HexPred_reefid2 <- dplyr::inner_join(HexPred_sf |> data.frame(), HexPred_reefid) |>
       dplyr::group_by(Tier5, fYEAR) |>
-      dplyr::filter(row_number() == 1) |>
+      dplyr::filter(dplyr::row_number() == 1) |>
       dplyr::mutate(across(everything(), ~ replace(.x, is.na(.x), 0))) |>
       sf::st_as_sf(sf_column_name = "geometry")
 
@@ -107,7 +112,7 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
 
     ## Fit FRK model
 
-    M <- FRK(
+    M <- FRK::FRK(
       f = model_formula,
       data = list(obj_frk$STObj),
       BAUs = obj_frk$ST_BAUs,
@@ -134,13 +139,13 @@ model_fitModelTier_type5_v2 <- function(data.grp.enough, tier.sf){
     post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
       dplyr::mutate(fYEAR = obj_frk$ST_BAUs@data$fYEAR,
                     Tier5 = obj_frk$ST_BAUs@data$Tier5,
-                    id_loc = row_number()) |>
+                    id_loc = dplyr::row_number()) |>
       tidyr::pivot_longer(!c(fYEAR, Tier5, id_loc), names_to = "draw", values_to = "pred") |>
       dplyr::mutate(model_name = "FRK")
 
     tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
 
-    pred_sum_sf <- post_dist_df |> group_by(fYEAR, Tier5) |>
+    pred_sum_sf <- post_dist_df |> dplyr::group_by(fYEAR, Tier5) |>
       ggdist::median_hdci(pred) |>
       dplyr::inner_join(tier.sf.joined |> dplyr::select(geometry, Tier5)) |>
       sf::st_as_sf(sf_column_name = "geometry") |>

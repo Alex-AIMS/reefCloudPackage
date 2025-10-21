@@ -741,9 +741,14 @@ model_summariseModelTier <- function(){
 
     ## The following code is to build the report
     ## Raw means
-    if (length(list.files(path = "../output/figures",
-                          pattern = "RawMeans_(Spatiotemporal_Tiers|Tiers).*png",
-                          full.names = TRUE)) >0) {
+    raw_files <- if (dir.exists("../output/figures")) {
+      list.files(path = "../output/figures",
+                 pattern = "RawMeans_(Spatiotemporal_Tiers|Tiers).*png",
+                 full.names = TRUE)
+    } else {
+      character(0)
+    }
+    if (length(raw_files) > 0) {
       ## if(!reefCloudPackage::build_report(component = "fit_model_tier_raw"))
       ##     cat("Raw cellmeans will not be incorporated in the report!\n\n")
       ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
@@ -753,9 +758,14 @@ model_summariseModelTier <- function(){
     }
 
     ## Simple INLA
-    if (length(list.files(path = "../output/figures",
-                          pattern = "simpleINLA_(Spatiotemporal_Tier|Tier).*png",
-                          full.names = TRUE)) >0) {
+    simple_files <- if (dir.exists("../output/figures")) {
+      list.files(path = "../output/figures",
+                 pattern = "simpleINLA_(Spatiotemporal_Tier|Tier).*png",
+                 full.names = TRUE)
+    } else {
+      character(0)
+    }
+    if (length(simple_files) > 0) {
       ## if(!reefCloudPackage::build_report(component = "fit_model_tier_simple"))
       ##     cat("Simple INLA cellmeans will not be incorporated in the report!\n\n")
       ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
@@ -765,9 +775,14 @@ model_summariseModelTier <- function(){
     }
 
     ## INLA SPDE
-    if (length(list.files(path = "../output/figures",
-                          pattern = "meshINLA_(Spatiotemporal_Tier|Tier).*png",
-                          full.names = TRUE)) >0) {
+    mesh_files <- if (dir.exists("../output/figures")) {
+      list.files(path = "../output/figures",
+                 pattern = "meshINLA_(Spatiotemporal_Tier|Tier).*png",
+                 full.names = TRUE)
+    } else {
+      character(0)
+    }
+    if (length(mesh_files) > 0) {
       ## if(!reefCloudPackage::build_report(component = "fit_model_tier_mesh"))
       ##     cat("SPDE INLA cellmeans will not be incorporated in the report!\n\n")
       ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
@@ -777,9 +792,14 @@ model_summariseModelTier <- function(){
     }
 
     ## INLA SPDE with covariates
-    if (length(list.files(path = "../output/figures",
-                          pattern = "meshCINLA_(Spatiotemporal_Tier|Tier).*png",
-                          full.names = TRUE)) >0) {
+    meshc_files <- if (dir.exists("../output/figures")) {
+      list.files(path = "../output/figures",
+                 pattern = "meshCINLA_(Spatiotemporal_Tier|Tier).*png",
+                 full.names = TRUE)
+    } else {
+      character(0)
+    }
+    if (length(meshc_files) > 0) {
       ## if(!reefCloudPackage::build_report(component = "fit_model_tier_mesh_covariates"))
       ##     cat("SPDE INLA with covariates cellmeans will not be incorporated in the report!\n\n")
       ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,

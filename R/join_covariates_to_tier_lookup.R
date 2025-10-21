@@ -22,12 +22,12 @@ join_covariates_to_tier_lookup <- function(tier.sf, i , N) {
       by = c("Tier5" = "Tier5")
     )
 
-   # Update status 
+   # Update status
     old_item_name <- get_status_name(4, "join_covariates_to_tier_lookup")
-     if (!str_detect(old_item_name, "\\[")) {
+     if (!stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
      } else{
-        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
      }
      status:::update_status_name(stage = 4, item = "join_covariates_to_tier_lookup", name = new_item_name)
      

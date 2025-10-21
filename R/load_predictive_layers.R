@@ -23,12 +23,12 @@ load_predictive_layers <- function(i , N) {
     stop("Predictive layers not found")
   }
 
-   # Update status 
+   # Update status
     old_item_name <- get_status_name(4, "load_predictive_layers")
-     if (!str_detect(old_item_name, "\\[")) {
+     if (!stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
      } else{
-        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
      }
      status:::update_status_name(stage = 4, item = "load_predictive_layers", name = new_item_name)
    },

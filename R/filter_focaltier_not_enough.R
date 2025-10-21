@@ -25,6 +25,15 @@
 filter_focaltier_not_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp , i , N) {
    status::status_try_catch(
    {
+  # Check if required columns exist
+  required_cols <- c("LONGITUDE", "LATITUDE", "fYEAR")
+  missing_cols <- setdiff(required_cols, names(data.grp))
+
+  if (length(missing_cols) > 0) {
+    # If columns don't exist, return empty dataset (all data has "enough" coverage)
+    return(data.grp[0, ])
+  }
+
   original_tiers <- unique(data.grp[[FOCAL_TIER]])
 
   # Step 1: Spatial Filtering

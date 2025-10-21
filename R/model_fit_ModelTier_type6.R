@@ -64,14 +64,14 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     full_cov_raw <- full_cov_by_tier[[TIER]] |>
       dplyr::rename(fYEAR = year) |>
       dplyr::filter(
-        between(fYEAR,
+        dplyr::between(fYEAR,
                 min(data.grp.tier$REPORT_YEAR),
                 max(data.grp.tier$REPORT_YEAR))
       )
 
     #--- Apply control quality on extreme values
-    out_cycl <- quantile(full_cov_raw$max_cyc, probs = 0.975)
-    out_dhw  <- quantile(full_cov_raw$max_dhw, probs = 0.975)
+    out_cycl <- stats::quantile(full_cov_raw$max_cyc, probs = 0.975)
+    out_dhw  <- stats::quantile(full_cov_raw$max_dhw, probs = 0.975)
 
     HexPred_sf <- full_cov_raw |>
       dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
@@ -99,9 +99,9 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
       dplyr::ungroup()
 
-    HexPred_reefid2 <- inner_join(HexPred_sf |> data.frame(), HexPred_reefid) |>
+    HexPred_reefid2 <- dplyr::inner_join(HexPred_sf |> data.frame(), HexPred_reefid) |>
       dplyr::group_by(Tier5, fYEAR) |>
-      dplyr::filter(row_number() == 1) |>
+      dplyr::filter(dplyr::row_number() == 1) |>
       dplyr::mutate(across(everything(), ~ replace(.x, is.na(.x), 0))) |>
       sf::st_as_sf(sf_column_name = "geometry")
 
@@ -117,8 +117,8 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
      next
     }
 
-     ## Test if more than one reef in the final data 
-    test_reefid <- HexPred_reefid2 %>% filter(Tier5 %in% data.grp.tier.ready$Tier5)
+     ## Test if more than one reef in the final data
+    test_reefid <- HexPred_reefid2 %>% dplyr::filter(Tier5 %in% data.grp.tier.ready$Tier5)
 
     #--- Prepare model objects
     obj_inla <- reefCloudPackage::inla_prep(data.grp.tier.ready, HexPred_reefid2, i, N)
@@ -192,12 +192,12 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       silent = 2L
     )
 
-    # Update status 
+    # Update status
       old_item_name <- get_status_name(4, "INLA_fit")
-        if (!str_detect(old_item_name, "\\[")) {
+        if (!stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
         } else{
-        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
         }
       status:::update_status_name(stage = 4, item = "INLA_fit", name = new_item_name)
 
@@ -240,8 +240,8 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     names_to = "draw",
     values_to = "pred"
   ) |>
-  group_by(fYEAR, Tier5, draw) |>
-  summarize(pred = mean(pred)) |>
+  dplyr::group_by(fYEAR, Tier5, draw) |>
+  dplyr::summarize(pred = mean(pred)) |>
   dplyr::mutate(
     id_loc = dplyr::row_number(),
     pred = plogis(pred),       
@@ -280,12 +280,12 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       ),
       file = paste0(DATA_PATH, "modelled/", "INLA_", FOCAL_TIER, "_", TIER, ".RData")
     )
-      # Update status 
+      # Update status
       old_item_name <- get_status_name(4, "INLA_saved")
-        if (!str_detect(old_item_name, "\\[")) {
+        if (!stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
         } else{
-        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
         }
       status:::update_status_name(stage = 4, item = "INLA_saved", name = new_item_name)
 

@@ -200,16 +200,7 @@ RUN R -e "options(repos = \
   install.packages('geojsonR');   \
   install.packages('geojsonsf');   \
   install.packages('s2');   \
-"  
-
-## Copy local package with tier loading fix
-COPY . /tmp/reefCloudPackage
-
-RUN R -e "options(repos = \
-  list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
-  remotes::install_local('/tmp/reefCloudPackage', force = TRUE, dependencies = FALSE);   \
-  remotes::install_github('open-AIMS/status', force = TRUE); \
-"  
+"
 
 ## In order to get the covariates directly from the server
 RUN apt-get update \
@@ -224,6 +215,15 @@ RUN R -e "options(repos = \
   install.packages('keyring'); \
   install.packages('geometa'); \
   install.packages('ows4R');   \
+"
+
+## Copy local package with tier loading fix
+COPY . /tmp/reefCloudPackage
+
+RUN R -e "options(repos = \
+  list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
+  remotes::install_local('/tmp/reefCloudPackage', force = TRUE, dependencies = FALSE);   \
+  remotes::install_github('open-AIMS/status', force = TRUE); \
 "  
 
 RUN R -e "options(repos = \

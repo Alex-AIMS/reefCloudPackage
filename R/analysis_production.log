@@ -1,0 +1,453 @@
+═══════════════════════════════════════════════════════
+  ReefCloud Analysis Pipeline - Memory Optimized
+═══════════════════════════════════════════════════════
+
+
+Attaching package: ‘reefCloudPackage’
+
+The following object is masked from ‘package:base’:
+
+    log
+
+Loading required package: cli
+Loading required package: crayon
+
+Attaching package: ‘crayon’
+
+The following object is masked from ‘package:cli’:
+
+    num_ansi_colors
+
+Warning: replacing previous import ‘cli::num_ansi_colors’ by ‘crayon::num_ansi_colors’ when loading ‘status’
+Warning in dir.create(status_dir) : '/tmp/RtmpJ50qAy' already exists
+Starting analysis with arguments:
+   --bucket=/home/project/data 
+   --domain=tier 
+   --by_tier=4 
+   --model_type=5 
+   --debug=true 
+   --runStage=-1 
+   --refresh_data=true 
+   --generate_report=true 
+
+Step 1: Initializing...
+Warning in dir.create(status_dir) : '/tmp/RtmpJ50qAy' already exists
+TERM environment variable not set.
+ ╔═════════════════════════════════════╤═══════════════════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy │                 ReefCloud statistical modelling               ║
+ ║ - Status filename: status.Rdata     │                                                               ║
+ ║ - Log filename: project.log         │ Stage 1 - Configure system                                    ║
+ ║ - Date/Time: 08/10/2025 14:02:33    │  ─ Parse CLA                                                  ║
+ ║ - Current stage: 1                  │  ─ Generate settings                                          ║
+ ║ - Current item: Initialising        │  ─ Configure paths                                            ║
+ ║ - Run stages: c("1", "2", "3", "4") │  ─ Initialise log                                             ║
+ ║                                     │  ─ Load package dependencies                                  ║
+ ║                                     │ Stage 2 - Obtain data                                         ║
+ ║                                     │ Stage 3 - Process data                                        ║
+ ║                                     │ Stage 4 - Model data                                          ║
+ ╠═════════════════════════════════════╧═══════════════════════════════════════════════════════════════╣
+Warning in max(stringr::str_locate(log, "\\|[^| ]*: ")[, "end"], na.rm = TRUE) :
+  no non-missing arguments to max; returning -Inf
+Warning in strrep(" ", exdent) :
+  NAs introduced by coercion to integer range
+ ║                                                                                                     ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: project.log                       │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:02:33                  │  √ Parse CLA                                    ║
+ ║ - Current stage: 1                                │  ─ Generate settings                            ║
+ ║ - Current item: parse_cla                         │  ─ Configure paths                              ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  ─ Initialise log                               ║
+ ║ - Refresh data: TRUE                              │  ─ Load package dependencies                    ║
+ ║ - Debug mode: TRUE                                │ Stage 2 - Obtain data                           ║
+ ║ - AWS path: /home/project/data/                   │ Stage 3 - Process data                          ║
+ ║ - Data from: User defined                         │ Stage 4 - Model data                            ║
+ ║ - Domain category: tier                           │                                                 ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │                                                 ║
+ ║ - Domain name: data                               │                                                 ║
+ ║ - Generate report: FALSE                          │                                                 ║
+ ║ - Model type: 5                                   │                                                 ║
+ ║ - By tier level: 4                                │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:33.79|SUCCESS: Stage 1 - Parse CLA                                                 ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: project.log                       │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:02:33                  │  √ Parse CLA                                    ║
+ ║ - Current stage: 1                                │  √ Generate settings                            ║
+ ║ - Current item: generate_settings                 │  ─ Configure paths                              ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  ─ Initialise log                               ║
+ ║ - Refresh data: TRUE                              │  ─ Load package dependencies                    ║
+ ║ - Debug mode: TRUE                                │ Stage 2 - Obtain data                           ║
+ ║ - AWS path: /home/project/data/                   │ Stage 3 - Process data                          ║
+ ║ - Data from: User defined                         │ Stage 4 - Model data                            ║
+ ║ - Domain category: tier                           │                                                 ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │                                                 ║
+ ║ - Domain name: data                               │                                                 ║
+ ║ - Generate report: FALSE                          │                                                 ║
+ ║ - Model type: 5                                   │                                                 ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:33.79|SUCCESS: Stage 1 - Parse CLA                                                 ║
+ ║ 2025-10-08 14:02:33.80|SUCCESS: Stage 1 - Generate settings                                         ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:02:33                  │  √ Parse CLA                                    ║
+ ║ - Current stage: 1                                │  √ Generate settings                            ║
+ ║ - Current item: initialise_log                    │  ─ Configure paths                              ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  √ Initialise log                               ║
+ ║ - Refresh data: TRUE                              │  ─ Load package dependencies                    ║
+ ║ - Debug mode: TRUE                                │ Stage 2 - Obtain data                           ║
+ ║ - AWS path: /home/project/data/                   │ Stage 3 - Process data                          ║
+ ║ - Data from: User defined                         │ Stage 4 - Model data                            ║
+ ║ - Domain category: tier                           │                                                 ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │                                                 ║
+ ║ - Domain name: data                               │                                                 ║
+ ║ - Generate report: FALSE                          │                                                 ║
+ ║ - Model type: 5                                   │                                                 ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:33.79|SUCCESS: Stage 1 - Parse CLA                                                 ║
+ ║ 2025-10-08 14:02:33.80|SUCCESS: Stage 1 - Generate settings                                         ║
+ ║ 2025-10-08 14:02:33.81|SUCCESS: Stage 1 - Initialise log                                            ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:02:33                  │  √ Parse CLA                                    ║
+ ║ - Current stage: 1                                │  √ Generate settings                            ║
+ ║ - Current item: configure_paths                   │  √ Configure paths                              ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  √ Initialise log                               ║
+ ║ - Refresh data: TRUE                              │  ─ Load package dependencies                    ║
+ ║ - Debug mode: TRUE                                │ Stage 2 - Obtain data                           ║
+ ║ - AWS path: /home/project/data/                   │ Stage 3 - Process data                          ║
+ ║ - Data from: User defined                         │ Stage 4 - Model data                            ║
+ ║ - Domain category: tier                           │                                                 ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │                                                 ║
+ ║ - Domain name: data                               │                                                 ║
+ ║ - Generate report: FALSE                          │                                                 ║
+ ║ - Model type: 5                                   │                                                 ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:33.79|SUCCESS: Stage 1 - Parse CLA                                                 ║
+ ║ 2025-10-08 14:02:33.80|SUCCESS: Stage 1 - Generate settings                                         ║
+ ║ 2025-10-08 14:02:33.81|SUCCESS: Stage 1 - Initialise log                                            ║
+ ║ 2025-10-08 14:02:33.83|SUCCESS: Stage 1 - Configure paths                                           ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:02:45                  │  √ Parse CLA                                    ║
+ ║ - Current stage: 1                                │  √ Generate settings                            ║
+ ║ - Current item: load_packages                     │  √ Configure paths                              ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  √ Initialise log                               ║
+ ║ - Refresh data: TRUE                              │  √ Load package dependencies                    ║
+ ║ - Debug mode: TRUE                                │ Stage 2 - Obtain data                           ║
+ ║ - AWS path: /home/project/data/                   │ Stage 3 - Process data                          ║
+ ║ - Data from: User defined                         │ Stage 4 - Model data                            ║
+ ║ - Domain category: tier                           │                                                 ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │                                                 ║
+ ║ - Domain name: data                               │                                                 ║
+ ║ - Generate report: FALSE                          │                                                 ║
+ ║ - Model type: 5                                   │                                                 ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:33.80|SUCCESS: Stage 1 - Generate settings                                         ║
+ ║ 2025-10-08 14:02:33.81|SUCCESS: Stage 1 - Initialise log                                            ║
+ ║ 2025-10-08 14:02:33.83|SUCCESS: Stage 1 - Configure paths                                           ║
+ ║ 2025-10-08 14:02:45.87|WARNING: Stage 1 - Load package dependencies: package                        ║
+ ║                                 ‘INLA’ was built under R version 4.5.0.  This                       ║
+ ║                                 warning is for developers only                                      ║
+ ║ 2025-10-08 14:02:45.87|SUCCESS: Stage 1 - Load package dependencies                                 ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:02:45                  │  √ Parse CLA                                    ║
+ ║ - Current stage: 1                                │  √ Generate settings                            ║
+ ║ - Current item: load_packages                     │  √ Configure paths                              ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  √ Initialise log                               ║
+ ║ - Refresh data: TRUE                              │  √ Load package dependencies                    ║
+ ║ - Debug mode: TRUE                                │ Stage 2 - Obtain data                           ║
+ ║ - AWS path: /home/project/data/                   │ Stage 3 - Process data                          ║
+ ║ - Data from: User defined                         │ Stage 4 - Model data                            ║
+ ║ - Domain category: tier                           │                                                 ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │                                                 ║
+ ║ - Domain name: data                               │                                                 ║
+ ║ - Generate report: FALSE                          │                                                 ║
+ ║ - Model type: 5                                   │                                                 ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:33.80|SUCCESS: Stage 1 - Generate settings                                         ║
+ ║ 2025-10-08 14:02:33.81|SUCCESS: Stage 1 - Initialise log                                            ║
+ ║ 2025-10-08 14:02:33.83|SUCCESS: Stage 1 - Configure paths                                           ║
+ ║ 2025-10-08 14:02:45.87|WARNING: Stage 1 - Load package dependencies: package                        ║
+ ║                                 ‘INLA’ was built under R version 4.5.0.  This                       ║
+ ║                                 warning is for developers only                                      ║
+ ║ 2025-10-08 14:02:45.87|SUCCESS: Stage 1 - Load package dependencies                                 ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+Step 2: Loading data...
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:02:46                  │ Stage 2 - Obtain data                           ║
+ ║ - Current stage: 2                                │  √ Retrieve benthic data                        ║
+ ║ - Current item: retrieve_benthic_data             │  ─ Unzip benthic data                           ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  ─ Import benthic data                          ║
+ ║ - Refresh data: TRUE                              │  ─ Validate benthic data                        ║
+ ║ - Debug mode: TRUE                                │  ─ Save benthic data                            ║
+ ║ - AWS path: /home/project/data/                   │  ─ Legacy benthic data                          ║
+ ║ - Data from: User defined                         │  ─ Retrieve tier data                           ║
+ ║ - Domain category: tier                           │  ─ Get geoserver info                           ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │  ─ Get geoserver data                           ║
+ ║ - Domain name: data                               │  ─ Get coral reef shapefiles                    ║
+ ║ - Generate report: FALSE                          │ Stage 3 - Process data                          ║
+ ║ - Model type: 5                                   │ Stage 4 - Model data                            ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:33.81|SUCCESS: Stage 1 - Initialise log                                            ║
+ ║ 2025-10-08 14:02:33.83|SUCCESS: Stage 1 - Configure paths                                           ║
+ ║ 2025-10-08 14:02:45.87|WARNING: Stage 1 - Load package dependencies: package                        ║
+ ║                                 ‘INLA’ was built under R version 4.5.0.  This                       ║
+ ║                                 warning is for developers only                                      ║
+ ║ 2025-10-08 14:02:45.87|SUCCESS: Stage 1 - Load package dependencies                                 ║
+ ║ 2025-10-08 14:02:46.86|SUCCESS: Stage 2 - Retrieve benthic data                                     ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Archive:  ../data4/primary/reef_data.zip
+  inflating: ../data4/primary/reef_data.csv  
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:02:53                  │ Stage 2 - Obtain data                           ║
+ ║ - Current stage: 2                                │  √ Retrieve benthic data                        ║
+ ║ - Current item: unzip_benthic_data                │  √ Unzip benthic data                           ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  ─ Import benthic data                          ║
+ ║ - Refresh data: TRUE                              │  ─ Validate benthic data                        ║
+ ║ - Debug mode: TRUE                                │  ─ Save benthic data                            ║
+ ║ - AWS path: /home/project/data/                   │  ─ Legacy benthic data                          ║
+ ║ - Data from: User defined                         │  ─ Retrieve tier data                           ║
+ ║ - Domain category: tier                           │  ─ Get geoserver info                           ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │  ─ Get geoserver data                           ║
+ ║ - Domain name: data                               │  ─ Get coral reef shapefiles                    ║
+ ║ - Generate report: FALSE                          │ Stage 3 - Process data                          ║
+ ║ - Model type: 5                                   │ Stage 4 - Model data                            ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:33.83|SUCCESS: Stage 1 - Configure paths                                           ║
+ ║ 2025-10-08 14:02:45.87|WARNING: Stage 1 - Load package dependencies: package                        ║
+ ║                                 ‘INLA’ was built under R version 4.5.0.  This                       ║
+ ║                                 warning is for developers only                                      ║
+ ║ 2025-10-08 14:02:45.87|SUCCESS: Stage 1 - Load package dependencies                                 ║
+ ║ 2025-10-08 14:02:46.86|SUCCESS: Stage 2 - Retrieve benthic data                                     ║
+ ║ 2025-10-08 14:02:53.51|SUCCESS: Stage 2 - Unzip benthic data                                        ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:03:05                  │ Stage 2 - Obtain data                           ║
+ ║ - Current stage: 2                                │  √ Retrieve benthic data                        ║
+ ║ - Current item: import_benthic_data               │  √ Unzip benthic data                           ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  √ Import benthic data                          ║
+ ║ - Refresh data: TRUE                              │  ─ Validate benthic data                        ║
+ ║ - Debug mode: TRUE                                │  ─ Save benthic data                            ║
+ ║ - AWS path: /home/project/data/                   │  ─ Legacy benthic data                          ║
+ ║ - Data from: User defined                         │  ─ Retrieve tier data                           ║
+ ║ - Domain category: tier                           │  ─ Get geoserver info                           ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │  ─ Get geoserver data                           ║
+ ║ - Domain name: data                               │  ─ Get coral reef shapefiles                    ║
+ ║ - Generate report: FALSE                          │ Stage 3 - Process data                          ║
+ ║ - Model type: 5                                   │ Stage 4 - Model data                            ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:45.87|WARNING: Stage 1 - Load package dependencies: package                        ║
+ ║                                 ‘INLA’ was built under R version 4.5.0.  This                       ║
+ ║                                 warning is for developers only                                      ║
+ ║ 2025-10-08 14:02:45.87|SUCCESS: Stage 1 - Load package dependencies                                 ║
+ ║ 2025-10-08 14:02:46.86|SUCCESS: Stage 2 - Retrieve benthic data                                     ║
+ ║ 2025-10-08 14:02:53.51|SUCCESS: Stage 2 - Unzip benthic data                                        ║
+ ║ 2025-10-08 14:03:05.32|SUCCESS: Stage 2 - Import benthic data                                       ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:03:05                  │ Stage 2 - Obtain data                           ║
+ ║ - Current stage: 2                                │  √ Retrieve benthic data                        ║
+ ║ - Current item: validate_benthic_data             │  √ Unzip benthic data                           ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  √ Import benthic data                          ║
+ ║ - Refresh data: TRUE                              │  √ Validate benthic data                        ║
+ ║ - Debug mode: TRUE                                │  ─ Save benthic data                            ║
+ ║ - AWS path: /home/project/data/                   │  ─ Legacy benthic data                          ║
+ ║ - Data from: User defined                         │  ─ Retrieve tier data                           ║
+ ║ - Domain category: tier                           │  ─ Get geoserver info                           ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │  ─ Get geoserver data                           ║
+ ║ - Domain name: data                               │  ─ Get coral reef shapefiles                    ║
+ ║ - Generate report: FALSE                          │ Stage 3 - Process data                          ║
+ ║ - Model type: 5                                   │ Stage 4 - Model data                            ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:45.87|SUCCESS: Stage 1 - Load package dependencies                                 ║
+ ║ 2025-10-08 14:02:46.86|SUCCESS: Stage 2 - Retrieve benthic data                                     ║
+ ║ 2025-10-08 14:02:53.51|SUCCESS: Stage 2 - Unzip benthic data                                        ║
+ ║ 2025-10-08 14:03:05.32|SUCCESS: Stage 2 - Import benthic data                                       ║
+ ║ 2025-10-08 14:03:05.93|SUCCESS: Stage 2 - Validate benthic data                                     ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:03:42                  │ Stage 2 - Obtain data                           ║
+ ║ - Current stage: 2                                │  √ Retrieve benthic data                        ║
+ ║ - Current item: save_data                         │  √ Unzip benthic data                           ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  √ Import benthic data                          ║
+ ║ - Refresh data: TRUE                              │  √ Validate benthic data                        ║
+ ║ - Debug mode: TRUE                                │  √ Save benthic data                            ║
+ ║ - AWS path: /home/project/data/                   │  ─ Legacy benthic data                          ║
+ ║ - Data from: User defined                         │  ─ Retrieve tier data                           ║
+ ║ - Domain category: tier                           │  ─ Get geoserver info                           ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │  ─ Get geoserver data                           ║
+ ║ - Domain name: data                               │  ─ Get coral reef shapefiles                    ║
+ ║ - Generate report: FALSE                          │ Stage 3 - Process data                          ║
+ ║ - Model type: 5                                   │ Stage 4 - Model data                            ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:02:46.86|SUCCESS: Stage 2 - Retrieve benthic data                                     ║
+ ║ 2025-10-08 14:02:53.51|SUCCESS: Stage 2 - Unzip benthic data                                        ║
+ ║ 2025-10-08 14:03:05.32|SUCCESS: Stage 2 - Import benthic data                                       ║
+ ║ 2025-10-08 14:03:05.93|SUCCESS: Stage 2 - Validate benthic data                                     ║
+ ║ 2025-10-08 14:03:42.17|SUCCESS: Stage 2 - Save benthic data                                         ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+TERM environment variable not set.
+ ╔═══════════════════════════════════════════════════╤═════════════════════════════════════════════════╗
+ ║ - Status directory: /tmp/RtmpJ50qAy               │          ReefCloud statistical modelling        ║
+ ║ - Status filename: status.Rdata                   │                                                 ║
+ ║ - Log filename: ../data4/log/reef_data.log        │ Stage 1 - Configure system                      ║
+ ║ - Date/Time: 08/10/2025 14:03:42                  │ Stage 2 - Obtain data                           ║
+ ║ - Current stage: 2                                │  √ Retrieve benthic data                        ║
+ ║ - Current item: retrieve_tier_data                │  √ Unzip benthic data                           ║
+ ║ - Run stages: c("1", "2", "3", "4")               │  √ Import benthic data                          ║
+ ║ - Refresh data: TRUE                              │  √ Validate benthic data                        ║
+ ║ - Debug mode: TRUE                                │  √ Save benthic data                            ║
+ ║ - AWS path: /home/project/data/                   │  √ Retrieve tier data                           ║
+ ║ - Data from: User defined                         │  ─ Get geoserver info                           ║
+ ║ - Domain category: tier                           │  ─ Get geoserver data                           ║
+ ║ - AWS output path: /home/project/d...utputs/tier/ │  ─ Get coral reef shapefiles                    ║
+ ║ - Domain name: data                               │ Stage 3 - Process data                          ║
+ ║ - Generate report: FALSE                          │ Stage 4 - Model data                            ║
+ ║ - Model type: 5                                   │                                                 ║
+ ║ - By tier level: 4                                │                                                 ║
+ ║ - Data path: ../data4/                            │                                                 ║
+ ║ - Input data: reef_data.zip                       │                                                 ║
+ ║ - R data file: reef_data.RData                    │                                                 ║
+ ║ - Filename: reef_data                             │                                                 ║
+ ║ - Input format: zip                               │                                                 ║
+ ║ - CSV file: reef_data.csv                         │                                                 ║
+ ║ - Tier data: tiers.zip                            │                                                 ║
+ ╠═══════════════════════════════════════════════════╧═════════════════════════════════════════════════╣
+ ║ 2025-10-08 14:03:05.32|SUCCESS: Stage 2 - Import benthic data                                       ║
+ ║ 2025-10-08 14:03:05.93|SUCCESS: Stage 2 - Validate benthic data                                     ║
+ ║ 2025-10-08 14:03:42.17|SUCCESS: Stage 2 - Save benthic data                                         ║
+ ║ 2025-10-08 14:03:42.19|WARNING: Stage 2 - Retrieve tier data: object 'tier.sf'                      ║
+ ║                                 not found.  This warning is for developers only                     ║
+ ║ 2025-10-08 14:03:42.19|SUCCESS: Stage 2 - Retrieve tier data                                        ║
+ ╚═════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Warning in readChar(con, 5L, useBytes = TRUE) :
+  cannot open compressed file '../data4/primary/tier4.sf.RData', probable reason 'No such file or directory'
+Error in readChar(con, 5L, useBytes = TRUE) : cannot open the connection
+Calls: <Anonymous> -> <Anonymous> -> <Anonymous> -> load -> readChar
+Execution halted

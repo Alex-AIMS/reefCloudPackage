@@ -67,12 +67,12 @@ make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) {
     suppressMessages() |>
     suppressWarnings()
 
-   # Update status 
+   # Update status
     old_item_name <- get_status_name(4, "make_reef_id")
-     if (!str_detect(old_item_name, "\\[")) {
+     if (!stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
      } else{
-        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
      }
      status:::update_status_name(stage = 4, item = "make_reef_id", name = new_item_name)
      

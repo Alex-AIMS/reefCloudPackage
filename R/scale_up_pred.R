@@ -19,13 +19,20 @@ scale_up_pred <- function(whichModel) {
   
   # ---- CASE 1: FRK/INLA model output (type5/type6) ----
     if (whichModel %in% c("type5", "type6")) {
-      
-      files <- list.files(
-        path = paste0(DATA_PATH, "modelled"),
-        pattern = "FRK|INLA", 
-        full.names = TRUE
-      )
-      files <- files[!grepl('TIER', files, perl = TRUE)]
+
+      modelled_path <- paste0(DATA_PATH, "modelled")
+      files <- if (dir.exists(modelled_path)) {
+        list.files(
+          path = modelled_path,
+          pattern = "FRK|INLA",
+          full.names = TRUE
+        )
+      } else {
+        character(0)
+      }
+      if (length(files) > 0) {
+        files <- files[!grepl('TIER', files, perl = TRUE)]
+      }
 
       # Stop if no model outputs found
       if (length(files) == 0) {
@@ -100,7 +107,9 @@ scale_up_pred <- function(whichModel) {
       rm(post_dist_df_list)
 
       # Log warnings for NAs
-      if (anyNA(post_dist_df_tier5) || anyNA(post_dist_df_all)) {
+      has_na_tier5 <- tryCatch(anyNA(post_dist_df_tier5), error = function(e) FALSE)
+      has_na_all <- tryCatch(anyNA(post_dist_df_all), error = function(e) FALSE)
+      if (isTRUE(has_na_tier5) || isTRUE(has_na_all)) {
         msg <- "Some model outputs contain NA values. Possibly not saved in the correct folder."
         status:::status_log("WARNING", log_file = log_file, "--Model predictions--", msg = msg)
       }

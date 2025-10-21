@@ -19,8 +19,8 @@ checkPackages <- function(log = TRUE) {
         ## unforunately we must do this the base r way until rlang is
         ## loaded
         eval(parse(text=paste0("suppressPackageStartupMessages(if(!require(",
-                               p,",quietly = TRUE, warn.conflicts = FALSE)) missing <- c(missing, ",
-                               p,"))")))
+                               p,",quietly = TRUE, warn.conflicts = FALSE)) missing <- c(missing, '",
+                               p,"'))")))
     }
     if (missing != "") {
       stop(paste(

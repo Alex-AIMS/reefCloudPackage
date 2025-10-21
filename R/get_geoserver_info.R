@@ -1,12 +1,13 @@
 #' @title Get Geoserver Info
-#' @description Retrieves metadata from the geoserver. 
+#' @description Retrieves metadata from the geoserver.
 #' This function loads available reefCloud layers and geoserver URL into the global environment.
-#' @return NULL 
+#' @return NULL
 #' @author Murray Logan
 #' @export
+#' @importFrom ows4R WFSClient
 #' @examples
 #' get_geoserver_info()
-#' # This will load `rc_client` in the global environment 
+#' # This will load `rc_client` in the global environment
 get_geoserver_info <- function() {
   status::status_try_catch(
   {

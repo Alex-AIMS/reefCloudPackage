@@ -30,19 +30,19 @@ select_covariates <- function(x, i , N) {
   variables_name_full <- grep("^max", variables_name_full, value = TRUE)
   
   filtered_data <- x |>
-    dplyr::select(all_of(variables_name_full)) |>
-    st_drop_geometry() |>
-    dplyr::summarise(across(everything(), ~ mid_quant_75(.x))) |>
-    tidyr::pivot_longer(everything(), names_to = "column", values_to = "q75_value") |>
+    dplyr::select(dplyr::all_of(variables_name_full)) |>
+    sf::st_drop_geometry() |>
+    dplyr::summarise(dplyr::across(dplyr::everything(), ~ mid_quant_75(.x))) |>
+    tidyr::pivot_longer(dplyr::everything(), names_to = "column", values_to = "q75_value") |>
     dplyr::filter(q75_value != 0) |>
     dplyr::pull(column)
 
    # Update status
     old_item_name <- get_status_name(4, "select_covariates")
-     if (!str_detect(old_item_name, "\\[")) {
+     if (!stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
      } else{
-        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
      }
      status:::update_status_name(stage = 4, item = "select_covariates", name = new_item_name)
 

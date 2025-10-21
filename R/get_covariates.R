@@ -33,6 +33,23 @@ get_covariates <- function() {
     # Determine which Tier column to use based on BY_TIER
     tier_col <- paste0("Tier", BY_TIER)
 
+    # DEBUG: Print available columns
+    message("DEBUG: Available columns in cov_dhw: ", paste(names(cov_dhw), collapse=", "))
+    message("DEBUG: Looking for tier column: ", tier_col)
+
+    # Check if tier_col exists in the data, if not, look for alternatives
+    if (!tier_col %in% names(cov_dhw)) {
+      # Try lowercase version
+      if (tolower(tier_col) %in% names(cov_dhw)) {
+        tier_col <- tolower(tier_col)
+      } else if ("tier_id" %in% names(cov_dhw)) {
+        # Fallback to tier_id if available
+        tier_col <- "tier_id"
+      } else {
+        stop(paste("Cannot find tier column. Available columns:", paste(names(cov_dhw), collapse=", ")))
+      }
+    }
+
     cov_dhw <- cov_dhw %>%
       dplyr::mutate(Tier5 = as.factor(!!sym(tier_col))) %>%
       sf::st_drop_geometry() %>%
@@ -67,6 +84,19 @@ get_covariates <- function() {
 
     # Determine which Tier column to use based on BY_TIER
     tier_col <- paste0("Tier", BY_TIER)
+
+    # Check if tier_col exists in the data, if not, look for alternatives
+    if (!tier_col %in% names(cov_cyc)) {
+      # Try lowercase version
+      if (tolower(tier_col) %in% names(cov_cyc)) {
+        tier_col <- tolower(tier_col)
+      } else if ("tier_id" %in% names(cov_cyc)) {
+        # Fallback to tier_id if available
+        tier_col <- "tier_id"
+      } else {
+        stop(paste("Cannot find tier column. Available columns:", paste(names(cov_cyc), collapse=", ")))
+      }
+    }
 
     cov_cyc <- cov_cyc %>%
       dplyr::mutate(Tier5 = as.factor(!!sym(tier_col))) %>%

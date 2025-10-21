@@ -16,7 +16,7 @@ data.grp.tier.ready <- data.grp.tier.ready %>%
 HexPred_reefid2 <- HexPred_reefid2 %>%
  dplyr:: mutate(fYEAR = as.character(fYEAR))
   
-data.sub <- left_join(data.grp.tier.ready, HexPred_reefid2) %>%
+data.sub <- dplyr::left_join(data.grp.tier.ready, HexPred_reefid2) %>%
   dplyr::select(P_CODE, reefid, Site, Transect, LONGITUDE, LATITUDE, Tier2:Tier5, fYEAR, fDEPTH, fGROUP:TOTAL, 
                 severity_cyc:max_dhw_lag2) %>%
   dplyr::mutate(
@@ -30,12 +30,12 @@ data.sub <- left_join(data.grp.tier.ready, HexPred_reefid2) %>%
 
 return(list(data.sub = data.sub))
 
- # Update status 
+ # Update status
   old_item_name <- get_status_name(4, "prep_INLA_objects")
-        if (!str_detect(old_item_name, "\\[")) {
+        if (!stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
         } else{
-        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
         }
       status:::update_status_name(stage = 4, item = "prep_INLA_objects", name = new_item_name)
    },
