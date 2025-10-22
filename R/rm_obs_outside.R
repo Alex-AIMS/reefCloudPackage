@@ -28,12 +28,18 @@
 #' }
 #' @export
 rm_obs_outside <- function(data.grp.tier, HexPred_reefid2, i , N) {
-   status::status_try_catch(
+   result <- status::status_try_catch(
      {
-  data.grp.tier.sf <- data.grp.tier |>
+  # Capture parameters to avoid scope issues
+  data_input <- data.grp.tier
+  HexPred_input <- HexPred_reefid2
+  i_input <- i
+  N_input <- N
+
+  data.grp.tier.sf <- data_input |>
     sf::st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
 
-  within_check <- sf::st_within(data.grp.tier.sf, HexPred_reefid2)
+  within_check <- sf::st_within(data.grp.tier.sf, HexPred_input)
 
   inside_indices <- which(lengths(within_check) > 0)
 
@@ -46,19 +52,22 @@ rm_obs_outside <- function(data.grp.tier, HexPred_reefid2, i , N) {
 
    # Update status
     old_item_name <- get_status_name(4, "rm_obs_outside_tier5_cells")
-     if (!stringr::str_detect(old_item_name, "\\[")) {
-        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-     } else{
-        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+     if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i_input," / ", N_input,"]")
+     } else if (!is.na(old_item_name)) {
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i_input," / ", N_input,"]"))
+     } else {
+        new_item_name <- paste("Remove obs outside tier5 cells [",i_input," / ", N_input,"]")
      }
      status:::update_status_name(stage = 4, item = "rm_obs_outside_tier5_cells", name = new_item_name)
 
+     data.grp.tier.filtered
      },
      stage_ = 4,
      order_ = 8,
      name_ = "Remove obs outside tier5 cells",
      item_ = "rm_obs_outside_tier5_cells"
    )
-  
-  return(data.grp.tier.filtered)
+
+  return(result)
 }

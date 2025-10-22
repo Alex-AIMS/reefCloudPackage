@@ -29,6 +29,12 @@ load_data_for_model <- function() {
   rdata_path <- file.path(DATA_PATH, "processed", RDATA_FILE)
   if (file.exists(rdata_path)) {
     load(rdata_path, envir = .GlobalEnv)
+    # Ensure 'data' variable is loaded into global environment
+    if (!exists("data", envir = .GlobalEnv)) {
+      stop("Data file loaded but 'data' object not found in loaded file: ", rdata_path)
+    }
+  } else {
+    stop("Required data file not found: ", rdata_path)
   }
 
   # Set target groups

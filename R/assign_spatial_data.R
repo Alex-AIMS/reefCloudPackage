@@ -8,10 +8,13 @@
 #' @author Murray Logan
 #' @export
 assign_spatial_data <- function(data) {
-  status::status_try_catch(
+  result <- status::status_try_catch(
   {
+    # Capture parameter to avoid scope issues
+    data_input <- data
+
     ## This only needs to be done at the site level
-    data.site <- data %>%
+    data.site <- data_input %>%
       dplyr::group_by(P_CODE, REEF, SITE_NO) %>%
       dplyr::summarise(
         LATITUDE = mean(LATITUDE),
@@ -27,12 +30,14 @@ assign_spatial_data <- function(data) {
       dplyr::distinct() %>%
       suppressMessages() %>%
       suppressWarnings()
-    data <- data %>%
+    data_processed <- data_input %>%
       dplyr::left_join(data.site) %>%
       suppressMessages()
     rm(data.site)
-    data <- data %>% dplyr::filter(!is.na(GROUP_DESC))  # this is necessary to counteract spurious joins to tiers
+    data_processed <- data_processed %>% dplyr::filter(!is.na(GROUP_DESC))  # this is necessary to counteract spurious joins to tiers
     if (!DEBUG_MODE) cli_alert_success("Spatial domains successfully applied to the benthic data")
+
+    data_processed  # Return from try_catch block
   },
   stage_ = 3,
   order_ = 4,
@@ -40,5 +45,5 @@ assign_spatial_data <- function(data) {
   item_ = "assign_spatial_data"
   )
 
-  return(data)
+  return(result)
 }

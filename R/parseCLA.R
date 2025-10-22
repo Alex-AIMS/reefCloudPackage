@@ -34,6 +34,9 @@
 parseCLA <- function(args) {
   status::status_try_catch(
   {
+  # CAPTURE ALL PARAMETERS AT THE START
+  args_input <- args
+
   valid_cla <- paste0("The call must be of the form:\n",
     "30_model.R --bucket=\"<PATH>\"",
     "\n\t--domain=<DOMAIN>",
@@ -48,23 +51,23 @@ parseCLA <- function(args) {
     "\n\t\tprogress is provided via a CLI",
     "\n<NUM>:\t which stages of the analysis to run (-1 or missing is all stages")
 
-  bucket <- grep('--bucket=.*', args)
-  domain <- grep('--domain=.*', args)
-  by_tier <- grep('--by_tier=.*', args)
-  model_type <- grep('--model_type=.*', args)
+  bucket <- grep('--bucket=.*', args_input)
+  domain <- grep('--domain=.*', args_input)
+  by_tier <- grep('--by_tier=.*', args_input)
+  model_type <- grep('--model_type=.*', args_input)
 
-  REFRESH_DATA <<- ifelse(any(grepl('--refresh_data ?= ?(true|t|TRUE|T)', args, perl = TRUE)), TRUE, FALSE)
+  REFRESH_DATA <<- ifelse(any(grepl('--refresh_data ?= ?(true|t|TRUE|T)', args_input, perl = TRUE)), TRUE, FALSE)
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "REFRESH_DATA",
   ##   status = "success", update_display = FALSE)
   status::add_setting(element = "refresh_data", item = REFRESH_DATA, name = "Refresh data")
 
-  DEBUG_MODE <<- ifelse(any(grepl('--debug ?= ?(true|t|TRUE|T)', args, perl = TRUE)), TRUE, FALSE)
+  DEBUG_MODE <<- ifelse(any(grepl('--debug ?= ?(true|t|TRUE|T)', args_input, perl = TRUE)), TRUE, FALSE)
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "DEBUG_MODE",
   ##   status = "success", update_display = FALSE)
   status::add_setting(element = "debug_mode", item = DEBUG_MODE, name = "Debug mode")
 
-  runstage <<- grep('--runStage ?=.*', args, perl = TRUE)
-  runStage <<- gsub('--runStage ?= ?', '\\1', args[runstage])
+  runstage <<- grep('--runStage ?=.*', args_input, perl = TRUE)
+  runStage <<- gsub('--runStage ?= ?', '\\1', args_input[runstage])
   if (length(runStage) == 0) {
     ## runStage <<- reefCloudPackage::get_stages()
     runStage <<- status::get_setting(element = "run_stages")
@@ -81,8 +84,10 @@ parseCLA <- function(args) {
     stop(paste0('A bucket (location/path of raw data) needs to be provided as a command line arguement, such as: Rscript <script.R> --bucket=<PATH>\n\n',
       valid_cla
     ))
-  file <- args[bucket]
+  file <- args_input[bucket]
   AWS_PATH <<- gsub('--bucket=(.*)','\\1/', file)
+  # Normalize path to remove double slashes
+  AWS_PATH <<- gsub('/+', '/', AWS_PATH)
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "AWS_PATH",
   ##   status = "success", update_display = FALSE)
   status::add_setting(element = "aws_path", item = AWS_PATH, name = "AWS path")
@@ -101,11 +106,11 @@ parseCLA <- function(args) {
     stop(paste0('A domain needs to be provided as a command line arguement, such as: Rscript <script.R> --domain=<DOMAIN>\n\n',
       valid_cla
     ))
-  if (!grepl('--domain=(site|tier)',args[domain], perl=TRUE))
+  if (!grepl('--domain=(site|tier)',args_input[domain], perl=TRUE))
     stop("The supplied domain in --domain=<domain> must be either 'site' or 'tier'")
 
   ## Set domain category global variable
-  DOMAIN_CATEGORY <<- gsub('--domain=', '', args[domain])
+  DOMAIN_CATEGORY <<- gsub('--domain=', '', args_input[domain])
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "DOMAIN_CATEGORY",
   ##   status = "success", update_display = FALSE)
   status::add_setting(element = "domain_category", item = DOMAIN_CATEGORY, name = "Domain category")
@@ -133,7 +138,7 @@ parseCLA <- function(args) {
   if (length(model_type) == 0) {
     MODEL_TYPE <<- 2   #simple hierachical
   } else {
-    MODEL_TYPE <<- as.numeric(gsub('--model_type=(.*)', '\\1', args[model_type]))
+    MODEL_TYPE <<- as.numeric(gsub('--model_type=(.*)', '\\1', args_input[model_type]))
   }
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "MODEL_TYPE",
   ##   status = "success", update_display = FALSE)
@@ -143,7 +148,7 @@ parseCLA <- function(args) {
   if (length(by_tier) == 0) {
     BY_TIER <<- 2
   } else {
-    BY_TIER <<- gsub('--by_tier=(.*)', '\\1', args[by_tier])
+    BY_TIER <<- gsub('--by_tier=(.*)', '\\1', args_input[by_tier])
   }
   ## reefCloudPackage::change_status(stage = "SETTINGS", item = "BY_TIER",
   ##   status = "success", update_display = FALSE)

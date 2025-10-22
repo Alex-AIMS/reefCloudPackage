@@ -139,10 +139,12 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
 
     # Update status
       old_item_name <- get_status_name(4, "FRK_fit")
-        if (!stringr::str_detect(old_item_name, "\\[")) {
+        if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-        } else{
+        } else if (!is.na(old_item_name)) {
         new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        } else {
+        new_item_name <- paste("Fit FRK model [",i," / ", N,"]")
         }
       status:::update_status_name(stage = 4, item = "FRK_fit", name = new_item_name)
 
@@ -199,10 +201,12 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
 
     # Update status
       old_item_name <- get_status_name(4, "FRK_saved")
-        if (!stringr::str_detect(old_item_name, "\\[")) {
+        if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-        } else{
+        } else if (!is.na(old_item_name)) {
         new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        } else {
+        new_item_name <- paste("Saved FRK outputs [",i," / ", N,"]")
         }
       status:::update_status_name(stage = 4, item = "FRK_saved", name = new_item_name)
 

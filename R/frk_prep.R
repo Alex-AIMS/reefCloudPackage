@@ -13,22 +13,40 @@
 #' @author Julie Vercelloni
 #' @export
 frk_prep <- function(data.grp.tier, HexPred_reefid2, i , N) {
-   status::status_try_catch(
+   result <- status::status_try_catch(
      {
+      # Capture parameters to avoid scope issues
+      data_input <- data.grp.tier
+      HexPred_input <- HexPred_reefid2
+      i_input <- i
+      N_input <- N
+
+      # Validate required columns
+      required_cols <- c("LONGITUDE", "LATITUDE", "fYEAR", "TOTAL")
+      missing_cols <- setdiff(required_cols, names(data_input))
+      if (length(missing_cols) > 0) {
+        stop(sprintf("Missing required columns for FRK: %s",
+                     paste(missing_cols, collapse = ", ")))
+      }
+
       # Convert fYEAR to Date (start of year)
-      data.grp.tier$Year <- as.Date(paste0(as.character(data.grp.tier$fYEAR), "-01-01"))
-      data.grp.tier$k_Z <- data.grp.tier$TOTAL  # number of trials
-      
-      lon_idx <- which(names(data.grp.tier) == "LONGITUDE")
-      lat_idx <- which(names(data.grp.tier) == "LATITUDE")
-      
-      STObj <- stConstruct(x = data.grp.tier,
+      data_input$Year <- as.Date(paste0(as.character(data_input$fYEAR), "-01-01"))
+      data_input$k_Z <- data_input$TOTAL  # number of trials
+
+      lon_idx <- which(names(data_input) == "LONGITUDE")
+      lat_idx <- which(names(data_input) == "LATITUDE")
+
+      if (length(lon_idx) == 0 || length(lat_idx) == 0) {
+        stop("LONGITUDE or LATITUDE columns not found in data")
+      }
+
+      STObj <- stConstruct(x = data_input,
                            space = c(lon_idx, lat_idx),
                            time = "Year",
                            interval = TRUE)
-      
+
       # Convert HexPred_reefid2 to sp object for BAU construction
-      HexPred_sp <- sf::as_Spatial(HexPred_reefid2)
+      HexPred_sp <- sf::as_Spatial(HexPred_input)
       nHEX <- nrow(subset(HexPred_sp, fYEAR == min(HexPred_sp@data$fYEAR)))
       nYEAR <- length(unique(HexPred_sp@data$fYEAR))
       
@@ -66,20 +84,23 @@ frk_prep <- function(data.grp.tier, HexPred_reefid2, i , N) {
                           regular = TRUE)
     # Update status
       old_item_name <- get_status_name(4, "prep_FRK_objects")
-        if (!stringr::str_detect(old_item_name, "\\[")) {
-        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-        } else{
-        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i_input," / ", N_input,"]")
+        } else if (!is.na(old_item_name)) {
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i_input," / ", N_input,"]"))
+        } else {
+        new_item_name <- paste("Prep FRK objects [",i_input," / ", N_input,"]")
         }
       status:::update_status_name(stage = 4, item = "prep_FRK_objects", name = new_item_name)
 
+      # Return objects
+      list("ST_BAUs" = ST_BAUs, "STObj" = STObj, "basis" = basis)
      },
      stage_ = 4,
      order_ = 9,
      name_ = "Prep FRK objects",
      item_ = "prep_FRK_objects"
    )
-  
-  obj_frk <- list("ST_BAUs" = ST_BAUs, "STObj" = STObj, "basis" = basis)
-  return(obj_frk)
+
+  return(result)
 }

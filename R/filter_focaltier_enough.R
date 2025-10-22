@@ -23,57 +23,67 @@
 #' @author Julie Vercelloni
 #' @export
 filter_focaltier_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp, i , N) {
-   status::status_try_catch(
+   result <- status::status_try_catch(
    {
+  # Capture input parameters
+  data.grp_input <- data.grp
+  FOCAL_TIER_input <- FOCAL_TIER
+  n.spat_input <- n.spat
+  n.temp_input <- n.temp
+  i_input <- i
+  N_input <- N
   # Check if required columns exist
   required_cols <- c("LONGITUDE", "LATITUDE", "fYEAR")
-  missing_cols <- setdiff(required_cols, names(data.grp))
+  missing_cols <- setdiff(required_cols, names(data.grp_input))
 
   if (length(missing_cols) > 0) {
     # If columns don't exist, return all data (no filtering possible)
-    return(data.grp)
-  }
+    data.grp_input
+  } else {
 
-  original_tiers <- unique(data.grp[[FOCAL_TIER]])
+  original_tiers <- unique(data.grp_input[[FOCAL_TIER_input]])
 
   # Step 1: Spatial Filtering
-  tal_tier_spat <- data.grp |>
-    dplyr::count(!!sym(FOCAL_TIER), LONGITUDE, LATITUDE) |>
-    dplyr::count(!!sym(FOCAL_TIER)) |>
-    dplyr::filter(n > n.spat)
+  tal_tier_spat <- data.grp_input |>
+    dplyr::count(!!sym(FOCAL_TIER_input), LONGITUDE, LATITUDE) |>
+    dplyr::count(!!sym(FOCAL_TIER_input)) |>
+    dplyr::filter(n > n.spat_input)
 
-  data.grp.filtered <- data.grp |>
-    dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_spat[[FOCAL_TIER]]) |>
+  data.grp.filtered <- data.grp_input |>
+    dplyr::filter(!!sym(FOCAL_TIER_input) %in% tal_tier_spat[[FOCAL_TIER_input]]) |>
     droplevels()
 
   # Step 2: Temporal Filtering
-  tal_tier_temp <- data.grp |>
-    dplyr::count(!!sym(FOCAL_TIER), fYEAR) |>
-    dplyr::count(!!sym(FOCAL_TIER)) |>
-    dplyr::filter(n > n.temp)
+  tal_tier_temp <- data.grp_input |>
+    dplyr::count(!!sym(FOCAL_TIER_input), fYEAR) |>
+    dplyr::count(!!sym(FOCAL_TIER_input)) |>
+    dplyr::filter(n > n.temp_input)
 
   data.grp.enough <- data.grp.filtered |>
-    dplyr::filter(!!sym(FOCAL_TIER) %in% tal_tier_temp[[FOCAL_TIER]]) |>
+    dplyr::filter(!!sym(FOCAL_TIER_input) %in% tal_tier_temp[[FOCAL_TIER_input]]) |>
     droplevels() |>
     data.frame()
 
   # Step 3: Identify Removed Tiers
-  remaining_tiers <- unique(data.grp.enough[[FOCAL_TIER]])
+  remaining_tiers <- unique(data.grp.enough[[FOCAL_TIER_input]])
   removed_tiers <- setdiff(original_tiers, remaining_tiers)
 
-  data.grp.removed <- data.grp |>
-    dplyr::filter(!!sym(FOCAL_TIER) %in% removed_tiers)
+  data.grp.removed <- data.grp_input |>
+    dplyr::filter(!!sym(FOCAL_TIER_input) %in% removed_tiers)
 
-  return(data.grp.enough)
-  
-  # Update status 
+  # Update status before returning
   old_item_name <- get_status_name(4, "filter_data_enough")
-        if (!str_detect(old_item_name, "\\[")) {
-        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-        } else{
-        new_item_name <- str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i_input," / ", N_input,"]")
+        } else if (!is.na(old_item_name)) {
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i_input," / ", N_input,"]"))
+        } else {
+        new_item_name <- paste("Filter data with enough coverage [",i_input," / ", N_input,"]")
         }
       status:::update_status_name(stage = 4, item = "filter_data_enough", name = new_item_name)
+
+  data.grp.enough
+  }
 
   },
    stage_ = 4,
@@ -81,5 +91,5 @@ filter_focaltier_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp, i , N)
    name_ = "Filter data with enough coverage",
    item_ = "filter_data_enough"
    )
-  
+   return(result)
 }

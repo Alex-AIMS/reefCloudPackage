@@ -48,7 +48,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
   ###################### START THE LOOP (PARALLEL or SEQUENTIAL)
 
   process_tier <- function(i) {
-    TIER <<- as.character(tiers[i])
+    TIER <- as.character(tiers[i])  # Local variable only (no global assignment in parallel context)
 
     #--- Filter input data
     data.grp.tier <- data.grp |>
@@ -70,8 +70,22 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       )
 
     #--- Apply control quality on extreme values
-    out_cycl <- stats::quantile(full_cov_raw$max_cyc, probs = 0.975)
-    out_dhw  <- stats::quantile(full_cov_raw$max_dhw, probs = 0.975)
+    # Validate columns exist
+    if (!all(c("max_cyc", "max_dhw") %in% names(full_cov_raw))) {
+      stop("Missing required covariate columns: max_cyc and/or max_dhw")
+    }
+
+    # Calculate quantiles with NA handling
+    out_cycl <- stats::quantile(full_cov_raw$max_cyc, probs = 0.975, na.rm = TRUE)
+    out_dhw  <- stats::quantile(full_cov_raw$max_dhw, probs = 0.975, na.rm = TRUE)
+
+    # Validate results
+    if (is.na(out_cycl) || is.na(out_dhw)) {
+      warning(sprintf("Could not calculate covariate thresholds for tier %s (all NA values)", TIER))
+      # Use conservative defaults
+      out_cycl <- Inf
+      out_dhw <- Inf
+    }
 
     HexPred_sf <- full_cov_raw |>
       dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
@@ -108,10 +122,17 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     #--- Filter observations outside Tier5
     data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2, i, N)
    
-    ## Log removed observations and stop if more than 30% of observations are outside tier5 cells 
+    ## Log removed observations and stop if more than 30% of observations are outside tier5 cells
+
+    # Check for empty data before calculating percentage
+    if (nrow(data.grp.tier) == 0) {
+      msg <- paste("No observations for", FOCAL_TIER, ":", TIER)
+      status:::status_log("ERROR", log_file = log_file, "--Fitting INLA model--", msg = msg)
+      next
+    }
 
     diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
-     if (diff_perc > 30) {
+     if (!is.na(diff_perc) && !is.nan(diff_perc) && diff_perc > 30) {
        msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
        status:::status_log("ERROR", log_file = log_file, "--Fitting INLA model--", msg = msg)
      next
@@ -194,10 +215,12 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
 
     # Update status
       old_item_name <- get_status_name(4, "INLA_fit")
-        if (!stringr::str_detect(old_item_name, "\\[")) {
+        if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-        } else{
+        } else if (!is.na(old_item_name)) {
         new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        } else {
+        new_item_name <- paste("Fit INLA model [",i," / ", N,"]")
         }
       status:::update_status_name(stage = 4, item = "INLA_fit", name = new_item_name)
 
@@ -282,10 +305,12 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
     )
       # Update status
       old_item_name <- get_status_name(4, "INLA_saved")
-        if (!stringr::str_detect(old_item_name, "\\[")) {
+        if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
         new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-        } else{
+        } else if (!is.na(old_item_name)) {
         new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+        } else {
+        new_item_name <- paste("Saved INLA outputs [",i," / ", N,"]")
         }
       status:::update_status_name(stage = 4, item = "INLA_saved", name = new_item_name)
 
@@ -310,6 +335,22 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       mc.cores = n_cores,
       mc.preschedule = FALSE  # Dynamic scheduling for better load balancing
     )
+
+    # Check for errors in parallel results
+    errors <- sapply(results, function(x) inherits(x, "try-error"))
+    if (any(errors)) {
+      error_indices <- which(errors)
+      error_tiers <- tiers[error_indices]
+      error_msgs <- sapply(results[errors], as.character)
+
+      msg <- sprintf("Model fitting failed for %d tier(s): %s\nErrors: %s",
+                     sum(errors),
+                     paste(error_tiers, collapse = ", "),
+                     paste(error_msgs, collapse = "; "))
+      status:::status_log("ERROR", log_file = log_file,
+                         "--Fitting INLA model--", msg = msg)
+      stop(msg)
+    }
   } else {
     # Sequential execution (fallback)
     results <- lapply(seq_along(tiers), process_tier)

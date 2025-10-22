@@ -12,11 +12,13 @@
 ##' @return dataframe 
 ##' @author Murray
 fill_gaps <- function(data) {
-  status::status_try_catch(
+  result <- status::status_try_catch(
   {
-    ## GROUPS <- data %>% pull(fGROUP) %>% unique
+    # Capture input parameters
+    data_input <- data
+    ## GROUPS <- data_input %>% pull(fGROUP) %>% unique
     GROUPS <- c("CRUSTOSE CORALLINE ALGAE","HARD CORAL","MACROALGAE","TURF ALGAE","SOFT CORAL","OTHER")
-    data.filler <- data %>%
+    data.filler <- data_input %>%
       dplyr::select(P_CODE, #ID,
         DATA_TYPE, REEF,
         SITE, SITE_NO, TRANSECT_NO,
@@ -33,7 +35,7 @@ fill_gaps <- function(data) {
     ## data.filler %>% filter(DATA_TYPE == 'Legacy', SITE == 'Ngaraard', fGROUP == 'OTHER') %>% as.data.frame %>% head
     ## -----------------------
 
-    data <- data %>%
+    data_result <- data_input %>%
       full_join(data.filler) %>%
       group_by(P_CODE, #ID,
         DATA_TYPE, REEF,
@@ -88,12 +90,13 @@ fill_gaps <- function(data) {
     ## return=NULL,
     ## stage = paste0("STAGE", CURRENT_STAGE),
     ## item = "Filling data gaps")
-    
+
+    data_result
   },
   stage_ = 3,
   order_ = 10,
   name_ = "Fill data gaps",
   item_ = "fill_data_gaps"
   )
-  return(data)
+  return(result)
 }

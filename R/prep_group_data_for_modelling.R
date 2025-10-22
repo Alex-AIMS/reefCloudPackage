@@ -8,8 +8,12 @@
 prep_group_data_for_modelling <- function(data, GROUP) {
   data.grp <- status::status_try_catch(
   {
-    data %>%
-      dplyr::filter(fGROUP == GROUP) %>%
+    # CAPTURE ALL PARAMETERS AT THE START
+    data_input <- data
+    GROUP_input <- GROUP
+
+    data_input %>%
+      dplyr::filter(fGROUP == GROUP_input) %>%
       droplevels() %>%
       dplyr::mutate(
         Tier5 = factor(Tier5),

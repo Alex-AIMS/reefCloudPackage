@@ -30,18 +30,38 @@ rm_factor <- function(model_formula, data.sub) {
   response_var <- all.vars(model_formula)[1]
 
   for (v in vars) {
+    # Check if column exists
+    if (!v %in% names(data.sub)) {
+      warning(sprintf("Formula variable '%s' not found in data", v))
+      term.labels <- term.labels[term.labels != v]
+      term.labels <- term.labels[!grepl(paste0("^f\\(", v, "\\b"), term.labels)]
+      next
+    }
+
     v_data <- data.sub[[v]]
+
+    # Skip if numeric
     if (is.numeric(v_data)) next
+
+    # Skip if factor with 2+ levels
     if (is.factor(v_data) && length(levels(v_data)) >= 2) next
+
+    # Remove this variable's terms
     term.labels <- term.labels[term.labels != v]
     term.labels <- term.labels[!grepl(paste0("^f\\(", v, "\\b"), term.labels)]
   }
 
-  model_formula <- reformulate(term.labels, response = response_var)
+  # Validate result
+  if (length(term.labels) == 0) {
+    warning("All formula terms removed - returning intercept-only model")
+    model_formula <- reformulate("1", response = response_var)
+  } else {
+    model_formula <- reformulate(term.labels, response = response_var)
 
-  # Add intercept back in if only random effects remain
-  if (all(stringr::str_detect(term.labels, "^f\\(")))
-    model_formula <- update(model_formula, . ~ . + 1)
+    # Add intercept back in if only random effects remain
+    if (all(stringr::str_detect(term.labels, "^f\\(")))
+      model_formula <- update(model_formula, . ~ . + 1)
+  }
 
   return(model_formula)
 }

@@ -8,15 +8,26 @@
 #' @export
 
 process_contrasts <- function(cellmeans_wide, tier_col) {
+  # Validate year columns exist
+  year_cols <- grep("20", names(cellmeans_wide), value = TRUE)
+  if (length(year_cols) == 0) {
+    stop("No year columns found in cellmeans_wide (expected columns containing '20')")
+  }
+
   predictions_i <- cellmeans_wide |>
     mutate(iter = seq_len(n())) |>
     pivot_longer(cols = contains("20"), names_to = "year") |>
     mutate(year = as.integer(year)) |>
     arrange(year, iter) |>
     group_by(iter) |>
-    mutate(diff = value / lag(value, n = 1),
+    mutate(diff = if_else(is.na(lag(value, n = 1)) | lag(value, n = 1) == 0, NA_real_, value / lag(value, n = 1)),
            diff_id = factor(paste0("diff_", seq_len(n())))) |>
     ungroup()
+
+  # Validate year conversion succeeded
+  if (anyNA(predictions_i$year)) {
+    stop("Year column conversion to integer failed")
+  }
 
   max_iter <- max(predictions_i$iter)
 

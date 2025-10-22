@@ -22,9 +22,17 @@ for (arg in cmd_args) {
   }
 }
 
+# Get DATA_PATH from environment variable, default to /data4/
+DATA_PATH <- Sys.getenv("DATA_PATH", unset = "/data4/")
+# Ensure trailing slash
+if (!grepl("/$", DATA_PATH)) {
+  DATA_PATH <- paste0(DATA_PATH, "/")
+}
+cat(sprintf("Using DATA_PATH: %s\n", DATA_PATH))
+
 # Set command line arguments
 args <- c(
-  "--bucket=./data/AUS/",
+  paste0("--bucket=", DATA_PATH),
   "--domain=tier",
   "--by_tier=5",
   "--model_type=6",
@@ -39,8 +47,8 @@ for (arg in args) {
 }
 cat("\n")
 
-# Define checkpoint directory
-CHECKPOINT_DIR <- "/data/AUS/checkpoints"
+# Define checkpoint directory using DATA_PATH
+CHECKPOINT_DIR <- paste0(DATA_PATH, "checkpoints")
 dir.create(CHECKPOINT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 # Helper functions for checkpointing

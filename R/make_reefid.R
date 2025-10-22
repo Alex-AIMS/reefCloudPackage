@@ -10,23 +10,30 @@
 #' @author Julie Vercelloni
 #' @export
 make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) {
-   status::status_try_catch(
+   result <- status::status_try_catch(
    {
+  # Capture parameters to avoid scope issues
+  tier_input <- tier.sf.joined
+  HexPred_input <- HexPred_sf
+  reef_layer_input <- reef_layer.sf
+  i_input <- i
+  N_input <- N
+
   sf::sf_use_s2(TRUE) |> suppressMessages()
 
-  covs.hexpred_tier_sf <- HexPred_sf |>
-    dplyr::left_join(tier.sf.joined, by = c("Tier5" = "Tier5")) |>
+  covs.hexpred_tier_sf <- HexPred_input |>
+    dplyr::left_join(tier_input, by = c("Tier5" = "Tier5")) |>
     dplyr::filter(fYEAR == min(fYEAR)) |>
     droplevels() |>
     sf::st_as_sf() |>
     sf::st_cast("POLYGON") |>
-    sf::st_transform(crs = sf::st_crs(reef_layer.sf)) |>
+    sf::st_transform(crs = sf::st_crs(reef_layer_input)) |>
     suppressMessages() |>
     suppressWarnings()
 
   # Check CRS units
   testthat::expect_equal(sf::st_crs(covs.hexpred_tier_sf)$units, "m")
-  testthat::expect_equal(sf::st_crs(reef_layer.sf)$units, "m")
+  testthat::expect_equal(sf::st_crs(reef_layer_input)$units, "m")
 
   # OPTIMIZATION #3: Cache cropped reef layers (saves 2-3x on geometry operations)
   # Create cache key based on bbox and CRS
@@ -43,7 +50,7 @@ make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) {
     load(cache_file)
   } else {
     # Compute and cache
-    Reef_layer_tier5_84 <- reef_layer.sf |>
+    Reef_layer_tier5_84 <- reef_layer_input |>
       sf::st_crop(covs.hexpred_tier_sf) |>
       sf::st_cast("POLYGON") |>
       dplyr::mutate(reefid = dplyr::row_number()) |>
@@ -61,26 +68,44 @@ make_reefid <- function(tier.sf.joined, HexPred_sf, reef_layer.sf, i , N) {
   # Join the shapefiles
   sf::sf_use_s2(FALSE) |> suppressMessages()
 
+  n_input <- nrow(covs.hexpred_tier_sf_84)
+
   covs.hexpred_tier_sf_v2_prep <- covs.hexpred_tier_sf_84 |>
-    sf::st_join(Reef_layer_tier5_84) |>
-    dplyr::select(Tier5, reefid, geometry) |>
-    suppressMessages() |>
-    suppressWarnings()
+    sf::st_join(Reef_layer_tier5_84)
+
+  n_output <- nrow(covs.hexpred_tier_sf_v2_prep)
+
+  if (n_output > n_input * 1.5) {
+    warning(sprintf("st_join produced %d rows from %d inputs (%.1f%% increase) - possible spatial overlaps",
+                   n_output, n_input, ((n_output - n_input) / n_input) * 100))
+  }
+
+  covs.hexpred_tier_sf_v2_prep <- covs.hexpred_tier_sf_v2_prep |>
+    dplyr::select(Tier5, reefid, geometry)
+
+  # Check for missing reefid
+  if (anyNA(covs.hexpred_tier_sf_v2_prep$reefid)) {
+    n_missing <- sum(is.na(covs.hexpred_tier_sf_v2_prep$reefid))
+    warning(sprintf("%d features have no reef assignment (NA reefid)", n_missing))
+  }
 
    # Update status
     old_item_name <- get_status_name(4, "make_reef_id")
-     if (!stringr::str_detect(old_item_name, "\\[")) {
-        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-     } else{
-        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+     if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i_input," / ", N_input,"]")
+     } else if (!is.na(old_item_name)) {
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i_input," / ", N_input,"]"))
+     } else {
+        new_item_name <- paste("Make reef id [",i_input," / ", N_input,"]")
      }
      status:::update_status_name(stage = 4, item = "make_reef_id", name = new_item_name)
-     
+
+   covs.hexpred_tier_sf_v2_prep
    },
    stage_ = 4,
    order_ = 7,
    name_ = "Make reef id",
    item_ = "make_reef_id"
    )
-  return(covs.hexpred_tier_sf_v2_prep)
+  return(result)
 }

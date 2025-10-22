@@ -24,12 +24,22 @@
 #' }
 #' @export
 select_covariates <- function(x, i , N) {
-   status::status_try_catch(
+   result <- status::status_try_catch(
    {
-  variables_name_full <- names(x)
+  # Capture parameters to avoid scope issues
+  x_input <- x
+  i_input <- i
+  N_input <- N
+
+  variables_name_full <- names(x_input)
   variables_name_full <- grep("^max", variables_name_full, value = TRUE)
-  
-  filtered_data <- x |>
+
+  if (length(variables_name_full) == 0) {
+    warning("No covariate columns found (none starting with 'max')")
+    return(character(0))
+  }
+
+  filtered_data <- x_input |>
     dplyr::select(dplyr::all_of(variables_name_full)) |>
     sf::st_drop_geometry() |>
     dplyr::summarise(dplyr::across(dplyr::everything(), ~ mid_quant_75(.x))) |>
@@ -37,20 +47,27 @@ select_covariates <- function(x, i , N) {
     dplyr::filter(q75_value != 0) |>
     dplyr::pull(column)
 
+  if (length(filtered_data) == 0) {
+    message("No covariates passed 75th quantile threshold")
+  }
+
    # Update status
     old_item_name <- get_status_name(4, "select_covariates")
-     if (!stringr::str_detect(old_item_name, "\\[")) {
-        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-     } else{
-        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+     if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i_input," / ", N_input,"]")
+     } else if (!is.na(old_item_name)) {
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i_input," / ", N_input,"]"))
+     } else {
+        new_item_name <- paste("Select covariates [",i_input," / ", N_input,"]")
      }
      status:::update_status_name(stage = 4, item = "select_covariates", name = new_item_name)
 
-    return(filtered_data)
+    filtered_data
    },
    stage_ = 4,
    order_ = 6,
    name_ = "Select covariates",
    item_ = "select_covariates"
    )
+   return(result)
 }

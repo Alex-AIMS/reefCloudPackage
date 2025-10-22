@@ -11,14 +11,17 @@
 #' @export
 scale_up_pred <- function(whichModel) {
 
-  status::status_try_catch({
+  result <- status::status_try_catch({
+
+    # Capture input parameters
+    whichModel_input <- whichModel
 
     # ---- Load input data tables for modelling ----
    # reefCloudPackage::load_data_for_model()
   #  load(file.path(DATA_PATH, "primary", "tier5.sf.RData"), envir = .GlobalEnv)
   
   # ---- CASE 1: FRK/INLA model output (type5/type6) ----
-    if (whichModel %in% c("type5", "type6")) {
+    if (whichModel_input %in% c("type5", "type6")) {
 
       modelled_path <- paste0(DATA_PATH, "modelled")
       files <- if (dir.exists(modelled_path)) {
@@ -46,18 +49,57 @@ scale_up_pred <- function(whichModel) {
       post_dist_df_list <- list()
       data_tier_list <- list()
 
-      for (i in seq_along(data.list)) {
-        GROUP <- "HARD CORAL"
-        tier <- stringr::str_extract(files[i], "(?<=_)(\\d+)(?=.RData)")
-        obj <- readRDS(files[i])
+      for (i in seq_along(files)) {
+        tryCatch({
+          GROUP <- "HARD CORAL"
+          tier <- stringr::str_extract(files[i], "(?<=_)(\\d+)(?=\\.RData)")
 
-        # Temporary renaming for compatibility
-        if ("data.sub" %in% names(obj)) {
-          names(obj)[names(obj) == "data.sub"] <- "data.grp.tier"
-        }
+          # Check file is readable
+          if (!file.exists(files[i])) {
+            warning(sprintf("Model file does not exist: %s", files[i]))
+            next
+          }
 
-        post_dist_df_list[[i]] <- obj$post_dist_df
-        data_tier_list[[i]] <- unique(obj$data.grp.tier$Tier5) 
+          obj <- readRDS(files[i])
+
+          # Validate object structure
+          if (!is.list(obj)) {
+            warning(sprintf("Invalid model object in file: %s", files[i]))
+            next
+          }
+
+          # Temporary renaming for compatibility
+          if ("data.sub" %in% names(obj)) {
+            names(obj)[names(obj) == "data.sub"] <- "data.grp.tier"
+          }
+
+          # Validate required components
+          if (!"post_dist_df" %in% names(obj)) {
+            warning(sprintf("Missing post_dist_df in model file: %s", files[i]))
+            next
+          }
+
+          if (!"data.grp.tier" %in% names(obj)) {
+            warning(sprintf("Missing data.grp.tier in model file: %s", files[i]))
+            next
+          }
+
+          post_dist_df_list[[i]] <- obj$post_dist_df
+          data_tier_list[[i]] <- unique(obj$data.grp.tier$Tier5)
+
+        }, error = function(e) {
+          warning(sprintf("Error reading model file %s: %s", files[i], e$message))
+        })
+      }
+
+      # Remove NULL elements
+      post_dist_df_list <- Filter(Negate(is.null), post_dist_df_list)
+      data_tier_list <- Filter(Negate(is.null), data_tier_list)
+
+      if (length(post_dist_df_list) == 0) {
+        msg <- "No valid model outputs could be loaded"
+        status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
+        stop(msg)
       }
 
       # Add tier type variable
@@ -76,6 +118,13 @@ scale_up_pred <- function(whichModel) {
       # Keep only valid elements
       post_dist_df_list <- post_dist_df_list |> purrr::keep(~ "model_name" %in% names(.x))
 
+      # Check if filtering removed all elements
+      if (length(post_dist_df_list) == 0) {
+        msg <- "No valid model outputs found (all missing 'model_name' column)"
+        status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
+        stop(msg)
+      }
+
       # Format data types and structure
       post_dist_df_list <- map(post_dist_df_list, ~ .x |>
         dplyr::mutate(
@@ -92,17 +141,31 @@ scale_up_pred <- function(whichModel) {
     
     load(file.path(DATA_PATH, "primary", "tiers.lookup.RData"), envir = .GlobalEnv)
 
+      # Validate tiers.lookup has required columns
+      if (!all(c("Tier5", "reef_area") %in% names(tiers.lookup))) {
+        msg <- "tiers.lookup missing required columns (Tier5, reef_area)"
+        status:::status_log("ERROR", log_file = log_file, "--Model predictions--", msg = msg)
+        stop(msg)
+      }
+
       # Bind and weight all tiers
       post_dist_df_all <- dplyr::bind_rows(post_dist_df_list) %>%
-        dplyr::left_join(tiers.lookup) %>%
+        dplyr::left_join(tiers.lookup, by = "Tier5") %>%
         dplyr::mutate(
           reef_area = reef_area / 1000000,
           weighted_pred = pred * reef_area
         )
-    
+
+      # Check for join failures
+      if (anyNA(post_dist_df_all$reef_area)) {
+        n_missing <- sum(is.na(post_dist_df_all$reef_area))
+        msg <- sprintf("%d rows failed to join with tiers.lookup (missing reef_area)", n_missing)
+        status:::status_log("WARNING", log_file = log_file, "--Model predictions--", msg = msg)
+      }
+
       # Bind all Tier5 rows
       post_dist_df_tier5 <- dplyr::bind_rows(post_dist_df_list) %>%
-        dplyr::left_join(tiers.lookup)
+        dplyr::left_join(tiers.lookup, by = "Tier5")
 
       rm(post_dist_df_list)
 
@@ -166,7 +229,7 @@ scale_up_pred <- function(whichModel) {
             ) %>%
             dplyr::left_join(sum_area, by = tier_col) %>%
             dplyr::mutate(
-              cover_prop = cover / sum_area
+              cover_prop = if_else(is.na(sum_area) | sum_area == 0, NA_real_, cover / sum_area)
             ) %>%
             dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
 
@@ -196,7 +259,7 @@ scale_up_pred <- function(whichModel) {
             ) %>%
             dplyr::left_join(sum_area, by = tier_col) %>%
             dplyr::mutate(
-              cover_prop = cover / sum_area
+              cover_prop = if_else(is.na(sum_area) | sum_area == 0, NA_real_, cover / sum_area)
             ) %>%
             dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
 
@@ -278,7 +341,7 @@ scale_up_pred <- function(whichModel) {
             ) %>%
             dplyr::left_join(sum_area, by = tier_col) %>%
             dplyr::mutate(
-              cover_prop = cover / sum_area
+              cover_prop = if_else(is.na(sum_area) | sum_area == 0, NA_real_, cover / sum_area)
             ) %>%
             dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
 
@@ -309,7 +372,7 @@ scale_up_pred <- function(whichModel) {
             ) %>%
             dplyr::left_join(sum_area, by = tier_col) %>%
             dplyr::mutate(
-              cover_prop = cover / sum_area
+              cover_prop = if_else(is.na(sum_area) | sum_area == 0, NA_real_, cover / sum_area)
             ) %>%
             dplyr::select(fYEAR, !!sym(tier_col), draw, model_name, cover_prop)
 
@@ -337,15 +400,17 @@ scale_up_pred <- function(whichModel) {
 
     # ---- CASE 2: Other model types not implemented ----
     } else {
-      msg <- paste("Code not updated for the model type", whichModel)
+      msg <- paste("Code not updated for the model type", whichModel_input)
       status:::status_log("ERROR", log_file = log_file, "--Model outputs--", msg = msg)
       stop("Code not updated")
     }
 
+    invisible(NULL)
   },
   stage_ = 4,
   order_ = 16,
   name_ = "Scaling-up model predictions and export",
   item_ = "model_prediction"
   )
+  return(result)
 }

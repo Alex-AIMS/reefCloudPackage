@@ -12,8 +12,12 @@
 #' @author Julie Vercelloni
 #' @export
 load_predictive_layers <- function(i , N) {
-   status::status_try_catch(
+   result <- status::status_try_catch(
    {
+  # Capture parameters to avoid scope issues
+  i_input <- i
+  N_input <- N
+
   files <- list.files(path = paste0(DATA_PATH, "processed"),
                       pattern = "covariates_full_tier5.RData", full.names = TRUE)
 
@@ -25,17 +29,21 @@ load_predictive_layers <- function(i , N) {
 
    # Update status
     old_item_name <- get_status_name(4, "load_predictive_layers")
-     if (!stringr::str_detect(old_item_name, "\\[")) {
-        new_item_name = paste(old_item_name,"[",i," / ", N,"]")
-     } else{
-        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i," / ", N,"]"))
+     if (!is.na(old_item_name) && !stringr::str_detect(old_item_name, "\\[")) {
+        new_item_name = paste(old_item_name,"[",i_input," / ", N_input,"]")
+     } else if (!is.na(old_item_name)) {
+        new_item_name <- stringr::str_replace(old_item_name, "\\[([^\\]]*)\\]", paste("[",i_input," / ", N_input,"]"))
+     } else {
+        new_item_name <- paste("Load predictive layers [",i_input," / ", N_input,"]")
      }
      status:::update_status_name(stage = 4, item = "load_predictive_layers", name = new_item_name)
+
+   full_cov_raw
    },
    stage_ = 4,
    order_ = 5,
    name_ = "Load predictive layers",
    item_ = "load_predictive_layers"
    )
-  return(full_cov_raw)
+  return(result)
 }

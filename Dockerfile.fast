@@ -1,0 +1,27 @@
+## ReefCloud Fast Build - Uses pre-built base image
+## Build base image first (only needed once or when dependencies change):
+##   docker build -f Dockerfile.base -t reefcloud:base .
+##
+## Then build this fast image (rebuild whenever R code changes):
+##   docker build -f Dockerfile.fast -t reefcloud:latest .
+
+FROM reefcloud:base
+
+## Set memory and environment optimizations for R (inherit from base but ensure they're set)
+ENV R_MAX_VSIZE=64Gb
+ENV R_GC_MEM_GROW=3
+
+## Copy local package with all fixes
+COPY . /tmp/reefCloudPackage
+
+## Install reefCloudPackage and update status package
+RUN R -e "options(repos = \
+  list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
+  remotes::install_local('/tmp/reefCloudPackage', force = TRUE, dependencies = FALSE);   \
+  remotes::install_github('open-AIMS/status', force = TRUE); \
+"
+
+## Copy run_analysis.R script to working directory
+COPY run_analysis.R /home/project/run_analysis.R
+
+WORKDIR /home/project

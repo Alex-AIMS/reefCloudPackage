@@ -3,3 +3,9 @@
 ^codecov\.yml$
 ^README\.Rmd$
 ^\.github$
+^data$
+^docker_build.*\.log$
+^analysis.*\.log$
+^monitor.*\.sh$
+^.*\.md$
+^Dockerfile$

@@ -12,7 +12,12 @@
 prepare_covariates <- function() {
   status::status_try_catch(
   {
-    files <- list.files(path = paste0(DATA_PATH, "primary"),
+    # CAPTURE GLOBAL VARIABLES AT THE START
+    DATA_PATH_input <- DATA_PATH
+    RDATA_FILE_input <- RDATA_FILE
+    BY_TIER_input <- BY_TIER
+
+    files <- list.files(path = paste0(DATA_PATH_input, "primary"),
       pattern = "covariate.*.RData$",
       full.names = TRUE)
     files <- gsub("//", "/", files)
@@ -22,8 +27,8 @@ prepare_covariates <- function() {
       names(cov_list) <- gsub('.*covariate_(.*).RData', '\\1', files)
 
       # OPTIMIZATION: Load data once before loop (instead of inside loop)
-      load(file=paste0(DATA_PATH, "processed/", RDATA_FILE))
-      load(paste0(DATA_PATH, 'primary/tier', BY_TIER, '.sf.RData'))
+      load(file=paste0(DATA_PATH_input, "processed/", RDATA_FILE_input))
+      load(paste0(DATA_PATH_input, 'primary/tier', BY_TIER_input, '.sf.RData'))
 
       # OPTIMIZATION: Pre-compute year range and full lookup grid once
       year_range <- data %>% dplyr::pull(REPORT_YEAR) %>% range()
@@ -46,10 +51,12 @@ prepare_covariates <- function() {
       full_cov <- purrr::reduce(cov_list, function(x, y) {
         dplyr::full_join(x, y, by = c("Tier5", "year"))
        })
-      save(full_cov, file=paste0(DATA_PATH, "processed/", "covariates_full_tier5.RData"))
-      assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))
-      save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE))
-      rm(full_cov, full_cov_lookup, year_range, data)
+      save(full_cov, file=paste0(DATA_PATH_input, "processed/", "covariates_full_tier5.RData"))
+      assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE_input, "_", "_with_covariates"))
+      save(data, file=paste0(DATA_PATH_input, "processed/", RDATA_COV_FILE))
+      # Assign data to global environment for Stage 4
+      assign("data", data, envir = .GlobalEnv)
+      rm(full_cov, full_cov_lookup, year_range)
     }
   },
   stage_ = 3,

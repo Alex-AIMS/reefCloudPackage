@@ -9,13 +9,18 @@
 #' @author Murray Logan
 #' @export
 validate_benthic_data <- function(data, rules) {
-  status::status_try_catch(
+  result <- status::status_try_catch(
   {
-    reefCloudPackage::validate_data(data, rules)
+    # CAPTURE ALL PARAMETERS AT THE START
+    data_input <- data
+    rules_input <- rules
+
+    reefCloudPackage::validate_data(data_input, rules_input)
   },
   stage_ = 2,
   order_ = 4,
   name_ = "Validate benthic data",
   item_ = "validate_benthic_data"
   )
+  return(result)
 }

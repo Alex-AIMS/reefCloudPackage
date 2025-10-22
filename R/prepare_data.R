@@ -10,9 +10,12 @@
 #' @author Murray Logan
 #' @export
 prepare_data <- function(data) {
-  status::status_try_catch(
+  result <- status::status_try_catch(
   {
-    data %>%
+    # Explicitly capture data parameter to avoid scope issues with status::status_try_catch
+    data_input <- data
+
+    data_processed <- data_input %>%
       dplyr::mutate(
         P_CODE = factor(P_CODE),
         ID = factor(ID),
@@ -40,12 +43,14 @@ prepare_data <- function(data) {
         TOTAL = ifelse(!is.na(COVER), NA, TOTAL),
         PERC_COVER = ifelse(!is.na(COVER), NA, PERC_COVER)) %>%
       suppressMessages() %>%
-      suppressWarnings() ->  
-      data
+      suppressWarnings()
+
+    # Assign to global environment for use in Stage 4
+    data <- data_processed  # Create local 'data' variable for save()
+    assign("data", data_processed, envir = .GlobalEnv)
     save(data, file=paste0(DATA_PATH, "processed/", RDATA_FILE))
-    write_csv(data %>% dplyr::select(-fYEAR),
+    write_csv(data_processed %>% dplyr::select(-fYEAR),
       file = paste0(AWS_OUTPUT_PATH, gsub('.csv','_tier.csv', CSV_FILE)))
-    rm(data)
     if (!DEBUG_MODE) cli_alert_success("Benthic data successfully processed")
     if (GENERATE_REPORT) {
       ANALYSIS_STAGE <<- c(ANALYSIS_STAGE,
@@ -53,11 +58,13 @@ prepare_data <- function(data) {
         unique()
       save(ANALYSIS_STAGE, file=paste0(DATA_PATH, "analysis_stage.RData"))
     }
+
+    data_processed  # Return the processed data from try_catch block
   },
   stage_ = 3,
   order_ = 4,
   name_ = "Prepare data",
   item_ = "prepare_data"
   )
-#  return(data)
+  return(result)
 }

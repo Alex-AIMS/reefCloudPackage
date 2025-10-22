@@ -26,9 +26,10 @@ get_sum_area <- function(post_dist_df_all, tier_col, group = NULL) {
       dplyr::summarise(sum_area = sum(reef_area), .groups = "drop")
   } else {
     sum_df <- post_dist_df_all |>
-      dplyr::filter(tier_type == group) |> 
+      dplyr::filter(tier_type == group) |>
       dplyr::group_by(Tier5) |>
       dplyr::slice_head(n = 1) |>
+      dplyr::ungroup() |>
       dplyr::group_by(!!sym(tier_col)) |>
       dplyr::summarise(sum_area = sum(reef_area), .groups = "drop")
   }
