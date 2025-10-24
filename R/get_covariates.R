@@ -15,16 +15,26 @@ get_covariates <- function() {
   # get the geoserver info
   reefCloudPackage::get_geoserver_info()
   
-  cov_dhw <-  reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "reefcloud:degrees_heating_weeks_tier", rc_client)   
+  cov_dhw <-  reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "reefcloud:degrees_heating_weeks_tier", rc_client)
   if (exists("cov_dhw") & !is.null(cov_dhw)) {
     cov_dhw <- sf::st_simplify(cov_dhw, dTolerance = 0.001) |>
       suppressMessages() |>
-      suppressWarnings() 
+      suppressWarnings()
+    # Ensure both have the same CRS before intersection
+    # If cov_dhw has no CRS, assign EPSG:4326 (WFS default)
+    if (is.na(sf::st_crs(cov_dhw))) {
+      cov_dhw <- sf::st_set_crs(cov_dhw, 4326)
+    }
+    cov_dhw <- sf::st_transform(cov_dhw, sf::st_crs(tier.sf))
     cov_dhw <- sf::st_make_valid(tier.sf) %>% sf::st_intersection(st_make_valid(cov_dhw)) |>
       suppressMessages() |>
       suppressWarnings()
+
+    # Determine which Tier column to use based on BY_TIER
+    tier_col <- paste0("Tier", BY_TIER)
+
     cov_dhw <- cov_dhw %>%
-      dplyr::mutate(Tier5 = as.factor(Tier5)) %>%
+      dplyr::mutate(Tier5 = as.factor(!!sym(tier_col))) %>%
       sf::st_drop_geometry() %>%
       dplyr::group_by(Tier5, year) %>%
       dplyr::summarise(
@@ -42,17 +52,26 @@ get_covariates <- function() {
   # get the geoserver info
   reefCloudPackage::get_geoserver_info()
 
-  cov_cyc <-  reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "reefcloud:storm4m_exposure_year_tier", rc_client)   
+  cov_cyc <-  reefCloudPackage::get_geoserver_data(Tier = as.numeric(BY_TIER) - 1, cov_name = "reefcloud:storm4m_exposure_year_tier", rc_client)
   if (exists("cov_cyc") & !is.null(cov_cyc)) {
     cov_cyc <- sf::st_simplify(cov_cyc, dTolerance = 0.001) |>
       suppressMessages() |>
       suppressWarnings()
-    st_crs(cov_cyc) <- st_crs(tier.sf)
+    # Ensure both have the same CRS before intersection
+    # If cov_cyc has no CRS, assign EPSG:4326 (WFS default)
+    if (is.na(sf::st_crs(cov_cyc))) {
+      cov_cyc <- sf::st_set_crs(cov_cyc, 4326)
+    }
+    cov_cyc <- sf::st_transform(cov_cyc, sf::st_crs(tier.sf))
     cov_cyc <- sf::st_make_valid(tier.sf) %>% sf::st_intersection(st_make_valid(cov_cyc)) |>
       suppressMessages() |>
       suppressWarnings()
+
+    # Determine which Tier column to use based on BY_TIER
+    tier_col <- paste0("Tier", BY_TIER)
+
     cov_cyc <- cov_cyc %>%
-      dplyr::mutate(Tier5 = as.factor(Tier5)) %>%
+      dplyr::mutate(Tier5 = as.factor(!!sym(tier_col))) %>%
       sf::st_drop_geometry() %>%
       dplyr::group_by(Tier5, end_year) %>%
       dplyr::summarise(
