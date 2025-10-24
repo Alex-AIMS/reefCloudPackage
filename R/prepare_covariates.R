@@ -45,7 +45,7 @@ prepare_covariates <- function() {
         dplyr::full_join(x, y, by = c("Tier5", "year"))
        })
       save(full_cov, file=paste0(DATA_PATH, "processed/", "covariates_full_tier5.RData"))
-      assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "_", "_with_covariates"))
+      assign("RDATA_COV_FILE", value = str_replace(RDATA_FILE, "\\.RData$", "_with_covariates.RData"))
       save(data, file=paste0(DATA_PATH, "processed/", RDATA_COV_FILE)) 
       rm(full_cov, full_cov_lookup, year_range, data)
     }
