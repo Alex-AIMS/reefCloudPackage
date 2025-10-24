@@ -47,6 +47,7 @@ get_covariates <- function() {
     cov_cyc <- sf::st_simplify(cov_cyc, dTolerance = 0.001) |>
       suppressMessages() |>
       suppressWarnings()
+    st_crs(cov_cyc) <- st_crs(tier.sf)
     cov_cyc <- sf::st_make_valid(tier.sf) %>% sf::st_intersection(st_make_valid(cov_cyc)) |>
       suppressMessages() |>
       suppressWarnings()
