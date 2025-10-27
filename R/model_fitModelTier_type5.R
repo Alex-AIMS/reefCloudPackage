@@ -11,8 +11,30 @@ model_fitModelTier_type5 <- function(data.grp.enough, tier.sf){
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
   data.grp <- data.grp.enough
 
+  # Validate FOCAL_TIER column exists
+  if (!FOCAL_TIER %in% names(data.grp)) {
+    stop(sprintf("Column '%s' does not exist in data. Available columns: %s",
+                 FOCAL_TIER, paste(names(data.grp), collapse=", ")))
+  }
+
+  # Validate data is not empty
+  if (nrow(data.grp) == 0) {
+    message(sprintf("No data to process for %s (data.grp.enough is empty)", FOCAL_TIER))
+    return(invisible(NULL))
+  }
+
   tiers <- unique(data.grp[[FOCAL_TIER]])
-  N <- length(unique(data.grp[[FOCAL_TIER]]))
+
+  # Remove NA tiers if any
+  tiers <- tiers[!is.na(tiers)]
+
+  # Check if there are any tiers to process
+  if (length(tiers) == 0) {
+    message(sprintf("No tiers to process for %s (all values are NA)", FOCAL_TIER))
+    return(invisible(NULL))
+  }
+
+  N <- length(tiers)
 
   #########################
   #### START LOOP BY TIER
@@ -37,8 +59,22 @@ model_fitModelTier_type5 <- function(data.grp.enough, tier.sf){
       dplyr::filter(dplyr::between(fYEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR)))
 
     ## Apply quality control thresholds
-    out_cycl <- stats::quantile(full_cov_raw$max_cyc, probs = 0.975)
-    out_dhw  <- stats::quantile(full_cov_raw$max_dhw, probs = 0.975)
+    # Validate columns exist
+    if (!all(c("max_cyc", "max_dhw") %in% names(full_cov_raw))) {
+      stop("Missing required covariate columns: max_cyc and/or max_dhw")
+    }
+
+    # Calculate quantiles with NA handling
+    out_cycl <- stats::quantile(full_cov_raw$max_cyc, probs = 0.975, na.rm = TRUE)
+    out_dhw  <- stats::quantile(full_cov_raw$max_dhw, probs = 0.975, na.rm = TRUE)
+
+    # Validate results
+    if (is.na(out_cycl) || is.na(out_dhw)) {
+      warning(sprintf("Could not calculate covariate thresholds for tier %s (all NA values)", TIER))
+      # Use conservative defaults
+      out_cycl <- Inf
+      out_dhw <- Inf
+    }
     
     HexPred_sf <- full_cov_raw |>
       dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
@@ -68,7 +104,7 @@ model_fitModelTier_type5 <- function(data.grp.enough, tier.sf){
       dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
       dplyr::ungroup()
 
-    HexPred_reefid2 <- dplyr::inner_join(HexPred_sf |> data.frame(), HexPred_reefid) |>
+    HexPred_reefid2 <- dplyr::inner_join(HexPred_sf |> data.frame(), HexPred_reefid, by = "Tier5") |>
       dplyr::group_by(Tier5, fYEAR) |>
       dplyr::filter(dplyr::row_number() == 1) |>
       dplyr::mutate(across(everything(), ~ replace(.x, is.na(.x), 0))) |>
@@ -77,13 +113,20 @@ model_fitModelTier_type5 <- function(data.grp.enough, tier.sf){
     ## Remove obs outside covariate grid
     data.grp.tier.ready <- reefCloudPackage::rm_obs_outside(data.grp.tier, HexPred_reefid2, i , N)    
 
-    ## Stop if more than 10% of observations are outside tier5 cells 
+    ## Stop if more than 10% of observations are outside tier5 cells
+    # Check for empty data before calculating percentage
+    if (nrow(data.grp.tier) == 0) {
+      msg <- paste("No observations for", FOCAL_TIER, ":", TIER)
+      status:::status_log("ERROR", log_file = log_file, "--Fitting FRK model--", msg = msg)
+      next
+    }
+
     diff_perc <- ((nrow(data.grp.tier) - nrow(data.grp.tier.ready)) / nrow(data.grp.tier)) * 100
 
-     if (diff_perc > 10) {
-       msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
-       status:::status_log("ERROR", log_file = log_file, "--Fitting FRK model--", msg = msg)
-     next
+    if (!is.na(diff_perc) && !is.nan(diff_perc) && diff_perc > 10) {
+      msg <- paste(diff_perc, "% of data locations are outside Tier5 cells for", FOCAL_TIER, ":", TIER)
+      status:::status_log("ERROR", log_file = log_file, "--Fitting FRK model--", msg = msg)
+      next
     }
 
     ## Test if more than one reef in the final data

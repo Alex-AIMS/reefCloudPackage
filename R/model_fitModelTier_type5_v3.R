@@ -37,8 +37,22 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
       dplyr::filter(dplyr::between(fYEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR)))
 
     ## Apply quality control thresholds
-    out_cycl <- stats::quantile(full_cov_raw$max_cyc, probs = 0.975)
-    out_dhw  <- stats::quantile(full_cov_raw$max_dhw, probs = 0.975)
+    # Validate columns exist
+    if (!all(c("max_cyc", "max_dhw") %in% names(full_cov_raw))) {
+      stop("Missing required covariate columns: max_cyc and/or max_dhw")
+    }
+
+    # Calculate quantiles with NA handling
+    out_cycl <- stats::quantile(full_cov_raw$max_cyc, probs = 0.975, na.rm = TRUE)
+    out_dhw  <- stats::quantile(full_cov_raw$max_dhw, probs = 0.975, na.rm = TRUE)
+
+    # Validate results
+    if (is.na(out_cycl) || is.na(out_dhw)) {
+      warning(sprintf("Could not calculate covariate thresholds for tier %s (all NA values)", TIER))
+      # Use conservative defaults
+      out_cycl <- Inf
+      out_dhw <- Inf
+    }
     
     HexPred_sf <- full_cov_raw |>
       dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
@@ -76,7 +90,7 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
       dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
       dplyr::ungroup()
 
-    HexPred_reefid2 <- dplyr::inner_join(HexPred_sf |> data.frame(), HexPred_reefid) |>
+    HexPred_reefid2 <- dplyr::inner_join(HexPred_sf |> data.frame(), HexPred_reefid, by = "Tier5") |>
       dplyr::group_by(Tier5, fYEAR) |>
       dplyr::filter(dplyr::row_number() == 1) |>
       dplyr::mutate(across(everything(), ~ replace(.x, is.na(.x), 0))) |>

@@ -33,15 +33,26 @@ filter_focaltier_not_enough <- function(data.grp, FOCAL_TIER, n.spat, n.temp , i
   i_input <- i
   N_input <- N
   # Check if required columns exist
-  required_cols <- c("LONGITUDE", "LATITUDE", "fYEAR")
+  required_cols <- c("LONGITUDE", "LATITUDE", "fYEAR", FOCAL_TIER_input)
   missing_cols <- setdiff(required_cols, names(data.grp_input))
 
   if (length(missing_cols) > 0) {
     # If columns don't exist, return empty dataset (all data has "enough" coverage)
+    warning(sprintf("Cannot filter by %s: missing columns %s",
+                    FOCAL_TIER_input, paste(missing_cols, collapse=", ")))
     data.grp_input[0, ]
   } else {
 
   original_tiers <- unique(data.grp_input[[FOCAL_TIER_input]])
+
+  # Remove NA tiers
+  original_tiers <- original_tiers[!is.na(original_tiers)]
+
+  # Check if there are any tiers
+  if (length(original_tiers) == 0) {
+    warning(sprintf("No valid tiers found in %s column", FOCAL_TIER_input))
+    return(data.grp_input[0, ])  # Return empty data frame with same structure
+  }
 
   # Step 1: Spatial Filtering
   tal_tier_spat <- data.grp_input |>

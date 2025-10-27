@@ -10,15 +10,47 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
   FOCAL_TIER <- paste0('Tier', as.numeric(BY_TIER) - 1)
   data.grp <- data.grp.not.enough
 
+  # Validate FOCAL_TIER column exists
+  if (!FOCAL_TIER %in% names(data.grp)) {
+    stop(sprintf("Column '%s' does not exist in data. Available columns: %s",
+                 FOCAL_TIER, paste(names(data.grp), collapse=", ")))
+  }
+
+  # Validate data is not empty
+  if (nrow(data.grp) == 0) {
+    message(sprintf("No data to process for %s (data.grp.not.enough is empty)", FOCAL_TIER))
+    return(invisible(NULL))
+  }
+
   tiers <- unique(data.grp[[FOCAL_TIER]])
-  N <- length(unique(data.grp[[FOCAL_TIER]]))
+
+  # Remove NA tiers if any
+  tiers <- tiers[!is.na(tiers)]
+
+  # Check if there are any tiers to process
+  if (length(tiers) == 0) {
+    message(sprintf("No tiers to process for %s (all values are NA)", FOCAL_TIER))
+    return(invisible(NULL))
+  }
+
+  N <- length(tiers)
 
   # OPTIMIZATION 1: Pre-load reef_layer.sf once (saves 10+ min per tier)
-  reef_layer_file <- list.files(
+  reef_layer_files <- list.files(
     path = paste0(DATA_PATH, "primary"),
     pattern = "reef_500_poly",
     full.names = TRUE
-  )[1]
+  )
+
+  if (length(reef_layer_files) == 0) {
+    stop("Reef layer file (reef_500_poly) not found in ", paste0(DATA_PATH, "primary"))
+  }
+
+  reef_layer_file <- reef_layer_files[1]
+  if (length(reef_layer_files) > 1) {
+    warning("Multiple reef layer files found, using: ", reef_layer_file)
+  }
+
   reef_layer.sf <- sf::read_sf(reef_layer_file)
 
   # OPTIMIZATION 2: Pre-load predictive layers once (eliminates redundant I/O)
@@ -38,7 +70,14 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
   # OPTIMIZATION 3: Parallelize tier processing (3-4x speedup with 3 cores)
   # Calculate safe number of parallel workers (each INLA model uses ~15-20GB)
   # With 64GB RAM limit, use max 3 cores
-  n_cores <- min(3, length(tiers), parallel::detectCores() - 1)
+  detected_cores <- parallel::detectCores()
+  if (is.na(detected_cores) || is.null(detected_cores)) {
+    detected_cores <- 1  # Fallback to sequential if detection fails
+    message("Unable to detect CPU cores, defaulting to sequential processing")
+  }
+
+  n_cores <- min(3, length(tiers), detected_cores - 1)
+  n_cores <- max(1, n_cores)  # Ensure at least 1 core
 
   if (n_cores > 1) {
     cli::cli_alert_info("Processing {N} tiers in parallel using {n_cores} cores")
@@ -113,7 +152,7 @@ model_fitModelTier_type6 <- function(data.grp.not.enough, tier.sf) {
       dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
       dplyr::ungroup()
 
-    HexPred_reefid2 <- dplyr::inner_join(HexPred_sf |> data.frame(), HexPred_reefid) |>
+    HexPred_reefid2 <- dplyr::inner_join(HexPred_sf |> data.frame(), HexPred_reefid, by = "Tier5") |>
       dplyr::group_by(Tier5, fYEAR) |>
       dplyr::filter(dplyr::row_number() == 1) |>
       dplyr::mutate(across(everything(), ~ replace(.x, is.na(.x), 0))) |>

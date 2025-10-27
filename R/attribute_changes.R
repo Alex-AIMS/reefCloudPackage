@@ -54,7 +54,15 @@ attribute_changes <- function() {
   start_col <- which(colnames(tiers.lookup) == FOCAL_TIER)
 
   for (i in seq_along(model_list)) {
-    if (dist_df$model_name[i] == "FRK") {
+    model_name_i <- dist_df$model_name[i]
+
+    # Skip if model_name is NA
+    if (is.na(model_name_i)) {
+      warning(sprintf("Model name is NA for index %d, skipping", i))
+      next
+    }
+
+    if (model_name_i == "FRK") {
       coef_table_list_FRK[[i]] <- FRK::coef_uncertainty(
         model_list[[i]], percentiles = c(2.5, 50, 97.5), nsim = 400, random_effects = FALSE
       ) %>%
@@ -70,7 +78,7 @@ attribute_changes <- function() {
           dplyr::select(all_of(colnames(tiers.lookup)[start_col:ncol(tiers.lookup)])) %>%
           dplyr::distinct())
 
-    } else if (dist_df$model_name[i] == "INLA") {
+    } else if (model_name_i == "INLA") {
       coef_table_list_INLA[[i]] <- model_list[[i]]$summary.fixed %>%
         tibble::rownames_to_column("term") %>%
         dplyr::select(term, `0.025quant`, mean, `0.975quant`) %>%
