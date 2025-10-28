@@ -14,6 +14,22 @@ process_contrasts <- function(cellmeans_wide, tier_col) {
     stop("No year columns found in cellmeans_wide (expected columns containing '20')")
   }
 
+  # Handle empty input - return empty tibble with expected columns
+  if (nrow(cellmeans_wide) == 0) {
+    return(tibble(
+      !!sym(tier_col) := character(0),
+      year = integer(0),
+      value = numeric(0),
+      .lower = numeric(0),
+      .upper = numeric(0),
+      model_name = character(0),
+      fold_change = numeric(0),
+      prob_up = numeric(0),
+      prob_down = numeric(0),
+      arrow = character(0)
+    ))
+  }
+
   predictions_i <- cellmeans_wide |>
     mutate(iter = seq_len(n())) |>
     pivot_longer(cols = contains("20"), names_to = "year") |>
@@ -55,12 +71,31 @@ process_contrasts <- function(cellmeans_wide, tier_col) {
     )) |>
     select(year, fold_change, prob_up, prob_down, arrow)
 
-  predictions_i |>
-    filter(!is.na(value)) |>
+  result <- predictions_i |>
+    filter(!is.na(value))
+
+  # Handle case where filtering removes all rows
+  if (nrow(result) == 0) {
+    rm(plot_data, fold_change, direction_arrow)
+    return(tibble(
+      !!sym(tier_col) := character(0),
+      year = integer(0),
+      value = numeric(0),
+      .lower = numeric(0),
+      .upper = numeric(0),
+      model_name = character(0),
+      fold_change = numeric(0),
+      prob_up = numeric(0),
+      prob_down = numeric(0),
+      arrow = character(0)
+    ))
+  }
+
+  result |>
     group_by(year, !!sym(tier_col), model_name) |>
     ggdist::median_hdci(value) |>
     select(-.width, -.interval) |>
     left_join(direction_arrow, by = "year")
-  
+
   rm(plot_data, fold_change, direction_arrow)
 }
