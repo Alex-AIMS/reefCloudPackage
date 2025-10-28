@@ -9,3 +9,18 @@ data/global_settings.RData
 data/log/
 old.R
 tests/data
+
+# Session and development files (local only)
+SESSION_SUMMARY.md
+
+# Log files
+*.log
+
+# IDE files
+.idea/
+
+# Monitoring scripts
+monitor_*.sh
+
+# Data directory
+data/
