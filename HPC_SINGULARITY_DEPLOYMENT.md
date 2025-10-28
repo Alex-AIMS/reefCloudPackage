@@ -1,7 +1,8 @@
 # Singularity Deployment on AIMS HPC (hpc-l001.aims.gov.au)
 
 **Target System**: hpc-l001.aims.gov.au
-**Data Location**: `~/julie/data`
+**Input Data Location**: `~/julie/input-data`
+**Output Data Location**: `~/julie/output-data`
 **Container Type**: Singularity (converted from Docker)
 **Analysis Runtime**: 8-12 hours
 
@@ -18,13 +19,16 @@
 ### On HPC System
 
 1. **Singularity module available** (check with `module avail singularity`)
-2. **Data prepared** in `~/julie/data/` with structure:
+2. **Data prepared** in `~/julie/input-data/` with structure:
    ```
-   ~/julie/data/
-   ├── raw/
-   │   ├── reef_data.zip
-   │   └── tiers.zip
-   └── (outputs will be created here)
+   ~/julie/
+   ├── input-data/
+   │   ├── raw/
+   │   │   ├── reef_data.zip      # Required
+   │   │   └── tiers.zip           # Required
+   │   └── (working directories will be created here)
+   └── output-data/
+       └── (CSV results will be written here)
    ```
 
 ---
@@ -82,29 +86,35 @@ singularity build reefcloud_final_fixes.sif reefcloud.def
 
 ---
 
-## Step 2: Prepare Data Directory on HPC
+## Step 2: Prepare Data Directories on HPC
 
 ```bash
 # SSH to HPC
 ssh username@hpc-l001.aims.gov.au
 
-# Create directory structure
-mkdir -p ~/julie/data/raw
-mkdir -p ~/julie/data/primary
-mkdir -p ~/julie/data/processed
-mkdir -p ~/julie/data/modelled
-mkdir -p ~/julie/data/summarised
-mkdir -p ~/julie/data/log
-mkdir -p ~/julie/data/outputs/tier
+# Create input data directory structure (if not already present)
+mkdir -p ~/julie/input-data/raw
+mkdir -p ~/julie/input-data/primary
+mkdir -p ~/julie/input-data/processed
+mkdir -p ~/julie/input-data/modelled
+mkdir -p ~/julie/input-data/summarised
+mkdir -p ~/julie/input-data/log
 
-# Verify data files are present
-ls -lh ~/julie/data/raw/
+# Create output data directory
+mkdir -p ~/julie/output-data
+
+# Verify input data files are present
+ls -lh ~/julie/input-data/raw/
 # Should see:
 # - reef_data.zip
 # - tiers.zip
 
 # Optional: Check data file sizes
-du -sh ~/julie/data/raw/*
+du -sh ~/julie/input-data/raw/*
+
+# If data files are not present, you need to upload them:
+# scp /path/to/reef_data.zip username@hpc-l001.aims.gov.au:~/julie/input-data/raw/
+# scp /path/to/tiers.zip username@hpc-l001.aims.gov.au:~/julie/input-data/raw/
 ```
 
 ---
@@ -149,7 +159,8 @@ cd $HOME/julie
 
 # Define paths
 SINGULARITY_IMAGE="$HOME/reefcloud_final_fixes.sif"
-DATA_PATH="$HOME/julie/data"
+INPUT_DATA_PATH="$HOME/julie/input-data"
+OUTPUT_DATA_PATH="$HOME/julie/output-data"
 
 # Check image exists
 if [ ! -f "$SINGULARITY_IMAGE" ]; then
@@ -157,14 +168,20 @@ if [ ! -f "$SINGULARITY_IMAGE" ]; then
     exit 1
 fi
 
-# Check data exists
-if [ ! -f "$DATA_PATH/raw/reef_data.zip" ]; then
-    echo "ERROR: reef_data.zip not found in $DATA_PATH/raw/"
+# Check input data exists
+if [ ! -f "$INPUT_DATA_PATH/raw/reef_data.zip" ]; then
+    echo "ERROR: reef_data.zip not found in $INPUT_DATA_PATH/raw/"
+    exit 1
+fi
+
+if [ ! -f "$INPUT_DATA_PATH/raw/tiers.zip" ]; then
+    echo "ERROR: tiers.zip not found in $INPUT_DATA_PATH/raw/"
     exit 1
 fi
 
 echo "Singularity image: $SINGULARITY_IMAGE"
-echo "Data path: $DATA_PATH"
+echo "Input data path: $INPUT_DATA_PATH"
+echo "Output data path: $OUTPUT_DATA_PATH"
 echo ""
 
 # Run the analysis
@@ -172,13 +189,14 @@ echo "Starting ReefCloud analysis..."
 echo "=========================================="
 
 singularity exec \
-    --bind ${DATA_PATH}:/data4 \
+    --bind ${INPUT_DATA_PATH}:/input-data \
+    --bind ${OUTPUT_DATA_PATH}:/output-data \
     --pwd /home/project \
     --cleanenv \
     ${SINGULARITY_IMAGE} \
     Rscript -e "
         args <- c(
-            '--bucket=/data4/',
+            '--bucket=/input-data/',
             '--domain=tier',
             '--by_tier=5',
             '--model_type=6',
@@ -190,6 +208,14 @@ singularity exec \
         reefCloudPackage::model_loadData()
         reefCloudPackage::model_processData()
         reefCloudPackage::model_fitModel()
+
+        # Copy CSV outputs to output-data directory
+        cat('\n\nCopying CSV outputs to /output-data...\n')
+        output_files <- list.files('/input-data/outputs/tier', pattern='\\\\.csv$', full.names=TRUE)
+        for (f in output_files) {
+            file.copy(f, '/output-data/', overwrite=TRUE)
+            cat('  Copied:', basename(f), '\n')
+        }
     "
 
 EXIT_CODE=$?
@@ -203,19 +229,21 @@ echo "=========================================="
 # Check outputs were created
 if [ $EXIT_CODE -eq 0 ]; then
     echo ""
-    echo "Output files created:"
-    ls -lh ${DATA_PATH}/outputs/tier/*.csv 2>/dev/null || echo "  No CSV outputs found"
+    echo "CSV output files in ~/julie/output-data/:"
+    ls -lh ${OUTPUT_DATA_PATH}/*.csv 2>/dev/null || echo "  No CSV outputs found"
     echo ""
-    echo "Model files created:"
-    ls -lh ${DATA_PATH}/modelled/*.RData 2>/dev/null || echo "  No model files found"
+    echo "Model files in ~/julie/input-data/modelled/:"
+    ls -lh ${INPUT_DATA_PATH}/modelled/*.RData 2>/dev/null || echo "  No model files found"
     echo ""
-    echo "Total output size:"
-    du -sh ${DATA_PATH}/outputs/ 2>/dev/null
-    du -sh ${DATA_PATH}/modelled/ 2>/dev/null
+    echo "Total sizes:"
+    echo "  CSV outputs: $(du -sh ${OUTPUT_DATA_PATH} 2>/dev/null | cut -f1)"
+    echo "  Model files: $(du -sh ${INPUT_DATA_PATH}/modelled 2>/dev/null | cut -f1)"
+    echo ""
+    echo "SUCCESS: Analysis completed. CSV outputs are in ~/julie/output-data/"
 else
     echo ""
     echo "ERROR: Analysis failed with exit code $EXIT_CODE"
-    echo "Check log file: ${DATA_PATH}/log/reef_data.log"
+    echo "Check log file: ${INPUT_DATA_PATH}/log/reef_data.log"
     exit $EXIT_CODE
 fi
 
@@ -257,7 +285,7 @@ scancel JOBID
 tail -f reefcloud_*.out
 
 # Or monitor the log file directly
-tail -f ~/julie/data/log/reef_data.log
+tail -f ~/julie/input-data/log/reef_data.log
 
 # Check resource usage
 sstat -j JOBID --format=JobID,AveCPU,MaxRSS,NTasks
@@ -280,25 +308,29 @@ sacct -j JOBID --format=JobID,JobName,Elapsed,TotalCPU,MaxRSS,State
 ### Check Outputs on HPC
 
 ```bash
-# List output CSV files
-ls -lh ~/julie/data/outputs/tier/
+# List CSV output files (main results)
+ls -lh ~/julie/output-data/
 
-# Expected files (if complete):
+# Expected CSV files (if complete):
 # - coef_table.csv
 # - output_tier2.csv through output_tier5.csv
 # - output2_data.csv through output5_data.csv
 # - info_tier2.csv through info_tier5.csv
 # - reef_data_tier.csv
 
-# Check model files
-ls -lh ~/julie/data/modelled/
+# Check model files (stored in input-data/modelled)
+ls -lh ~/julie/input-data/modelled/
 
-# Expected files:
+# Expected model files:
 # - FRK_Tier4_*.RData (5 files, ~4.6 GB total)
 # - Possibly INLA_Tier4_*.RData files
 
 # View coef_table results
-head ~/julie/data/outputs/tier/coef_table.csv
+head ~/julie/output-data/coef_table.csv
+
+# Check output sizes
+du -sh ~/julie/output-data/
+du -sh ~/julie/input-data/modelled/
 ```
 
 ### Download Results to Local Machine
@@ -307,18 +339,18 @@ head ~/julie/data/outputs/tier/coef_table.csv
 # On your local machine
 cd /mnt/c/Users/azivalje/aims-git/reefCloudPackage
 
-# Download all outputs (use rsync for efficiency)
+# Download CSV outputs (main results - small, ~10 MB)
 rsync -avz --progress \
-    username@hpc-l001.aims.gov.au:~/julie/data/outputs/ \
+    username@hpc-l001.aims.gov.au:~/julie/output-data/ \
     ./hpc_outputs/
 
 # Or use scp for specific files
-scp username@hpc-l001.aims.gov.au:~/julie/data/outputs/tier/*.csv \
+scp username@hpc-l001.aims.gov.au:~/julie/output-data/*.csv \
     ./hpc_outputs/
 
-# Download model files (large!)
+# Download model files (optional - large ~4.6 GB!)
 rsync -avz --progress \
-    username@hpc-l001.aims.gov.au:~/julie/data/modelled/ \
+    username@hpc-l001.aims.gov.au:~/julie/input-data/modelled/ \
     ./hpc_model_files/
 ```
 
@@ -336,13 +368,16 @@ srun --pty --mem=32G --cpus-per-task=8 --time=2:00:00 bash
 module load singularity
 
 # Run container interactively
-singularity shell --bind ~/julie/data:/data4 ~/reefcloud_final_fixes.sif
+singularity shell \
+    --bind ~/julie/input-data:/input-data \
+    --bind ~/julie/output-data:/output-data \
+    ~/reefcloud_final_fixes.sif
 
 # Inside container, run R
 Singularity> R
 
 # In R session:
-args <- c('--bucket=/data4/', '--domain=tier', '--by_tier=5', '--model_type=6', '--debug=true', '--runStage=1', '--refresh_data=false')
+args <- c('--bucket=/input-data/', '--domain=tier', '--by_tier=5', '--model_type=6', '--debug=true', '--runStage=1', '--refresh_data=false')
 reefCloudPackage::startMatter(args)
 # Test individual functions...
 ```
@@ -354,10 +389,11 @@ Modify `run_reefcloud.sh` to run specific stages:
 ```bash
 # Run only Stage 4 (if Stages 1-3 already completed)
 singularity exec \
-    --bind ${DATA_PATH}:/data4 \
+    --bind ${INPUT_DATA_PATH}:/input-data \
+    --bind ${OUTPUT_DATA_PATH}:/output-data \
     ${SINGULARITY_IMAGE} \
     Rscript -e "
-        args <- c('--bucket=/data4/', '--domain=tier', '--by_tier=5', '--model_type=6', '--debug=true', '--runStage=4', '--refresh_data=false')
+        args <- c('--bucket=/input-data/', '--domain=tier', '--by_tier=5', '--model_type=6', '--debug=true', '--runStage=4', '--refresh_data=false')
         reefCloudPackage::startMatter(args)
         reefCloudPackage::model_fitModel()
     "
@@ -378,15 +414,21 @@ If analyzing multiple independent regions:
 
 # Map array task ID to region
 case $SLURM_ARRAY_TASK_ID in
-    1) BUCKET="/data4/region1/" ;;
-    2) BUCKET="/data4/region2/" ;;
-    3) BUCKET="/data4/region3/" ;;
-    4) BUCKET="/data4/region4/" ;;
-    5) BUCKET="/data4/region5/" ;;
+    1) REGION="region1" ;;
+    2) REGION="region2" ;;
+    3) REGION="region3" ;;
+    4) REGION="region4" ;;
+    5) REGION="region5" ;;
 esac
 
-singularity exec --bind ~/julie/data:/data4 ~/reefcloud_final_fixes.sif \
-    Rscript -e "args <- c('--bucket=${BUCKET}', ...); ..."
+INPUT_DATA="$HOME/julie/input-data-${REGION}"
+OUTPUT_DATA="$HOME/julie/output-data-${REGION}"
+
+singularity exec \
+    --bind ${INPUT_DATA}:/input-data \
+    --bind ${OUTPUT_DATA}:/output-data \
+    ~/reefcloud_final_fixes.sif \
+    Rscript -e "args <- c('--bucket=/input-data/', ...); ..."
 ```
 
 ---
@@ -430,13 +472,24 @@ singularity build --fakeroot reefcloud_final_fixes.sif docker-archive://reefclou
 
 **Symptoms**: Error "reef_data.zip not found"
 
-**Solution**: Check bind mount is correct:
+**Solution**: Check bind mounts are correct:
 
 ```bash
-# Test bind mount
-singularity exec --bind ~/julie/data:/data4 reefcloud_final_fixes.sif ls -la /data4/raw/
+# Test bind mounts
+singularity exec \
+    --bind ~/julie/input-data:/input-data \
+    --bind ~/julie/output-data:/output-data \
+    reefcloud_final_fixes.sif \
+    ls -la /input-data/raw/
 
-# Should see reef_data.zip
+# Should see reef_data.zip and tiers.zip
+
+# Also verify output directory is writable
+singularity exec \
+    --bind ~/julie/input-data:/input-data \
+    --bind ~/julie/output-data:/output-data \
+    reefcloud_final_fixes.sif \
+    touch /output-data/test.txt && echo "Output directory is writable"
 ```
 
 ### Issue: R package not found
@@ -481,19 +534,19 @@ singularity exec reefcloud_final_fixes.sif R -e "library(FRK); library(INLA)"
 ### Successful Completion Indicators
 
 1. **Exit code 0** in SLURM output
-2. **13 CSV files** in `~/julie/data/outputs/tier/`:
-   - 8 prediction files
-   - 4 info files
+2. **13 CSV files** in `~/julie/output-data/`:
+   - 8 prediction files (output_tier*.csv, output*_data.csv)
+   - 4 info files (info_tier*.csv)
    - 1 coef_table.csv
-3. **5 model files** in `~/julie/data/modelled/`:
+3. **5 model files** in `~/julie/input-data/modelled/`:
    - FRK_Tier4_*.RData files (~4.6 GB total)
-4. **No errors** in `~/julie/data/log/reef_data.log`
+4. **No errors** in `~/julie/input-data/log/reef_data.log`
 
 ### Output Sizes
 
-- **CSV outputs**: ~10 MB total
-- **Model files**: ~4-6 GB total
-- **Intermediate files**: ~500 MB (processed data)
+- **CSV outputs** (`~/julie/output-data/`): ~10 MB total
+- **Model files** (`~/julie/input-data/modelled/`): ~4-6 GB total
+- **Intermediate files** (`~/julie/input-data/processed/`): ~500 MB
 - **Total**: ~5-7 GB
 
 ---
@@ -501,8 +554,13 @@ singularity exec reefcloud_final_fixes.sif R -e "library(FRK); library(INLA)"
 ## Quick Reference Commands
 
 ```bash
-# Build Singularity image
-singularity build reefcloud.sif docker-archive://reefcloud.tar
+# On local machine - save and transfer Docker image
+docker save reefcloud:final_fixes -o reefcloud_final_fixes.tar
+scp reefcloud_final_fixes.tar username@hpc-l001.aims.gov.au:~/
+
+# On HPC - build Singularity image
+module load singularity
+singularity build reefcloud_final_fixes.sif docker-archive://reefcloud_final_fixes.tar
 
 # Submit job
 sbatch run_reefcloud.sh
@@ -519,8 +577,11 @@ scancel JOBID
 # Check job efficiency
 seff JOBID
 
-# Download results
-rsync -avz username@hpc-l001.aims.gov.au:~/julie/data/outputs/ ./outputs/
+# Download CSV results
+rsync -avz username@hpc-l001.aims.gov.au:~/julie/output-data/ ./outputs/
+
+# Download model files (optional, large)
+rsync -avz username@hpc-l001.aims.gov.au:~/julie/input-data/modelled/ ./models/
 ```
 
 ---
