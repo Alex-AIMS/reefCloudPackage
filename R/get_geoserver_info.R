@@ -51,6 +51,7 @@ get_geoserver_info <- function() {
      )
     )
     assign("rc_client", rc_client, env =  .GlobalEnv)
+    invisible(NULL)
   },
   stage_ = 2,
   order_ = 9,
