@@ -19,7 +19,8 @@ echo ""
 
 # Configuration
 WORK_DIR="${HOME}/julie"
-REPO_URL="https://github.com/open-AIMS/reefCloudPackage.git"  # Update if different
+REPO_URL="git@github.com:Alex-AIMS/reefCloudPackage.git"
+REPO_BRANCH="optimised"
 REPO_DIR="${WORK_DIR}/reefCloudPackage"
 IMAGE_NAME="reefcloud_memq_optimised_v1.sif"
 IMAGE_PATH="${WORK_DIR}/${IMAGE_NAME}"
@@ -28,6 +29,7 @@ DOCKERFILE="Dockerfile.memq"
 echo "Configuration:"
 echo "  Working directory: ${WORK_DIR}"
 echo "  Repository: ${REPO_URL}"
+echo "  Branch: ${REPO_BRANCH}"
 echo "  Image output: ${IMAGE_PATH}"
 echo ""
 
@@ -99,17 +101,24 @@ if [ -d "${REPO_DIR}/.git" ]; then
     CURRENT_BRANCH=$(git branch --show-current)
     echo "Current branch: ${CURRENT_BRANCH}"
 
+    # Switch to optimised branch if not already on it
+    if [ "${CURRENT_BRANCH}" != "${REPO_BRANCH}" ]; then
+        echo "Switching to ${REPO_BRANCH} branch..."
+        git fetch origin
+        git checkout ${REPO_BRANCH}
+    fi
+
     # Stash any local changes
     if ! git diff-index --quiet HEAD --; then
         echo "Stashing local changes..."
         git stash
     fi
 
-    # Pull latest changes
-    echo "Pulling latest changes..."
-    git pull origin ${CURRENT_BRANCH}
+    # Pull latest changes from optimised branch
+    echo "Pulling latest changes from ${REPO_BRANCH}..."
+    git pull origin ${REPO_BRANCH}
 
-    echo "✓ Repository updated"
+    echo "✓ Repository updated to ${REPO_BRANCH} branch"
 else
     echo "Cloning repository..."
 
@@ -124,29 +133,52 @@ else
     # Clone the repository
     cd "${WORK_DIR}"
 
-    # If you're working from a local copy, use rsync instead
-    echo "Note: If cloning fails, you can manually copy the code:"
-    echo "  rsync -avz /path/to/local/reefCloudPackage/ ${WORK_DIR}/reefCloudPackage/"
+    echo "Cloning from ${REPO_URL} (${REPO_BRANCH} branch)..."
+    echo ""
+    echo "Note: This uses SSH. If cloning fails:"
+    echo "  1. Ensure SSH key is configured: ssh -T git@github.com"
+    echo "  2. Or manually copy: rsync -avz ~/aims-git/reefCloudPackage/ ${WORK_DIR}/reefCloudPackage/"
     echo ""
 
-    if git clone "${REPO_URL}" "${REPO_DIR}"; then
-        echo "✓ Repository cloned"
+    if git clone -b ${REPO_BRANCH} "${REPO_URL}" "${REPO_DIR}"; then
+        echo "✓ Repository cloned (${REPO_BRANCH} branch)"
+        cd "${REPO_DIR}"
+
+        # Verify we're on the correct branch
+        CURRENT_BRANCH=$(git branch --show-current)
+        echo "✓ Current branch: ${CURRENT_BRANCH}"
     else
         echo "✗ Clone failed"
         echo ""
-        echo "Alternative: Copy code manually"
-        echo "From your local machine:"
+        echo "Possible issues:"
+        echo "  1. SSH key not configured on HPC"
+        echo "  2. Not authorized to access repository"
+        echo "  3. Network connectivity"
+        echo ""
+        echo "Test SSH access:"
+        echo "  ssh -T git@github.com"
+        echo ""
+        echo "Alternative: Copy code manually from local machine:"
         echo "  rsync -avz ~/aims-git/reefCloudPackage/ ${USER}@hpc-l001:${WORK_DIR}/reefCloudPackage/"
         echo ""
         read -p "Have you already copied the code manually? (y/n) " -n 1 -r
         echo ""
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            echo "Please copy the code and run this script again"
+            echo "Please setup SSH access or copy the code, then run this script again"
             exit 1
         fi
-    fi
 
-    cd "${REPO_DIR}"
+        cd "${REPO_DIR}"
+
+        # If manually copied, verify branch
+        if [ -d ".git" ]; then
+            CURRENT_BRANCH=$(git branch --show-current)
+            if [ "${CURRENT_BRANCH}" != "${REPO_BRANCH}" ]; then
+                echo "⚠ WARNING: Current branch is ${CURRENT_BRANCH}, not ${REPO_BRANCH}"
+                echo "The manually copied code should be from the ${REPO_BRANCH} branch"
+            fi
+        fi
+    fi
 fi
 echo ""
 
