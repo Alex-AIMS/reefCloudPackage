@@ -1,0 +1,235 @@
+Bootstrap: docker
+From: rocker/r-ver:4.4.1
+
+%help
+    ReefCloud Analysis Package - Optimized for AIMS HPC memq Partition
+
+    This container includes:
+    - R 4.4.1 with complete package stack
+    - Memory optimization utilities (memory_utils.R)
+    - INLA, spatial analysis packages
+    - cmdstan for Bayesian modeling
+    - Optimized for 256GB RAM memq partition
+
+    Usage:
+        singularity exec reefcloud_memq_optimised_v1.sif R
+        singularity exec reefcloud_memq_optimised_v1.sif Rscript script.R
+
+%labels
+    Author ReefCloud Team
+    Version memq-optimised-v1
+    Description ReefCloud analysis package optimized for AIMS HPC memq partition (256GB)
+    Memory.Optimized true
+    Memory.Target 256GB
+    Includes memory_utils.R
+
+%files
+    # Copy the entire package to temp location
+    # Note: This copies from where you run the build command
+    . /tmp/reefCloudPackage
+
+%environment
+    # Memory optimization settings for memq (256GB)
+    export R_MAX_VSIZE=240Gb
+    export R_GC_MEM_GROW=2.0
+    export R_COMPILE_PKGS=0
+    export R_DISABLE_HTTPD=1
+
+    # CRAN mirror
+    export CRAN_MIRROR='https://packagemanager.posit.co/cran/2024-09-01/'
+
+%post
+    echo "========================================"
+    echo "Building ReefCloud Container for memq"
+    echo "========================================"
+    echo "Start: $(date)"
+
+    # Set CRAN mirror for this session
+    export CRAN_MIRROR='https://packagemanager.posit.co/cran/2024-09-01/'
+
+    # Install system dependencies
+    echo ""
+    echo "Installing system dependencies..."
+    apt-get update
+    apt-get install -y --no-install-recommends \
+        libudunits2-dev \
+        libssl-dev \
+        libgdal-dev \
+        libproj-dev \
+        libgeos-dev \
+        cmake \
+        libfontconfig1-dev \
+        libharfbuzz-dev \
+        libfribidi-dev \
+        glpk-utils \
+        libglpk-dev \
+        git \
+        wget \
+        curl \
+        gdebi-core \
+        libsodium-dev
+
+    rm -rf /var/lib/apt/lists/*
+
+    # Install tidyverse core packages
+    echo ""
+    echo "Installing tidyverse packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('dplyr', 'lubridate', 'ggplot2', 'readr', 'stringr', 'tidyr', 'tidyverse'));"
+
+    # Install utility packages
+    echo ""
+    echo "Installing utility packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('crayon', 'cli', 'validate', 'remotes'));"
+
+    # Project specific packages
+    echo ""
+    echo "Installing status package..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        remotes::install_github('open-AIMS/status@v0.0.3');"
+
+    # Shiny packages
+    echo ""
+    echo "Installing Shiny packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('shiny', 'shinydashboard', 'shinyWidgets', 'shinyjs', 'shinyBS', \
+            'shinyTree', 'fansi', 'DT', 'reactable', 'leaflet'));"
+
+    # Documentation packages
+    echo ""
+    echo "Installing documentation packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('markdown', 'bookdown', 'rmarkdown', 'plotly'));"
+
+    # Testing packages
+    echo ""
+    echo "Installing testing packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('testthat', 'assertthat'));"
+
+    # Install Quarto
+    echo ""
+    echo "Installing Quarto..."
+    QUARTO_VERSION="1.3.450"
+    curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb
+    gdebi --non-interactive quarto-linux-amd64.deb
+    rm quarto-linux-amd64.deb
+
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages('quarto');"
+
+    # Spatial packages
+    echo ""
+    echo "Installing spatial packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages('sf');"
+
+    # Stan and Bayesian packages
+    echo ""
+    echo "Installing Stan and Bayesian packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('rstan', 'brms', 'tidybayes')); \
+        install.packages('cmdstanr', repos = c('https://mc-stan.org/r-packages/', getOption('repos'))); \
+        remotes::install_github('stan-dev/cmdstanr'); \
+        library(cmdstanr); \
+        check_cmdstan_toolchain(); \
+        install_cmdstan(cores = 2);"
+
+    # Statistical packages
+    echo ""
+    echo "Installing statistical packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('emmeans', 'DHARMa', 'patchwork', 'future', 'purrr', \
+            'insight', 'HDInterval', 'gridGraphics'));"
+
+    # INLA dependencies
+    echo ""
+    echo "Installing INLA dependencies..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('sp', 'fmesher'));"
+
+    # Install INLA
+    echo ""
+    echo "Installing INLA..."
+    wget https://inla.r-inla-download.org/R/stable/src/contrib/INLA_24.05.10.tar.gz
+    R CMD INSTALL --clean --no-multiarch --without-keep.source --byte-compile --resave-data --compact-docs --no-demo INLA_24.05.10.tar.gz
+    rm INLA_24.05.10.tar.gz
+
+    # INLA utilities and related packages
+    echo ""
+    echo "Installing INLA utilities..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('posterior', 'bayesplot', 'DT', 'easystats', 'modelsummary', 'styler')); \
+        remotes::install_github('inbo/inlatools'); \
+        remotes::install_github('jmgirard/standist'); \
+        remotes::install_github('timcdlucas/INLAutils');"
+
+    # FRK and spatial analysis packages
+    echo ""
+    echo "Installing FRK and spatial analysis packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('Hmisc', 'spacetime', 'sparseinv', 'statmod', 'TMB', 'ggpubr')); \
+        remotes::install_github('andrewzm/FRK', ref = 'sumaggregation'); \
+        install.packages(c('rnaturalearth', 'rnaturalearthdata', 'ggnewscale', 'inlabru', \
+            'stars', 'geojsonR', 'geojsonsf', 's2'));"
+
+    # GeoServer access packages
+    echo ""
+    echo "Installing GeoServer packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('httr', 'sodium', 'keyring', 'geometa', 'ows4R'));"
+
+    # Additional packages
+    echo ""
+    echo "Installing additional packages..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        install.packages(c('validate', 'tidybayes', 'sn', 'pkgdown', 'usethis', 'Qtools'));"
+
+    # Install reefCloudPackage with all optimizations
+    echo ""
+    echo "Installing reefCloudPackage..."
+    R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+        remotes::install_local('/tmp/reefCloudPackage', force = TRUE, dependencies = FALSE); \
+        remotes::install_github('open-AIMS/status', force = TRUE);"
+
+    # Clean up
+    apt-get clean
+    rm -rf /tmp/reefCloudPackage
+
+    # Create R environment configuration for memory efficiency
+    mkdir -p /usr/local/lib/R/etc/
+    cat >> /usr/local/lib/R/etc/Rprofile.site << 'RPROFILE'
+# Memory optimization settings for memq (256GB)
+options(expressions = 50000)
+options(warn = 1)
+
+# Auto-load memory utilities
+if (requireNamespace('reefCloudPackage', quietly = TRUE)) {
+    message('reefCloudPackage loaded with memory utilities')
+}
+RPROFILE
+
+    # Document the image
+    R -e "cat('\n=== ReefCloud Image Info ===\n'); \
+        cat('R Version:', R.version.string, '\n'); \
+        cat('Memory Utils: Included\n'); \
+        cat('Optimized for: memq partition (256GB RAM)\n'); \
+        cat('Date Built:', date(), '\n');"
+
+    echo ""
+    echo "Build completed: $(date)"
+    echo "========================================"
+
+%runscript
+    exec R "$@"
+
+%test
+    # Test R installation
+    R --version
+
+    # Test reefCloudPackage
+    R -q -e "library(reefCloudPackage); cat('✓ reefCloudPackage loaded\n')"
+
+    # Test memory utilities
+    R -q -e "library(reefCloudPackage); print_memory('Test'); cat('✓ memory_utils.R working\n')"
