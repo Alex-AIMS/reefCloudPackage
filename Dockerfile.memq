@@ -1,0 +1,178 @@
+## Optimized Dockerfile for memq High-Memory Partition
+## This version includes memory_utils.R and optimizations for 256GB nodes
+FROM rocker/r-ver:4.4.1
+
+## Set memory and environment optimizations for R (optimized for memq 256GB)
+ENV R_MAX_VSIZE=240Gb
+ENV R_GC_MEM_GROW=2.0
+ENV R_COMPILE_PKGS=0
+ENV R_DISABLE_HTTPD=1
+
+## Install system dependencies
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libudunits2-dev \
+    libssl-dev \
+    libgdal-dev \
+    libproj-dev \
+    libgeos-dev \
+    cmake \
+    libfontconfig1-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    glpk-utils \
+    libglpk-dev \
+    git \
+    wget \
+    curl \
+    gdebi-core \
+    libsodium-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+## Set CRAN mirror
+ENV CRAN_MIRROR='https://packagemanager.posit.co/cran/2024-09-01/'
+
+## Install tidyverse core packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('dplyr', 'lubridate', 'ggplot2', 'readr', 'stringr', 'tidyr', 'tidyverse')); \
+"
+
+## Install utility packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('crayon', 'cli', 'validate', 'remotes')); \
+"
+
+## Project specific packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  remotes::install_github('open-AIMS/status@v0.0.3'); \
+"
+
+## Shiny packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('shiny', 'shinydashboard', 'shinyWidgets', 'shinyjs', 'shinyBS', \
+    'shinyTree', 'fansi', 'DT', 'reactable', 'leaflet')); \
+"
+
+## Documentation packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('markdown', 'bookdown', 'rmarkdown', 'plotly')); \
+"
+
+## Testing packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('testthat', 'assertthat')); \
+"
+
+## Install Quarto
+ARG QUARTO_VERSION="1.3.450"
+RUN curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb \
+  && gdebi --non-interactive quarto-linux-amd64.deb \
+  && rm quarto-linux-amd64.deb
+
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages('quarto'); \
+"
+
+## Spatial packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages('sf'); \
+"
+
+## Stan and Bayesian packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('rstan', 'brms', 'tidybayes')); \
+  install.packages('cmdstanr', repos = c('https://mc-stan.org/r-packages/', getOption('repos'))); \
+  remotes::install_github('stan-dev/cmdstanr'); \
+  library(cmdstanr); \
+  check_cmdstan_toolchain(); \
+  install_cmdstan(cores = 2); \
+"
+
+## Statistical packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('emmeans', 'DHARMa', 'patchwork', 'future', 'purrr', \
+    'insight', 'HDInterval', 'gridGraphics')); \
+"
+
+## INLA dependencies
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('sp', 'fmesher')); \
+"
+
+## Install INLA
+RUN wget https://inla.r-inla-download.org/R/stable/src/contrib/INLA_24.05.10.tar.gz \
+  && R CMD INSTALL --clean --no-multiarch --without-keep.source --byte-compile --resave-data --compact-docs --no-demo INLA_24.05.10.tar.gz \
+  && rm INLA_24.05.10.tar.gz
+
+## INLA utilities and related packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('posterior', 'bayesplot', 'DT', 'easystats', 'modelsummary', 'styler')); \
+  remotes::install_github('inbo/inlatools'); \
+  remotes::install_github('jmgirard/standist'); \
+  remotes::install_github('timcdlucas/INLAutils'); \
+"
+
+## FRK and spatial analysis packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('Hmisc', 'spacetime', 'sparseinv', 'statmod', 'TMB', 'ggpubr')); \
+  remotes::install_github('andrewzm/FRK', ref = 'sumaggregation'); \
+  install.packages(c('rnaturalearth', 'rnaturalearthdata', 'ggnewscale', 'inlabru', \
+    'stars', 'geojsonR', 'geojsonsf', 's2')); \
+"
+
+## GeoServer access packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('httr', 'sodium', 'keyring', 'geometa', 'ows4R')); \
+"
+
+## Additional packages
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  install.packages(c('validate', 'tidybayes', 'sn', 'pkgdown', 'usethis', 'Qtools')); \
+"
+
+## Copy local package (includes memory_utils.R and all fixes)
+COPY . /tmp/reefCloudPackage
+
+## Install reefCloudPackage with all optimizations
+RUN R -e "options(repos = list(CRAN = Sys.getenv('CRAN_MIRROR'))); \
+  remotes::install_local('/tmp/reefCloudPackage', force = TRUE, dependencies = FALSE); \
+  remotes::install_github('open-AIMS/status', force = TRUE); \
+"
+
+## Clean up
+RUN apt-get clean && rm -rf /tmp/reefCloudPackage
+
+## Create R environment configuration for memory efficiency
+RUN mkdir -p /usr/local/lib/R/etc/ && \
+    echo "# Memory optimization settings for memq (256GB)" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "options(expressions = 50000)" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "options(warn = 1)" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "# Auto-load memory utilities" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "if (requireNamespace('reefCloudPackage', quietly = TRUE)) {" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "  message('reefCloudPackage loaded with memory utilities')" >> /usr/local/lib/R/etc/Rprofile.site && \
+    echo "}" >> /usr/local/lib/R/etc/Rprofile.site
+
+## Create working directory
+RUN mkdir -p /home/project
+WORKDIR /home/project
+
+## Add labels for image metadata
+LABEL maintainer="ReefCloud Team"
+LABEL version="memq-optimized"
+LABEL description="ReefCloud analysis package optimized for AIMS HPC memq partition (256GB)"
+LABEL memory.optimized="true"
+LABEL memory.target="256GB"
+LABEL includes="memory_utils.R"
+
+## Document the image contents
+RUN R -e "cat('\n=== ReefCloud Image Info ===\n'); \
+  cat('R Version:', R.version.string, '\n'); \
+  cat('Memory Utils: Included\n'); \
+  cat('Optimized for: memq partition (256GB RAM)\n'); \
+  cat('Date Built:', date(), '\n'); \
+  cat('Installed Packages:\n'); \
+  print(installed.packages()[,'Package']); \
+" > /home/project/image_info.txt
+
+## Default command
+CMD ["R"]
