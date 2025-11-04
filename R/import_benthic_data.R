@@ -9,10 +9,11 @@
 import_benthic_data <- function() {
   status::status_try_catch(
   {
-    ## Read data into a R
-    data <- read_csv(paste0(DATA_PATH, "primary/", CSV_FILE),
+    ## Read data using vroom for better performance (Suggestion 39)
+    data <- vroom::vroom(paste0(DATA_PATH, "primary/", CSV_FILE),
       col_types = "cdcddccdcdTcdcc",
-      trim_ws = TRUE) %>%
+      trim_ws = TRUE,
+      show_col_types = FALSE) %>%
       mutate(SITE_DEPTH = as.character(SITE_DEPTH))
   },
   stage_ = 2,

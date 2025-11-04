@@ -14,23 +14,24 @@ retrieve_benthic_data <- function() {
     if (DATA_FROM == "S3") {
       reefCloudPackage::load_aws(file = CSV_FILE, level = "primary/")
     }
+    # Use safe_copy instead of system() for all data sources (Suggestion 60)
     if (DATA_FROM == "LOCAL") {
-      system(paste0(
-        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-        DATA_PATH, "primary/", FILENAME, ".zip"
-      ))
+      reefCloudPackage::safe_copy(
+        from = paste0(AWS_PATH, "raw/", FILENAME, ".zip"),
+        to = paste0(DATA_PATH, "primary/", FILENAME, ".zip")
+      )
     }
     if (DATA_FROM == "SYNTHETIC") {
-      system(paste0(
-        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-        DATA_PATH, "primary/", FILENAME, ".zip"
-      ))
+      reefCloudPackage::safe_copy(
+        from = paste0(AWS_PATH, "raw/", FILENAME, ".zip"),
+        to = paste0(DATA_PATH, "primary/", FILENAME, ".zip")
+      )
     }
     if (DATA_FROM == "User defined") {
-      system(paste0(
-        "cp ", AWS_PATH, "raw/", FILENAME, ".zip", " ",
-        DATA_PATH, "primary/", FILENAME, ".zip"
-      ))
+      reefCloudPackage::safe_copy(
+        from = paste0(AWS_PATH, "raw/", FILENAME, ".zip"),
+        to = paste0(DATA_PATH, "primary/", FILENAME, ".zip")
+      )
     }
   },
   stage_ = 2,

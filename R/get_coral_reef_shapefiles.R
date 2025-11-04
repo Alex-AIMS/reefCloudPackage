@@ -10,13 +10,16 @@ get_coral_reef_shape_files <- function() {
   status::status_try_catch(
   {
       ## Retrieve a more local version of the data
-      zip_path <- system.file("extdata", package = "reefCloudPackage") |>
+      zip_path <- system.file("extdata", package = "reefCloudPackage") %>%
         list.files(full.names = TRUE)
       if (!DEBUG_MODE) cli_h1("Loading coral reefs of the world shapefile")
-      system(paste0(
-        "unzip -o -j ", zip_path, " -d ",
-        DATA_PATH, "primary/"
-      ), ignore.stdout = TRUE)
+      # Use safe_unzip instead of system() (Suggestion 60)
+      reefCloudPackage::safe_unzip(
+        zipfile = zip_path,
+        exdir = paste0(DATA_PATH, "primary/"),
+        overwrite = TRUE,
+        junkpaths = TRUE
+      )
 
       reef_layer.sf <- sf::read_sf(paste0(
         DATA_PATH,

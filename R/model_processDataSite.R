@@ -25,7 +25,7 @@ model_processDataSite <- function(){
   ###################################################################################
 
 
-  data <- prepare_data(data) |>
+  data <- prepare_data(data) %>%
     mutate(SITE = REEF)
 
 

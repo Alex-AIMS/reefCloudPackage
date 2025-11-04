@@ -8,8 +8,8 @@ model_fitModelTier_type4 <- function(data.grp){
 
   ## reefCloudPackage::ReefCloud_tryCatch({
 
-    tiers.lookup <<- get(load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData')))
-    tier5.sf <- get(load(file=paste0(DATA_PATH,'primary/tier5.sf.RData')))
+    tiers.lookup <<- reefCloudPackage::get_tiers_lookup()
+    tier5.sf <- reefCloudPackage::get_tier_data(5)
 
     ## reefCloudPackage::ReefCloud_tryCatch({
       TIERS <- NULL

@@ -17,7 +17,7 @@ get_tiers <- function() {
         tier.sf <- geojson_sf(paste0(AWS_PATH, "raw/tier-",t,".json")) %>%
           suppressMessages() %>%
           suppressWarnings()
-        if (nrow(tier.sf)==0) {
+        if (is.null(tier.sf) || nrow(tier.sf)==0) {
           next
         } else {
           if (t!=5) tier.sf <- tier.sf %>% dplyr::select(-reef_area)

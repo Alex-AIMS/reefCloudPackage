@@ -7,7 +7,8 @@
 logBox <- function(box.width, box.margins) {
     if (exists("LOG_FILE")) {
         if (file.exists(LOG_FILE)) {
-            log <- system(paste0("tail -n 5 ", LOG_FILE), intern = TRUE)
+            # Use safe_tail instead of system() (Suggestion 60)
+            log <- reefCloudPackage::safe_tail(LOG_FILE, n = 5)
             pos <- max(stringr::str_locate(log, "\\|[^| ]*:\ ")[,"end"])
             log <- cli::ansi_strwrap(log,width = 80, exdent = pos)
         } else {

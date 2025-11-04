@@ -23,7 +23,6 @@ config <- function(){
   {
     if (!dir.exists(paste0(DATA_PATH, '/primary'))) dir.create(paste0(DATA_PATH, '/primary'))
     if (!dir.exists(paste0(DATA_PATH, '/processed'))) dir.create(paste0(DATA_PATH, '/processed'))
-    if (!dir.exists(paste0(DATA_PATH, '/processed'))) dir.create(paste0(DATA_PATH, '/processed'))
     if (!dir.exists(paste0(DATA_PATH, '/modelled'))) dir.create(paste0(DATA_PATH, '/modelled'))
     if (!dir.exists(paste0(DATA_PATH, '/summarised'))) dir.create(paste0(DATA_PATH, '/summarised'))
 

@@ -8,7 +8,7 @@
 #' @export
 meshINLA_tier3 <- function(cellmeans.full) {
   tier3.sf <- get(load(paste0(DATA_PATH,'primary/tier3.sf.RData')))
-  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  tiers.lookup <- reefCloudPackage::get_tiers_lookup()
 
   cellmeans.full.tier3 <- cellmeans.full %>%
     left_join(tiers.lookup %>%

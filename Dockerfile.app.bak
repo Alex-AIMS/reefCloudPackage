@@ -1,0 +1,38 @@
+## ReefCloud Application Image
+## Uses pre-built base image with all dependencies
+## Build: docker build -f Dockerfile.app -t reefcloud:latest .
+##
+## This builds in ~2-5 minutes vs 60-90 minutes for full build
+
+## Use pre-built base image
+## Option 1: From Docker Hub (after pushing base image)
+# FROM yourusername/reefcloud-base:latest
+
+## Option 2: From GitHub Container Registry
+# FROM ghcr.io/reefcloud/reefcloud-base:latest
+
+## Option 3: Local base image (default - for testing before pushing)
+FROM reefcloud-base:latest
+
+LABEL maintainer="ReefCloud Team"
+LABEL description="ReefCloud application with reefCloudPackage"
+
+## Install/update only the reefCloudPackage and status package
+## This is the only step that changes frequently
+RUN R -e "remotes::install_github('ReefCloud/reefCloudPackage', ref = 'main'); \
+  remotes::install_github('open-AIMS/status', force = TRUE); \
+"
+
+## Copy application code for running 00_main.R
+COPY 00_main.R /home/project/
+COPY R/ /home/project/R/
+
+WORKDIR /home/project
+
+## Verification
+RUN R -e "cat('Application image build complete.\n'); \
+  cat('reefCloudPackage installed:', 'reefCloudPackage' %in% installed.packages()[,1], '\n'); \
+"
+
+## Default command (can be overridden)
+# CMD ["R"]

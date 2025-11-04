@@ -10,11 +10,21 @@ get_legacy_data <- function() {
   status::status_try_catch(
   {
     LEGACY_DATA <<- TRUE
-    if (DATA_FROM == "LOCAL")
-      system(paste0("cp ", AWS_PATH, "raw/", LEGACY_FILENAME, ".zip", " ",
-        DATA_PATH, "primary/", LEGACY_FILENAME, ".zip"))
-    if (INPUT_FORMAT == "zip")
-      system(paste0('unzip -o -j ', DATA_PATH, 'primary/', LEGACY_FILENAME, '.zip -d ', DATA_PATH, 'primary/'))
+    # Use safe_copy and safe_unzip instead of system() (Suggestion 60)
+    if (DATA_FROM == "LOCAL") {
+      reefCloudPackage::safe_copy(
+        from = paste0(AWS_PATH, "raw/", LEGACY_FILENAME, ".zip"),
+        to = paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".zip")
+      )
+    }
+    if (INPUT_FORMAT == "zip") {
+      reefCloudPackage::safe_unzip(
+        zipfile = paste0(DATA_PATH, 'primary/', LEGACY_FILENAME, '.zip'),
+        exdir = paste0(DATA_PATH, 'primary/'),
+        overwrite = TRUE,
+        junkpaths = TRUE
+      )
+    }
     legacy_data <- read_csv(paste0(DATA_PATH, "primary/", LEGACY_FILENAME, ".csv"),
       ## col_types = "cdccccdddddcdTcdccc",
       ## col_types = "cdcddccccdccdccd",

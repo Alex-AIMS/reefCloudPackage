@@ -30,7 +30,7 @@
 rm_obs_outside <- function(data.grp.tier, HexPred_reefid2, i , N) {
    status::status_try_catch(
      {
-  data.grp.tier.sf <- data.grp.tier |>
+  data.grp.tier.sf <- data.grp.tier %>%
     sf::st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
 
   within_check <- sf::st_within(data.grp.tier.sf, HexPred_reefid2)

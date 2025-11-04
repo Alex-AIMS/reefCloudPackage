@@ -12,16 +12,16 @@
 
 lag_covariates <- function(cov, year_range, full_cov_lookup, cov_name) {
   cov %>%
-    dplyr::filter(year >= year_range[1] & year <= year_range[2]) %>% 
-    dplyr::select(-end_date) %>% 
+    dplyr::filter(year >= year_range[1] & year <= year_range[2]) %>%
+    dplyr::select(dplyr::any_of(c("Tier5", "year", paste0("severity_", cov_name), paste0("max_", cov_name)))) %>%
     dplyr::full_join(full_cov_lookup) %>%
     dplyr::arrange(Tier5, year) %>%
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  ~ replace_na(.x, replace = 0))) %>% 
+                  ~ replace_na(.x, replace = 0))) %>%
     dplyr::group_by(Tier5) %>%
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
-                  list(lag1 = ~ lag(.x) ))) %>% 
+                  list(lag1 = ~ lag(.x) ))) %>%
     dplyr::mutate(across(paste0(c("severity_", "max_"), cov_name),
                   list(lag2 = ~ lag(.x, n = 2) ))) %>%
-    dplyr::ungroup() 
+    dplyr::ungroup()
 }

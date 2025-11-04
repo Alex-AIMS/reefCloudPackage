@@ -21,35 +21,35 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
     TIER <<- as.character(tiers[i])
 
     ## Filter to current tier
-    data.grp.tier <- data.grp |>
-      dplyr::filter(data.grp[[FOCAL_TIER]] == TIER) |>
-      dplyr::select(-COVER) |>
+    data.grp.tier <- data.grp %>%
+      dplyr::filter(data.grp[[FOCAL_TIER]] == TIER) %>%
+      dplyr::select(-COVER) %>%
       dplyr::mutate(across(Tier5, as.character))
 
     ## Join covariates
-    tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf, i, N) |> 
+    tier.sf.joined <- reefCloudPackage::join_covariates_to_tier_lookup(tier.sf, i, N) %>% 
       dplyr::filter(!!sym(FOCAL_TIER) == TIER)
 
     ## Load covariate layers
-    full_cov_raw <- reefCloudPackage::load_predictive_layers(i , N) |> 
-      dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) |>
-      dplyr::rename(fYEAR = year) |>
+    full_cov_raw <- reefCloudPackage::load_predictive_layers(i , N) %>% 
+      dplyr::filter(Tier5 %in% tier.sf.joined$Tier5) %>%
+      dplyr::rename(fYEAR = year) %>%
       dplyr::filter(between(fYEAR, min(data.grp.tier$REPORT_YEAR), max(data.grp.tier$REPORT_YEAR)))
 
     ## Apply quality control thresholds
     out_cycl <- quantile(full_cov_raw$max_cyc, probs = 0.975)
     out_dhw  <- quantile(full_cov_raw$max_dhw, probs = 0.975)
     
-    HexPred_sf <- full_cov_raw |>
-      dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) |>
-      dplyr::mutate(across(matches("^max_cyc.*"), ~ ifelse(.x >= out_cycl & As.Data == "No", NA, .x))) |>
+    HexPred_sf <- full_cov_raw %>%
+      dplyr::mutate(As.Data = ifelse(Tier5 %in% data.grp.tier$Tier5, "Yes", "No")) %>%
+      dplyr::mutate(across(matches("^max_cyc.*"), ~ ifelse(.x >= out_cycl & As.Data == "No", NA, .x))) %>%
       dplyr::mutate(across(matches("^max_dhw.*"), ~ ifelse(.x >= out_dhw & As.Data == "No", NA, .x)))
 
     ## Select covariates
     selected_covar <- reefCloudPackage::select_covariates(HexPred_sf, i , N) 
 
     ## Scale covariates
-    HexPred_sf <- HexPred_sf |>
+    HexPred_sf <- HexPred_sf %>%
       dplyr::mutate(across(
        matches("^severity.*|^max.*"),
       ~ as.numeric((. - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE))
@@ -65,16 +65,16 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
     #  status:::status_log("WARNING", log_file = log_file, "--Fitting FRK model--", msg = msg )
     #}
 
-   HexPred_reefid <- covs.hexpred_tier_sf_v2_prep |>
-    #  dplyr::filter(!is.na(reefid))  |>
-      dplyr::group_by(Tier5) |>
-      dplyr::summarise(reefid = paste0(reefid, collapse = "_")) |>
+   HexPred_reefid <- covs.hexpred_tier_sf_v2_prep %>%
+    #  dplyr::filter(!is.na(reefid))  %>%
+      dplyr::group_by(Tier5) %>%
+      dplyr::summarise(reefid = paste0(reefid, collapse = "_")) %>%
       ungroup()
 
-    HexPred_reefid2 <- inner_join(HexPred_sf |> data.frame(), HexPred_reefid) |>
-      dplyr::group_by(Tier5, fYEAR) |>
-      dplyr::filter(row_number() == 1) |>
-      dplyr::mutate(across(everything(), ~ replace(.x, is.na(.x), 0))) |>
+    HexPred_reefid2 <- inner_join(HexPred_sf %>% data.frame(), HexPred_reefid) %>%
+      dplyr::group_by(Tier5, fYEAR) %>%
+      dplyr::filter(row_number() == 1) %>%
+      dplyr::mutate(across(everything(), ~ replace(.x, is.na(.x), 0))) %>%
       sf::st_as_sf(sf_column_name = "geometry")
 
     ## Remove obs outside covariate grid
@@ -160,19 +160,19 @@ model_fitModelTier_type5_v3 <- function(data.grp.enough, tier.sf){
   #   ##############################
     pred <- FRK::predict(M, type = "mean", nsim = 1000)
 
-    post_dist_df <- as.data.frame(pred$MC$mu_samples) |>
+    post_dist_df <- as.data.frame(pred$MC$mu_samples) %>%
       dplyr::mutate(fYEAR = obj_frk$ST_BAUs@data$fYEAR,
                     Tier5 = obj_frk$ST_BAUs@data$Tier5,
-                    id_loc = row_number()) |>
-      tidyr::pivot_longer(!c(fYEAR, Tier5, id_loc), names_to = "draw", values_to = "pred") |>
+                    id_loc = row_number()) %>%
+      tidyr::pivot_longer(!c(fYEAR, Tier5, id_loc), names_to = "draw", values_to = "pred") %>%
       dplyr::mutate(model_name = "FRK")
 
     tier.sf.joined$Tier5 <- as.factor(tier.sf.joined$Tier5)
 
-    pred_sum_sf <- post_dist_df |> group_by(fYEAR, Tier5) |>
-      ggdist::median_hdci(pred) |>
-      dplyr::inner_join(tier.sf.joined |> dplyr::select(geometry, Tier5)) |>
-      sf::st_as_sf(sf_column_name = "geometry") |>
+    pred_sum_sf <- post_dist_df %>% group_by(fYEAR, Tier5) %>%
+      ggdist::median_hdci(pred) %>%
+      dplyr::inner_join(tier.sf.joined %>% dplyr::select(geometry, Tier5)) %>%
+      sf::st_as_sf(sf_column_name = "geometry") %>%
       dplyr::mutate(Unc = .upper - .lower,
                     Tier5_fYEAR = paste0(Tier5, fYEAR))
 

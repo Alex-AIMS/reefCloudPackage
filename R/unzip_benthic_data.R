@@ -10,10 +10,13 @@ unzip_benthic_data <- function() {
   status::status_try_catch(
   {
     if (INPUT_FORMAT == "zip") {
-      system(paste0(
-        "unzip -o -j ", DATA_PATH, "primary/", FILENAME,
-        ".zip -d ", DATA_PATH, "primary/"
-      ))
+      # Use safe_unzip instead of system() (Suggestion 60)
+      reefCloudPackage::safe_unzip(
+        zipfile = paste0(DATA_PATH, "primary/", FILENAME, ".zip"),
+        exdir = paste0(DATA_PATH, "primary/"),
+        overwrite = TRUE,
+        junkpaths = TRUE
+      )
       if (!DEBUG_MODE) {
         cli_alert_success("Benthic data successfully unzipped to: {.file {paste0(DATA_PATH, 'primary/')}}")
       }

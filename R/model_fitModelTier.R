@@ -13,7 +13,7 @@ model_fitModelTier <- function() {
   # ---- Define target benthic group ----
   # For now, modelling "hard corals" only
   # for (GROUP in GROUPS) {   # benthic groups
-  GROUP <- GROUPS[[2]] 
+  GROUP <<- GROUPS[[2]] 
 
     # ---- Prepare data for modelling ----
     data.grp <- reefCloudPackage::prep_group_data_for_modelling(data, GROUP) 

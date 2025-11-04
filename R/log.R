@@ -9,7 +9,8 @@
 log <- function(status, logFile, Category, msg=NULL) {
     d=dirname(logFile)
     files <- list.files(d)
-    if(!any(grepl(paste0('^',logFile,'$'),files))) system(paste0('touch "',logFile,'"'))
+    # Use file.create() instead of system('touch') (Suggestion 60)
+    if(!any(grepl(paste0('^',logFile,'$'),files))) file.create(logFile)
     now <- Sys.time()
     options(digits.secs=2)              ## switch to subsecond display
     msg = paste0(now, '|', status, ': ', Category, ' ', msg)

@@ -5,9 +5,15 @@
 #' @return NULL
 #' @export
 load_aws <- function(file, level, col_types) {
-    paste0('aws s3 ls "', AWS_PATH, ifelse(level == 'primary/', 'raw/', level),'"')
-    system(paste0('aws s3 cp "', AWS_PATH,
-                  ifelse(level == 'primary/', 'raw/', level),
-                  file, '" "', DATA_PATH, level, file, '" --profile stats'))
-                  ## file, '" "', DATA_PATH, level, file, '" --profile rc-devops'))
+    # Use safe_aws instead of system() (Suggestion 60)
+    source_level <- ifelse(level == 'primary/', 'raw/', level)
+    source_path <- paste0(AWS_PATH, source_level, file)
+    dest_path <- paste0(DATA_PATH, level, file)
+
+    result <- reefCloudPackage::safe_aws(
+      args = c("s3", "cp", source_path, dest_path),
+      profile = "stats"
+    )
+
+    return(result$status == 0)
 }

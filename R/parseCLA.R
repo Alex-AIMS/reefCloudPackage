@@ -77,7 +77,7 @@ parseCLA <- function(args) {
   }
 
   ## Ensure that a bucket is supplied
-  if (length(domain) == 0)
+  if (length(bucket) == 0)
     stop(paste0('A bucket (location/path of raw data) needs to be provided as a command line arguement, such as: Rscript <script.R> --bucket=<PATH>\n\n',
       valid_cla
     ))

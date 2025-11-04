@@ -14,8 +14,8 @@ assign_spatial_data <- function(data) {
     data.site <- data %>%
       dplyr::group_by(P_CODE, REEF, SITE_NO) %>%
       dplyr::summarise(
-        LATITUDE = mean(LATITUDE),
-        LONGITUDE = mean(LONGITUDE))
+        LATITUDE = mean(LATITUDE, na.rm = TRUE),
+        LONGITUDE = mean(LONGITUDE, na.rm = TRUE))
     sf_use_s2(FALSE)
     data.site <-
       data.site %>%

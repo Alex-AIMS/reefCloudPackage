@@ -1,0 +1,42 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Documentation (keep DESCRIPTION and NAMESPACE)
+*.md
+!DESCRIPTION
+!NAMESPACE
+
+# Logs
+*.log
+log/
+
+# Data files
+data/
+*.RData
+*.rds
+*.csv
+*.zip
+
+# Temporary files
+*~
+.DS_Store
+tmp/
+temp/
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts
+*.o
+*.so
+*.dll

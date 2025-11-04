@@ -6,7 +6,7 @@
 #' @examples examples 
 #' @export
 meshINLA_tier4 <- function(cellmeans.full) {
-  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  tiers.lookup <- reefCloudPackage::get_tiers_lookup()
   cellmeans.full.tier4 <- cellmeans.full %>%
     left_join(tiers.lookup) %>%
     group_by(Tier4, fYEAR, Rep) %>%

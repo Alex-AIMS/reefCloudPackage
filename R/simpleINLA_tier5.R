@@ -9,7 +9,7 @@ simpleINLA_tier5 <- function(data.sub, GROUP, TIER, .data, .data.fit.cm = .data.
   list2env(.data, envir = environment())
   list2env(.data.fit.cm, envir = environment())
   ## ---- simpleINLATier5Spatiotemporal
-  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  tiers.lookup <- reefCloudPackage::get_tiers_lookup()
   load(file=paste0(DATA_PATH,'modelled/simplemod_', DOMAIN_NAME, "_", GROUP, '_TIER', TIER, '.RData'))
   load(file=paste0(DATA_PATH,'modelled/simpledraws_', DOMAIN_NAME, "_", GROUP, '_TIER', TIER, '.RData'))
   ## Posterior predictions from draws - on the whole Tier 5 grid

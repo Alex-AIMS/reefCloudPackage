@@ -17,18 +17,17 @@
 #' @examples examples 
 #' @export
 mean_median_hdci <- function(.data, ...) {
-    require(tidybayes)
-    col_exprs <- quos(..., .named = TRUE)
+    col_exprs <- rlang::quos(..., .named = TRUE)
     col_expr = col_exprs[[1]]
     col_name = names(col_exprs)
-    x1 <- .data %>% 
-        mean_hdci(!!sym(col_name), na.rm=TRUE)
-    x2 <- .data %>% 
-        median_hdci(!!sym(col_name), na.rm=TRUE)
-    x1 %>% 
+    x1 <- .data %>%
+        ggdist::mean_hdci(!!rlang::sym(col_name), na.rm=TRUE)
+    x2 <- .data %>%
+        ggdist::median_hdci(!!rlang::sym(col_name), na.rm=TRUE)
+    x1 %>%
         dplyr::rename(mean = value, lower = .lower, upper = .upper) %>%
         dplyr::select(-.point, -.width, -.interval) %>%
-        bind_cols(x2 %>% 
-                  ungroup %>% 
+        dplyr::bind_cols(x2 %>%
+                  dplyr::ungroup() %>%
                   dplyr::select(median = value))
 }

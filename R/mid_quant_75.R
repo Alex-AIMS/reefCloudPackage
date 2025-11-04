@@ -19,6 +19,8 @@
 mid_quant_75 <- function(y){
   y <- as.numeric(as.character(y))
   y <- y[!is.na(y)]
+  # Return NA if all values were NA (Suggestion 21)
+  if (length(y) == 0) return(NA_real_)
   ymid <- Qtools::midquantile(y, probs = 3/4)
     return(ymid$y)
   }

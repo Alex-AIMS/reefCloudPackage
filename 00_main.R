@@ -1,10 +1,12 @@
 ## Actions
 
-remove.packages(c("reefCloudPackage", "status"))
+## NOTE: Using local package code (includes optimizations)
+## If you need to reinstall from GitHub, uncomment the lines below:
+# remove.packages(c("reefCloudPackage", "status"))
+# remotes::install_github('ReefCloud/reefCloudPackage', force = TRUE, dependencies = FALSE)
+# remotes::install_github('open-AIMS/status', force = TRUE)
 
-remotes::install_github('ReefCloud/reefCloudPackage', force = TRUE, dependencies = FALSE)
-remotes::install_github('open-AIMS/status', force = TRUE)
-library(status) 
+library(status)
 library(reefCloudPackage)
 
 reefCloudPackage::startMatter() 

@@ -7,7 +7,7 @@
 #' @examples examples 
 #' @export
 meshINLA_tier5TemporalFocal <- function(data.sub, cellmeans.full, FOCAL_TIER) {
-  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  tiers.lookup <- reefCloudPackage::get_tiers_lookup()
 
   ## Restrict this to just the observed (focal)Tier5 hexagons, otherwise the grid of plots will be huge!
   cellmeans.tier5 <- cellmeans.full %>%

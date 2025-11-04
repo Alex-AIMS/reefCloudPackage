@@ -43,8 +43,8 @@ fill_gaps <- function(data) {
         REPORT_YEAR, fYEAR, DATE) %>%
       mutate(COUNT = ifelse(is.na(COUNT), 0, COUNT),
         TOTAL = max(TOTAL, na.rm = TRUE),
-        TOTAL = ifelse(is.infinite(TOTAL) & DATA_TYPE == 'Legacy', NA, TOTAL),
-        PERC_COVER = COUNT/TOTAL,
+        TOTAL = ifelse(is.numeric(TOTAL) && is.infinite(TOTAL) & DATA_TYPE == 'Legacy', NA, TOTAL),
+        PERC_COVER = ifelse(TOTAL == 0 | is.na(TOTAL), NA_real_, COUNT/TOTAL),
         REPORT_YEAR = ifelse(is.na(REPORT_YEAR), as.numeric(as.character(fYEAR)), REPORT_YEAR),
         ## fGROUP = ifelse(!(fGROUP %in% GROUPS), "OTHER", fGROUP)) %>%     # the OTHER group is already in the data
         ) %>%
@@ -58,7 +58,7 @@ fill_gaps <- function(data) {
         REPORT_YEAR, fYEAR, DATE) %>%
       summarise(COUNT = sum(COUNT),
         TOTAL = max(TOTAL, na.rm = TRUE),
-        TOTAL = ifelse(is.infinite(TOTAL) & DATA_TYPE == 'Legacy', NA, TOTAL),
+        TOTAL = ifelse(is.numeric(TOTAL) && is.infinite(TOTAL) & DATA_TYPE == 'Legacy', NA, TOTAL),
         PERC_COVER = sum(PERC_COVER),
         COVER = mean(COVER)) %>%
       mutate(COUNT = ifelse(!is.na(COVER), NA, COUNT),                    ## for legacy data that only provides

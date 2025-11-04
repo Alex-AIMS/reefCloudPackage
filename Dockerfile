@@ -18,28 +18,13 @@ RUN apt-get update \
     git \ 
   && rm -rf /var/lib/apt/lists/*
 
-## A selection of tidyverse packages
+## Base R packages - consolidated for better caching (Fixes #1, #8)
 RUN R -e "options(repos = \
   list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
-  install.packages('dplyr'); \
-  install.packages('lubridate'); \
-  install.packages('ggplot2'); \
-  install.packages('readr'); \
-  install.packages('stringr'); \
-  install.packages('tidyr'); \
-  install.packages('tidyverse'); \
-"  
-
-RUN R -e "options(repos = \
-  list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
-  install.packages('crayon'); \
-  install.packages('cli'); \
-  install.packages('validate'); \
-"  
-
-RUN R -e "options(repos = \
-  list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
-  install.packages('remotes'); \
+  install.packages(c( \
+    'remotes', 'dplyr', 'lubridate', 'ggplot2', 'readr', \
+    'stringr', 'tidyr', 'crayon', 'cli' \
+  )); \
 "
 
 ## Project specific packages
@@ -58,7 +43,6 @@ RUN R -e "options(repos = \
   install.packages('shinyBS'); \
   install.packages('shinyTree'); \
   install.packages('fansi'); \
-  install.packages('DT'); \
   install.packages('reactable'); \
   install.packages('leaflet'); \
 "  
@@ -67,16 +51,9 @@ RUN R -e "options(repos = \
 RUN R -e "options(repos = \
   list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
   install.packages('markdown'); \
-"  
+"
 
-## Install extra packages required for tidyverse 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    libfontconfig1-dev \
-    libharfbuzz-dev \
-    libfribidi-dev \
-  && rm -rf /var/lib/apt/lists/*
-
+## Tidyverse and testing packages (Fix #2: removed duplicate system dependencies)
 RUN R -e "options(repos = \
   list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
   install.packages('tidyverse'); \
@@ -103,8 +80,9 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 ARG QUARTO_VERSION="1.3.450"
-RUN curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb
-RUN gdebi --non-interactive quarto-linux-amd64.deb
+RUN curl -o quarto-linux-amd64.deb -L https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb && \
+    gdebi --non-interactive quarto-linux-amd64.deb && \
+    rm quarto-linux-amd64.deb
 
 RUN R -e "options(repos = \
   list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
@@ -135,7 +113,6 @@ RUN R -e "options(repos = \
   install.packages('emmeans');   \
   install.packages('DHARMa');   \
   install.packages('patchwork');   \
-  install.packages('brms');   \
 "  
 
 RUN R -e "options(repos = \
@@ -222,14 +199,11 @@ RUN R -e "options(repos = \
 RUN R -e "options(repos = \
   list(CRAN = 'https://packagemanager.posit.co/cran/2024-09-01/')); \
   install.packages('validate');   \
-  install.packages('tidybayes');   \
   install.packages('sn');   \
   install.packages('pkgdown');   \
   install.packages('usethis');   \
   install.packages('Qtools'); \
-"  
-
-RUN apt-get clean
+"
 
 # USER users
 

@@ -13,6 +13,14 @@
 #' @examples examples 
 #' @export
 write_aws <- function(file, level) {
-    ## system(paste0('aws s3 cp "', DATA_PATH, level, file, '" "', AWS_PATH, level, file, '" --profile rc-devops'))
-    system(paste0('aws s3 cp "', DATA_PATH, level, file, '" "', AWS_PATH, level, file, '" --profile stats'))
+    # Use safe_aws instead of system() (Suggestion 60)
+    source_path <- paste0(DATA_PATH, level, file)
+    dest_path <- paste0(AWS_PATH, level, file)
+
+    result <- reefCloudPackage::safe_aws(
+      args = c("s3", "cp", source_path, dest_path),
+      profile = "stats"
+    )
+
+    return(result$status == 0)
 }

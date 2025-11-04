@@ -8,8 +8,8 @@ model_fitModelTier_type3 <- function(data.grp){
     if (reefCloudPackage::isParent()) reefCloudPackage::startMatter()
 
     ## reefCloudPackage::ReefCloud_tryCatch({
-      tiers.lookup <<- get(load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData')))
-      tier5.sf <- get(load(file=paste0(DATA_PATH,'primary/tier5.sf.RData')))
+      tiers.lookup <<- reefCloudPackage::get_tiers_lookup()
+      tier5.sf <- reefCloudPackage::get_tier_data(5)
 
       ## reefCloudPackage::ReefCloud_tryCatch({
         TIERS <- NULL
@@ -271,7 +271,7 @@ model_fitModelTier_type3 <- function(data.grp){
             cli::cli_progress_update(force=TRUE)
             ## ----end
             ## ---- meshINLATier5TemporalFocal
-            load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+            tiers.lookup <- reefCloudPackage::get_tiers_lookup()
             ## Restrict this to just the observed (focal)Tier5 hexagons, otherwise the grid of plots will be huge!
             cellmeans.tier5 <- cellmeans.full %>%
               right_join(data.sub %>% dplyr::select(Tier5, Tier4) %>% distinct()) %>%
@@ -289,7 +289,7 @@ model_fitModelTier_type3 <- function(data.grp){
             cli::cli_progress_update(force=TRUE)
             ## ----end
             ## ---- meshINLATier5Temporal
-            load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+            tiers.lookup <- reefCloudPackage::get_tiers_lookup()
             cellmeans.tier5 <- cellmeans.full %>%
               left_join(tiers.lookup %>% dplyr::select(Tier4, Tier5) %>% distinct()) %>%
               group_by(fYEAR, Tier4, Tier5) %>%
@@ -321,7 +321,7 @@ model_fitModelTier_type3 <- function(data.grp){
             cli::cli_progress_update(force=TRUE)
             ## ----end
             ## ---- meshINLATier4Posteriors
-            load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+            tiers.lookup <- reefCloudPackage::get_tiers_lookup()
             cellmeans.full.tier4 <- cellmeans.full %>%
               left_join(tiers.lookup) %>%
               group_by(Tier2, Tier3, Tier4, fYEAR, Rep) %>%
@@ -367,7 +367,7 @@ model_fitModelTier_type3 <- function(data.grp){
             cli::cli_progress_update(force=TRUE)
             ## ----end
             ## ---- meshINLATier3Posteriors
-            load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+            tiers.lookup <- reefCloudPackage::get_tiers_lookup()
             cellmeans.full.tier3 <- cellmeans.full.tier4 %>%
               left_join(tiers.lookup) %>%
               group_by(Tier2, Tier3, fYEAR, Rep) %>%
@@ -414,7 +414,7 @@ model_fitModelTier_type3 <- function(data.grp){
             cli::cli_progress_update(force=TRUE)
             ## ----end
             ## ---- meshINLATier2Posteriors
-            load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+            tiers.lookup <- reefCloudPackage::get_tiers_lookup()
             cellmeans.full.tier2 <- cellmeans.full.tier3 %>%
               left_join(tiers.lookup) %>%
               group_by(Tier2, fYEAR, Rep) %>%

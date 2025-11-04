@@ -3,7 +3,8 @@
 #' @examples openingBanner()
 #' @export
 openingBanner <- function() {
-    system('clear')
+    # Use ANSI escape codes instead of system('clear') (Suggestion 60)
+    cat("\033[2J\033[H")
     cat(" ")
     currentTime <- format(Sys.time(),'%d/%m/%Y %H:%M:%S')
 

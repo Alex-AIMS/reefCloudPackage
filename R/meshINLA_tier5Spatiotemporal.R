@@ -6,7 +6,7 @@
 #' @examples examples 
 #' @export
 meshINLA_tier5Spatiotemporal <- function(tier5.sf, cellmeans.full) {
-  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  tiers.lookup <- reefCloudPackage::get_tiers_lookup()
 
   cellmeans.tier5.sf <- cellmeans.full %>%
     group_by(fYEAR, Tier5) %>%

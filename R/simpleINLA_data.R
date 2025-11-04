@@ -7,7 +7,7 @@
 #' @export
 simpleINLA_data <- function(data.sub, GROUP, TIER) {
   ## ---- simpleINLAData
-  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  tiers.lookup <- reefCloudPackage::get_tiers_lookup()
   tier5.sf <- get(load(paste0(DATA_PATH,'primary/tier5.sf.RData')))
   tier4.sf <- get(load(paste0(DATA_PATH,'primary/tier4.sf.RData')))
   ## Generate the Tier5 prediction grid

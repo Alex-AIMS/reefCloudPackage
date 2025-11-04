@@ -8,7 +8,7 @@
 simpleINLA_tier2 <- function(data.sub, GROUP, .data.tier5) {
   list2env(.data.tier5, envir = environment())
   ## ---- simpleINLATier2
-  load(file=paste0(DATA_PATH,'primary/tiers.lookup.RData'))
+  tiers.lookup <- reefCloudPackage::get_tiers_lookup()
   tier2.sf <- get(load(paste0(DATA_PATH,'primary/tier2.sf.RData')))
   ## cellmeans.tier2 <- cellmeans.tier4 %>%
   cellmeans.tier2 <- cellmeans %>%      #go back to tier 5 cellmeans
